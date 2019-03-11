@@ -1,3 +1,15 @@
+# 1.9.1
+- Fix coloring of outdated miners on Dashboard
+- Autodetect for fork of CN/R(variant: "auto"), Graft(variant: "rwz"), Zelerius(variant: "zls")
+# 1.9.0
+- Integrated Monero CN-R variant so called CNv4, aka CN-R, aka CNv5, aka Cryptonight-R #233 (algo: "cryptonight", variant: "r")
+- Integrated Wownero CN-R variant #233 (algo: "cryptonight", variant: "wow")
+- Integrated Graft variant (algo: "cryptonight", variant: "rwz" OR variant: "graft")
+- Integrated X-Cash variant #234 (algo: "cryptonight", variant: "double" OR variant: "heavyx" OR variant: "xcash")
+- Integrated Zelerius variant (algo: "cryptonight", variant: "zls" OR variant: "zelerius")
+- Add miner version column to the Dashboard (version turns red when its outdated)
+- Fixed crash when remote logging is disabled
+- Added config parameter --skip-self-check to skip the algo verification check on startup to improce startup speed. Use with caution and only if you know that the algos are working fine on your machine.
 # 1.8.13
 - Integrated HOSP variant (algo: "cryptonight", variant: "hosp")
 - Added ASM code/optimization for HOSP and RTO on Intel CPUs

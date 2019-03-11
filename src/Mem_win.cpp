@@ -159,7 +159,7 @@ void Mem::allocate(ScratchPadMem& scratchPadMem, bool useHugePages)
         return;
     }
 
-    scratchPadMem.size = std::max(scratchPadMem.size, static_cast<size_t>(MEMORY));
+    scratchPadMem.size = std::max(scratchPadMem.size + scratchPadMem.size % MEMORY, static_cast<size_t>(MEMORY));
 
     scratchPadMem.memory = static_cast<uint8_t*>(VirtualAlloc(nullptr, scratchPadMem.size, MEM_COMMIT | MEM_RESERVE | MEM_LARGE_PAGES, PAGE_READWRITE));
     if (scratchPadMem.memory) {
@@ -182,4 +182,14 @@ void Mem::release(ScratchPadMem &scratchPadMem)
     else {
         _mm_free(scratchPadMem.memory);
     }
+}
+
+void *Mem::allocateExecutableMemory(size_t size)
+{
+    return VirtualAlloc(0, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+}
+
+void Mem::flushInstructionCache(void *p, size_t size)
+{
+    ::FlushInstructionCache(GetCurrentProcess(), p, size);
 }

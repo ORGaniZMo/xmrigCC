@@ -65,6 +65,9 @@
     var currentServerTime = 0;
     var clockDrift = 0;
 
+    var latestVersion = 0;
+    var currentVersion = 0;
+
     $.fn.dataTable.ext.search.push(
         function( settings, data, dataIndex ) {
 
@@ -108,6 +111,7 @@
                     orderable: false
                 },
                 {data: "client_status.client_id", render: clientInfo},
+                {data: "client_status.version", render: version},
                 //{data: "client_status.current_pool"},
                 {data: "client_status.current_status", render: clientStatus},
                 {data: "client_status.current_algo_name", render: algoAndPowVariantName},
@@ -411,6 +415,15 @@
                         latestRelease = release.tag_name
                         latestVersion = parseInt(release.tag_name.split('.').join(""));
                         currentVersion = parseInt(json.current_version.split('.').join(""))/*;
+
+                        if (currentVersion < 1000) {
+                            currentVersion = currentVersion * 10;
+                        }
+
+                        if (latestVersion < 1000) {
+                            latestVersion = latestVersion * 10;
+                        }
+
                         if (latestVersion > currentVersion) {
                             $("#updateNotificationBar").html('<div class="alert alert-info alert-dismissable fade in">' +
                                 '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
@@ -726,17 +739,31 @@
         }
     }
 
+    function version( data, type, row ) {
+        var clientVersion = parseInt(row.client_status.version.split('.').join(""));
+
+        if (clientVersion < 1000) {
+            clientVersion = clientVersion * 10;
+        }
+
+        if (latestVersion > clientVersion) {
+            return '<span data-toggle="tooltip" title="Outdated"><div class="offline">' + data + '</div></span>';
+        } else {
+            return data;
+        }
+    }
+
     function clientStatus( data, type, row ) {
         var lastStatus = row.client_status.last_status_update * 1000;
 
         if (isOnline(lastStatus)) {
 			if (data == "RUNNING") {
-				return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "617600000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>';
+				return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>';
 			} else {
-				return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "617600000");
+				return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
 			}
         } else {
-            return '<span class="offline"><i class="fa fa-power-off"></i></span> ' + (row.client_status.version.split('.').join("") - "617600000");
+            return '<span class="offline"><i class="fa fa-power-off"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
         }
     }
 
@@ -877,6 +904,7 @@
         <tr>
             <th class="center" width="2%"><i class="fa fa-square-o" id="selectAllTop"></i></th>
             <th>Miner Id</th>
+            <th>Ver</th>
             <!--<th>Pool</th>-->
             <th>Status</th>
             <th>Algo / PoW</th>
@@ -903,6 +931,7 @@
             <th class="left">Total:</th>
             <th></th>
             <!--<th></th>-->
+            <th></th>
             <th></th>
             <th></th>
             <th></th>
