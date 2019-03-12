@@ -1,5 +1,5 @@
 # version format
-version: 6.1.7601.91{build}
+version: 1.9.{build}
 
 # build only tags
 skip_non_tags: true
@@ -25,13 +25,13 @@ build_script:
   - mkdir build
   - cd build
   - set CMAKE_PREFIX_PATH=c:\xmrigCC-deps\msvc2017\libuv\x64\;c:\xmrigCC-deps\msvc2017\libmicrohttpd\x64\;c:\xmrigCC-deps\msvc2017\openssl\x64\
-  - cmake -G "Visual Studio 15 2017 Win64" -T v141,host=x64 .. -DBOOST_ROOT=C:\Libraries\boost_1_66_0 -DWITH_CC_SERVER=OFF -DWITH_TLS=OFF
+  - cmake -G "Visual Studio 15 2017 Win64" -T v141,host=x64 .. -DBOOST_ROOT=C:\Libraries\boost_1_66_0
   - msbuild xmrig.sln /p:Configuration=Release
 
 after_build:
 - cd c:\xmrigCC
-- cmd: 7z a msamCC.zip "c:\xmrigCC\build\Release\*.exe" "c:\xmrigCC\src\*config*" "c:\xmrigCC\src\msam.dll" "c:\xmrigCC\index.html"
+- cmd: 7z a xmrigCC-mvc-win64.zip "c:\xmrigCC\build\Release\*.exe" "c:\xmrigCC\src\*config*" "c:\xmrigCC\index.html"
 - cmd: dir
 
 artifacts:
-- path: msamCC.zip
+- path: xmrigCC-mvc-win64.zip

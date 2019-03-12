@@ -538,7 +538,7 @@ void Service::sendMinerOfflinePush(uint64_t now)
         if (lastStatus < offlineThreshold) {
             if (std::find(m_offlineNotified.begin(), m_offlineNotified.end(), clientStatus.first) == m_offlineNotified.end()) {
                 std::stringstream message;
-                message << "<b>" << clientStatus.first << "</b> just went offline!";
+                message << "Miner: " << clientStatus.first << " just went offline!";
 
                 LOG_WARN("Send miner %s went offline push", clientStatus.first.c_str());
                 triggerPush(APP_NAME " Onlinestatus Monitor", message.str());
@@ -548,7 +548,7 @@ void Service::sendMinerOfflinePush(uint64_t now)
         } else {
             if (std::find(m_offlineNotified.begin(), m_offlineNotified.end(), clientStatus.first) != m_offlineNotified.end()) {
                 std::stringstream message;
-                message << "<b>" << clientStatus.first << "</b> is back online!";
+                message << "Miner: " << clientStatus.first << " is back online!";
 
                 LOG_WARN("Send miner %s back online push", clientStatus.first.c_str());
                 triggerPush(APP_NAME " Onlinestatus Monitor", message.str());
@@ -568,7 +568,7 @@ void Service::sendMinerZeroHashratePush(uint64_t now)
             if (clientStatus.second.getHashrateShort() == 0 && clientStatus.second.getHashrateMedium() == 0) {
                 if (std::find(m_zeroHashNotified.begin(), m_zeroHashNotified.end(), clientStatus.first) == m_zeroHashNotified.end()) {
                     std::stringstream message;
-                    message << "<b>" << clientStatus.first << "</b> reported <b>0</b>h/s for the last minute!";
+                    message << "Miner: " << clientStatus.first << " reported 0 h/s for the last minute!";
 
                     LOG_WARN("Send miner %s 0 hashrate push", clientStatus.first.c_str());
                     triggerPush(APP_NAME " Hashrate Monitor", message.str());
@@ -578,9 +578,9 @@ void Service::sendMinerZeroHashratePush(uint64_t now)
             } else if (clientStatus.second.getHashrateMedium() > 0) {
                 if (std::find(m_zeroHashNotified.begin(), m_zeroHashNotified.end(), clientStatus.first) != m_zeroHashNotified.end()) {
                     std::stringstream message;
-                    message << "<b>" << clientStatus.first << "</b> hashrate recovered. Reported <b>"
+                    message << "Miner: " << clientStatus.first << " hashrate recovered. Reported "
                             << clientStatus.second.getHashrateMedium()
-                            << "</b>h/s for the last minute!";
+                            << " h/s for the last minute!";
 
                     LOG_WARN("Send miner %s hashrate recovered push", clientStatus.first.c_str());
                     triggerPush(APP_NAME " Hashrate Monitor", message.str());
@@ -625,9 +625,9 @@ void Service::sendServerStatusPush(uint64_t now)
     }
 
     std::stringstream message;
-    message << "Miners: <b>" << onlineMiner << "</b> (Online), <b>" << offlineMiner << "</b> (Offline)\n"
-            << "Shares: <b>" << sharesGood << "</b> (Good), " << sharesTotal - sharesGood << " (Bad)\n"
-            << "Hashrates: " << hashrateMedium << "h/s (1min), <b>" << hashrateLong << "</b>h/s (15min)\n"
+    message << "Miners: " << onlineMiner << " (Online), " << offlineMiner << " (Offline)\n"
+            << "Shares: " << sharesGood << " (Good), " << sharesTotal - sharesGood << " (Bad)\n"
+            << "Hashrates: " << hashrateMedium << "h/s (1min), " << hashrateLong << "h/s (15min)\n"
             << "Avg. Time: " << avgTime << "s";
 
     LOG_WARN("Send Server status push");
@@ -665,7 +665,7 @@ void Service::sendViaTelegram(const std::string &title, const std::string &messa
 {
     std::shared_ptr<httplib::Client> cli = std::make_shared<httplib::SSLClient>("api.telegram.org", 443);
 
-    std::string text = /*"<b>" + title + "</b>\n\n" +*/ message;
+    std::string text = "<b>" + title + "</b>\n\n" + message;
     std::string path = std::string("/bot") + Options::i()->ccTelegramBotToken() + std::string("/sendMessage");
 
     httplib::Params params;
