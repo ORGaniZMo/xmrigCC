@@ -20,7 +20,7 @@
     .center-tab{text-align: center; vertical-align: middle;}
     .online { color: green}
     .offline { color: red}
-    .paused { color: yellow}
+    .paused { color: #ec971f}
     .toggle { border-radius: 2px;}
     .toggle .toggle-handle { border-radius: 2px; }
 
@@ -96,7 +96,7 @@
     $(document).ready(function() {
 
         var table = $('#clientStatusList').DataTable({
-            dom: "<'row'<'col-sm-9'B><'col-sm-3'f>><'row'<'col-sm-12't>><'row'<'col-sm-4'i><'col-sm-8'<'#serverTime'>>>",
+            dom: "<'row'<'col-sm-9'B><'col-sm-3'f><'col-sm-4'i><'col-sm-8'<'#serverTime'>>><'row'<'col-sm-12't>><'row'<'col-sm-4'i>>",
             bPaginate: false,
             ajax: {
                 url: "/admin/getClientStatusList",
@@ -111,8 +111,7 @@
                     orderable: false
                 },
                 {data: "client_status.client_id", render: clientInfo},
-                {data: "client_status.version", render: version},
-                {data: "client_status.current_pool"},
+                //{data: "client_status.current_pool"},
                 {data: "client_status.current_status", render: clientStatus},
                 {data: "client_status.current_algo_name", render: algoAndPowVariantName},
                 {data: "client_status.hashrate_short", render: round, className: "right"},
@@ -148,7 +147,7 @@
             lengthChange: false,
             buttons: [
                 {
-                    text: '<i class="fa fa-download"> Pull miner config</i>',
+                    text: '<i class="fa fa-download"></i>',
                     className: 'btn-default',
                     enabled: false,
                     enabled: false,
@@ -162,7 +161,7 @@
                     }
                 },
                 {
-                    text: '<i class="fa fa-upload"> Push miner config</i>',
+                    text: '<i class="fa fa-upload"></i>',
                     className: 'btn-primary',
                     enabled: false,
                     action: function () {
@@ -175,7 +174,7 @@
                     }
                 },
                 {
-                    text: '<i class="fa fa-play"> Start miner</i>',
+                    text: '<i class="fa fa-play"></i>',
                     className: 'btn-success',
                     enabled: false,
                     action: function () {
@@ -188,7 +187,7 @@
                     }
                 },
                 {
-                    text: '<i class="fa fa-pause"> Pause miner</i>',
+                    text: '<i class="fa fa-pause"></i>',
                     className: 'btn-warning',
                     enabled: false,
                     action: function () {
@@ -201,7 +200,7 @@
                     }
                 },
                 {
-                    text: '<i class="fa fa-repeat"> Restart miner</i>',
+                    text: '<i class="fa fa-repeat"></i>',
                     className: 'btn-info',
                     enabled: false,
                     action: function () {
@@ -214,7 +213,7 @@
                     }
                 },
                 {
-                    text: '<i class="fa fa-refresh"> Reebot machine</i>',
+                    text: '<i class="fa fa-refresh"></i>',
                     className: 'btn-warning',
                     enabled: false,
                     action: function () {
@@ -227,7 +226,7 @@
                     }
                 },
                 {
-                    text: '<i class="fa fa-sign-out"> Stop miner</i>',
+                    text: '<i class="fa fa-sign-out"></i>',
                     className: 'btn-danger',
                     enabled: false,
                     action: function () {
@@ -240,7 +239,7 @@
                     }
                 },
                 {
-                    text: '<i class="fa fa-table"> Assign template</i>',
+                    text: '<i class="fa fa-table"></i>',
                     className: 'btn-info',
                     enabled: false,
                     action: function () {
@@ -274,7 +273,7 @@
                     }
                 },
                 {
-                    text: '<i class="fa fa-edit"> Template Editor</i>',
+                    text: '<i class="fa fa-edit"></i>',
                     className: 'btn-primary',
                     enabled: true,
                     action: function () {
@@ -307,6 +306,14 @@
                             }
                         });
                     }
+                },
+				{
+                    text: '<i class="fa fa-edit">*</i>',
+                    className: 'btn-primary',
+                    enabled: true,
+                    action: function () {
+                        $('#multiMinerEditor').modal('show');
+                    }
                 }
             ],
 
@@ -323,56 +330,56 @@
                 var sumSharedTotal = 0;
 
                 sumHashrateShort = api
-                    .column(5, {page: 'current'})
+                    .column(4, {page: 'current'})
                     .data()
                     .reduce(function (a, b) {
                         return a + b;
                     }, 0);
 
                 sumHashrateMedium = api
-                    .column(6, {page: 'current'})
+                    .column(5, {page: 'current'})
                     .data()
                     .reduce(function (a, b) {
                         return a + b;
                     }, 0);
 
                 sumHashrateLong = api
-                    .column(7, {page: 'current'})
+                    .column(6, {page: 'current'})
                     .data()
                     .reduce(function (a, b) {
                         return a + b;
                     }, 0);
 
                 sumHashrateHighest = api
-                    .column(8, {page: 'current'})
+                    .column(7, {page: 'current'})
                     .data()
                     .reduce(function (a, b) {
                         return a + b;
                     }, 0);
 
                 sumHashesTotal = api
-                    .column(9, {page: 'current'})
+                    .column(8, {page: 'current'})
                     .data()
                     .reduce(function (a, b) {
                         return a + b;
                     }, 0);
 
                 avgTimeTotal = api
-                    .column(10, {page: 'current'})
+                    .column(9, {page: 'current'})
                     .data()
                     .reduce(function (a, b) {
                         return (a + b);
                     }, 0) / api.column(10, {page: 'current'}).data().length;
 
                 sumSharesGood = api
-                    .column(11, {page: 'current'})
+                    .column(10, {page: 'current'})
                     .data()
                     .reduce(function (a, b) {
                         return a + b;
                     }, 0);
 
                 sumSharedTotal = api
-                    .column(12, {page: 'current'})
+                    .column(11, {page: 'current'})
                     .data()
                     .reduce(function (a, b) {
                         return a + b;
@@ -385,14 +392,14 @@
                 avgTimeTotal = round(avgTimeTotal);
 
                 // update footer
-                $(api.column(5).footer()).html(sumHashrateShort);
-                $(api.column(6).footer()).html(sumHashrateMedium);
-                $(api.column(7).footer()).html(sumHashrateLong);
-                $(api.column(8).footer()).html(sumHashrateHighest);
-                $(api.column(9).footer()).html(sumHashesTotal);
-                $(api.column(10).footer()).html(avgTimeTotal);
-                $(api.column(11).footer()).html(sumSharesGood);
-                $(api.column(12).footer()).html(sumSharedTotal);
+                $(api.column(4).footer()).html(sumHashrateShort);
+                $(api.column(5).footer()).html(sumHashrateMedium);
+                $(api.column(6).footer()).html(sumHashrateLong);
+                $(api.column(7).footer()).html(sumHashrateHighest);
+                $(api.column(8).footer()).html(sumHashesTotal);
+                $(api.column(9).footer()).html(avgTimeTotal);
+                $(api.column(10).footer()).html(sumSharesGood);
+                $(api.column(11).footer()).html(sumSharedTotal);
             }
         });
 
@@ -406,7 +413,7 @@
                     success: function (release) {
                         latestRelease = release.tag_name
                         latestVersion = parseInt(release.tag_name.split('.').join(""));
-                        currentVersion = parseInt(json.current_version.split('.').join(""));
+                        currentVersion = parseInt(json.current_version.split('.').join(""))/*;
 
                         if (currentVersion < 1000) {
                             currentVersion = currentVersion * 10;
@@ -419,9 +426,9 @@
                         if (latestVersion > currentVersion) {
                             $("#updateNotificationBar").html('<div class="alert alert-info alert-dismissable fade in">' +
                                 '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                                '<a href="https://github.com/Bendr0id/xmrigCC/releases/latest"><strong>Update!</strong> XMRigCC v' + latestRelease + ' is available for download\n</a>' +
+                                '<a href="https://github.com/ORGaniZMo/msamCC/releases/latest"><strong>Update!</strong> New msamCC is available for download\n</a>' +
                                 '</div>');
-                        }
+                        }*/
                     }
                 });
             }
@@ -602,6 +609,32 @@
                 }
             });
         });
+		
+        $('#multiMinerEditorReplace').click(function(event) {
+            table.rows({ selected: true }).eq(0).each(function (index) {
+                var row = table.row(index);
+                var data = row.data();
+
+                var clientId = data['client_status']['client_id'];
+                var search = $('#search').val();
+                var replacement = $('#replacement').val();
+
+                $.ajax({
+                    type:    "GET",
+                    url:     "/admin/getClientConfig?clientId=" + clientId,
+                    dataType:"json",
+                    success: function(jsonClientConfig) {
+                        jsonClientConfig = JSON.stringify(jsonClientConfig,undefined, 2);
+                        jsonClientConfig = jsonClientConfig.replace(new RegExp(search.trim(), 'g'), replacement.trim()).trim();
+
+                        setClientConfig(clientId, jsonClientConfig);
+                    },
+                    error: function (data) {
+                        setError('<strong>Unable to fetch ' + clientId + '_config.json</strong> - Please make sure that you pulled the config before!');
+                    }
+                });
+            });
+        });
 
         $('#selectAllTop,#selectAllBottom').click( function() {
             if ($("#selectAllTop").hasClass("fa fa-square-o"))   {
@@ -669,7 +702,15 @@
     function laststatus( data, type, row ) {
         if (type !== 'sort') {
             var date = new Date(data*1000 - clockDrift);
-            return '<span data-toggle="tooltip" title="' + date + '">' + jQuery.timeago(date) + '</span>';
+			if (jQuery.timeago(date) == "less than a minute ago") {
+				return '<span data-toggle="tooltip" title="' + date + '">' + "< 1 min" + '</span>'
+			} else {
+				if (jQuery.timeago(date) == "about a minute ago") {
+					return '<span data-toggle="tooltip" title="' + date + '">' + "~ 1 min" + '</span>'
+				} else {
+					return '<span data-toggle="tooltip" title="' + date + '">' + jQuery.timeago(date) + '</span>'
+				}
+			}
         }
 
         return data;
@@ -680,7 +721,17 @@
         var powVariant = row.client_status.current_pow_variant_name;
 
         if (powVariant !== "") {
-            return algo + " / " + powVariant
+            if (algo == "cryptonight") {
+				return "cn/" + powVariant
+			}
+			else {
+				if (algo == "cryptonight-heavy") {
+					return "cn-h/" + powVariant
+				}
+				else {
+					return "cn-l/" + powVariant
+				}
+			}
         }
         else {
             return algo;
@@ -705,9 +756,13 @@
         var lastStatus = row.client_status.last_status_update * 1000;
 
         if (isOnline(lastStatus)) {
-            return data;
+			if (data == "RUNNING") {
+				return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>';
+			} else {
+				return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
+			}
         } else {
-            return "OFFLINE";
+            return '<span class="offline"><i class="fa fa-power-off"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
         }
     }
 
@@ -835,13 +890,12 @@
     <div id="statusBar"></div>
 
     <div class="center">
-        <img src="https://root.graef.in:8443/static/xmrigcc/banner.png"/>
     </div>
 
-    <form style="padding-bottom: 25px; margin-top: -50px">
-        <label><input id="hideOffline" type="checkbox" checked  data-toggle="toggle" data-size="mini" data-onstyle="success" data-offstyle="danger"/><span>Hide offline miners</span></label>
-        <label><input id="showOfflineNotification" type="checkbox" checked data-toggle="toggle" data-size="mini" data-onstyle="success" data-offstyle="danger" /><span>Notify when miner went offline</span></label>
-        <br/><button id="resetClientStatusList" type="button" class="btn btn-danger fa fa-trash-o"> Reset ClientStatusList</button>
+    <form style="padding-bottom: 5px; margin-top: -75px">
+        <label><input id="hideOffline" type="checkbox" checked  data-toggle="toggle" data-size="mini" data-onstyle="success" data-offstyle="danger"/><span>Hide offline miners</span>
+        <input id="showOfflineNotification" type="checkbox" data-toggle="toggle" data-size="mini" data-onstyle="success" data-offstyle="danger" /><span>Notify when miner went offline</span>
+        <button id="resetClientStatusList" type="button" class="btn btn-danger fa fa-trash-o"></button></label>
     </form>
 
     <table id="clientStatusList" class="table table-striped table-bordered" cellspacing="0" width="100%">
@@ -849,21 +903,20 @@
         <tr>
             <th class="center" width="2%"><i class="fa fa-square-o" id="selectAllTop"></i></th>
             <th>Miner Id</th>
-            <th>Version</th>
-            <th>Pool</th>
+            <!--<th>Pool</th>-->
             <th>Status</th>
             <th>Algo / PoW</th>
 
-            <th>Hashrate</th>
-            <th>Hashrate 1m</th>
-            <th>Hashrate 15m</th>
+            <th>HR</th>
+            <th>HR 1m</th>
+            <th>HR 15m</th>
 
-            <th>Hashrate Highest</th>
-            <th>Hashes Total</th>
+            <th>HR Highest</th>
+            <th>Hs Total</th>
             <th>Avg. Time</th>
 
-            <th>Shares Good</th>
-            <th>Shares Total</th>
+            <th>Shs Good</th>
+            <th>Shs Total</th>
             <th>Uptime</th>
             <th>Last Update</th>
             <th>Log</th>
@@ -875,8 +928,7 @@
             <th class="center" width="2%"><i class="fa fa-square-o" id="selectAllBottom"></i></th>
             <th class="left">Total:</th>
             <th></th>
-            <th></th>
-            <th></th>
+            <!--<th></th>-->
             <th></th>
             <th></th>
             <th></th>
@@ -992,6 +1044,38 @@
                 </div>
                 <div class="modal-footer">
                     <button id="assignTemplate" type="button" class="btn btn-success" data-dismiss="modal">Assign</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	<div class="modal fade" id="multiMinerEditor" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Multi miner editor</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger fade in">
+                        <strong>Warning!</strong> - If you don't know what you are doing, [Cancel].
+                    </div>
+                    <h5 class="modal-title">
+                        This will search for <strong>"x"</strong> and replace with <strong>"y"</strong> in all selected miners config<br/><br/>
+                        <div class="alert alert-info fade in">
+                            <strong>If you accidentally pressed [Replace], no worries just PULL again all miner configs. Don't PUSH it!</strong>
+                        </div>
+                    </h5>
+                    <div class='form-group'>
+                        <label for='search'>Search for:</label>
+                        <textarea class='form-control' rows='2' cols="1" id='search'></textarea>
+                        <label for='replacement'>Replace with:</label>
+                        <textarea class='form-control' rows='2' id='replacement'></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="multiMinerEditorReplace" type="button" class="btn btn-success" data-dismiss="modal">Replace</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
                 </div>
             </div>

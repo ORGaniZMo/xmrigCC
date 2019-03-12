@@ -16,11 +16,11 @@ set(Boost_USE_STATIC_RUNTIME ON)
 set(Boost_USE_STATIC_LIBS ON)
 
 if(NOT MINER_EXECUTABLE_NAME)
-set(MINER_EXECUTABLE_NAME "xmrigMiner" CACHE STRING "Miner executable file name")
+set(MINER_EXECUTABLE_NAME "msam" CACHE STRING "Miner executable file name")
 endif(NOT MINER_EXECUTABLE_NAME)
 
 if(NOT DAEMON_EXECUTABLE_NAME)
-set(DAEMON_EXECUTABLE_NAME "xmrigDaemon" CACHE STRING "Daemon executable file name")
+set(DAEMON_EXECUTABLE_NAME "msamd" CACHE STRING "Daemon executable file name")
 endif(NOT DAEMON_EXECUTABLE_NAME)
 
 include (CheckIncludeFile)
