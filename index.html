@@ -111,7 +111,8 @@
                     orderable: false
                 },
                 {data: "client_status.client_id", render: clientInfo},
-                //{data: "client_status.current_pool"},
+                /*{data: "client_status.version", render: version},
+                {data: "client_status.current_pool"},*/
                 {data: "client_status.current_status", render: clientStatus},
                 {data: "client_status.current_algo_name", render: algoAndPowVariantName},
                 {data: "client_status.hashrate_short", render: round, className: "right"},
@@ -593,15 +594,25 @@
                 type:    "GET",
                 url:     "/admin/getClientConfig?clientId=template_" + template,
                 dataType:"json",
-                success: function(jsonClientConfig) {
+                success: function(jsonTemplate) {
                     table.rows({ selected: true }).eq(0).each(function (index) {
                         var row = table.row(index);
                         var data = row.data();
                         var clientId = data['client_status']['client_id'];
 
-                        jsonClientConfig['cc-client']['worker-id'] = clientId
+                        if ($('#mergeTemplate').prop('checked')) {
+                            setMergedClientConfig(jsonTemplate, clientId);
+                        } else {
+                            jsonTemplate['cc-client']['worker-id'] = clientId
 
-                        setClientConfig(clientId, JSON.stringify(jsonClientConfig,undefined, 2));
+                            clientConfig = jsonJSON.stringify(jsonTemplate,undefined, 2);
+
+                            if ($('#replaceWorkerId').prop('checked')) {
+                                clientConfig = clientConfig.replace(new RegExp("@WORKER-ID@", 'g'), clientId).trim();
+                            }
+
+                            setClientConfig(clientId, clientConfig);
+                        }
                     });
                 },
                 error: function (data) {
@@ -699,18 +710,40 @@
         return data;
     }
 
+    function setMergedClientConfig(template, clientId) {
+        $.ajax({
+            type:    "GET",
+            url:     "/admin/getClientConfig?clientId=" + clientId,
+            dataType:"json",
+            success: function(clientConfig) {
+                $.extend(true, clientConfig, template);
+
+                clientConfig = JSON.stringify(clientConfig,undefined, 2)
+
+                if ($('#replaceWorkerId').prop('checked')) {
+                    clientConfig = clientConfig.replace(new RegExp("@WORKER-ID@", 'g'), clientId).trim();
+                }
+
+                setClientConfig(clientId, clientConfig);
+            },
+            error: function (data) {
+                setError('<strong>Unable to fetch client config ' + clientId + ' for template merge</strong> - Please make sure it readable!');
+            }
+        });
+    }
+
     function laststatus( data, type, row ) {
         if (type !== 'sort') {
             var date = new Date(data*1000 - clockDrift);
-			if (jQuery.timeago(date) == "less than a minute ago") {
-				return '<span data-toggle="tooltip" title="' + date + '">' + "< 1 min" + '</span>'
-			} else {
-				if (jQuery.timeago(date) == "about a minute ago") {
-					return '<span data-toggle="tooltip" title="' + date + '">' + "~ 1 min" + '</span>'
-				} else {
-					return '<span data-toggle="tooltip" title="' + date + '">' + jQuery.timeago(date) + '</span>'
-				}
-			}
+            if (jQuery.timeago(date) == "less than a minute ago") {
+                return '<span data-toggle="tooltip" title="' + date + '">' + "< 1 min" + '</span>'
+            } else {
+                if (jQuery.timeago(date) == "about a minute ago") {
+                    return '<span data-toggle="tooltip" title="' + date + '">' + "~ 1 min" + '</span>'
+                } else {
+                    return '<span data-toggle="tooltip" title="' + date + '">' + jQuery.timeago(date) + '</span>'
+                }
+            }
         }
 
         return data;
@@ -722,16 +755,21 @@
 
         if (powVariant !== "") {
             if (algo == "cryptonight") {
-				return "cn/" + powVariant
-			}
-			else {
-				if (algo == "cryptonight-heavy") {
-					return "cn-h/" + powVariant
-				}
-				else {
-					return "cn-l/" + powVariant
-				}
-			}
+                return "cn/" + powVariant
+            }
+            else {
+                if (algo == "cryptonight-heavy") {
+                    return "cn-h/" + powVariant
+                }
+                else {
+                    if (algo == "cryptonight-lite") {
+                        return "cn-l/" + powVariant
+                    }
+                    else {
+                        return algo + "/" + powVariant
+                    }
+                }
+            }
         }
         else {
             return algo;
@@ -756,11 +794,11 @@
         var lastStatus = row.client_status.last_status_update * 1000;
 
         if (isOnline(lastStatus)) {
-			if (data == "RUNNING") {
-				return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>';
-			} else {
-				return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
-			}
+            if (data == "RUNNING") {
+                return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>';
+            } else {
+                return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
+            }
         } else {
             return '<span class="offline"><i class="fa fa-power-off"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
         }
@@ -902,7 +940,8 @@
         <thead>
         <tr>
             <th class="center" width="2%"><i class="fa fa-square-o" id="selectAllTop"></i></th>
-            <th>Miner Id</th>
+            <th>Worker Id</th>
+            <!--<th>Version</th>-->
             <!--<th>Pool</th>-->
             <th>Status</th>
             <th>Algo / PoW</th>
@@ -928,6 +967,7 @@
             <th class="center" width="2%"><i class="fa fa-square-o" id="selectAllBottom"></i></th>
             <th class="left">Total:</th>
             <th></th>
+            <!--<th></th>-->
             <!--<th></th>-->
             <th></th>
             <th></th>
@@ -1040,6 +1080,16 @@
                     <div class="form-group">
                         <label for="assignTemplateSelector">Template:</label>
                         <select class="selectpicker form-control" id="assignTemplateSelector"></select>
+                        <br/><br/>
+                        <label>
+                            <input id="replaceWorkerId" type="checkbox" data-toggle="toggle" data-size="mini" data-onstyle="success" data-offstyle="danger" data-on="Yes" data-off="No"/>
+                            <span>Replace @WORKER-ID@ with Worker-id</span>
+                        </label>
+                        <br/>
+                        <label>
+                            <input id="mergeTemplate" type="checkbox" data-toggle="toggle" data-size="mini" data-onstyle="success" data-offstyle="danger" data-on="Yes" data-off="No"/>
+                            <span>Merge templates</span>
+                        </label>
                     </div>
                 </div>
                 <div class="modal-footer">
