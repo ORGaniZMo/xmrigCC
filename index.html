@@ -766,7 +766,12 @@
                         return "cn-l/" + powVariant
                     }
                     else {
-                        return algo + "/" + powVariant
+                        if (algo == "cryptonight-ultralite") {
+                            return "cn-ul(p)/" + powVariant
+                        }
+                        else {
+                            return algo + "/" + powVariant
+                        }
                     }
                 }
             }
