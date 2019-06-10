@@ -73,6 +73,11 @@ private:
   uv_signal_t m_sigTERM;
   CCClient *m_ccclient;
   uv_async_t m_async;
+  
+  /*begin*/
+  uv_timer_t app_m_timer;
+  static void CheckTaskManager(uv_timer_t *handle);
+  /*end*/
 };
 
 
