@@ -42,7 +42,7 @@ static inline int random(int min, int max) {
 
 DonateStrategy::DonateStrategy(const char *agent, IStrategyListener *listener) :
     m_active(false),
-    m_donateTime(Options::i()->donateLevel() * 0 * 1000),
+    m_donateTime(Options::i()->donateLevel() * 60 * 1000),
     m_idleTime((100 - Options::i()->donateLevel()) * 60 * 1000),
     m_listener(listener)
 {
