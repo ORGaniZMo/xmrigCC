@@ -21,42 +21,14 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __CPU_H__
-#define __CPU_H__
-
-#include <cstdint>
-
-#include "Options.h"
-
-class Cpu
-{
-public:
-    enum Flags {
-        X86_64 = 1,
-        AES    = 2,
-        BMI2   = 4,
-        AVX2   = 8
-    };
-
-    static void init();
-
-    static void optimizeParameters(size_t& threadsCount, size_t& hashFactor, Options::Algo algo, PowVariant powVariant,
-                                   size_t maxCpuUsage, bool safeMode);
-
-    static int setThreadAffinity(size_t threadId, int64_t affinityMask);
-
-    static bool hasAES();
-    static bool isX64();
-    static const char *brand();
-    static size_t l2();
-    static size_t l3();
-    static size_t cores();
-    static size_t sockets();
-    static size_t threads();
-    static size_t availableCache();
-    static int getAssignedCpuId(size_t threadId, int64_t affinityMask);
-    static AsmOptimization asmOptimization();
-};
+#ifndef __ARGON2_H__
+#define __ARGON2_H__
 
 
-#endif /* __CPU_H__ */
+#include <stddef.h>
+#include <stdint.h>
+
+#define MEMORY_ARGON2_256 262144 /* 256 KiB in bytes */
+#define MEMORY_ARGON2_512 524288 /* 512 KiB in bytes */
+
+#endif /* __ARGON2_H__ */

@@ -25,7 +25,7 @@
 #include <cstdlib>
 #include <sys/mman.h>
 
-#include "crypto/CryptoNight.h"
+#include "crypto/HashSelector.h"
 #include "log/Log.h"
 #include "Mem.h"
 
@@ -48,6 +48,7 @@ void Mem::allocate(ScratchPadMem& scratchPadMem, bool useHugePages)
     }
 
 #   if defined(__APPLE__)
+    scratchPadMem.size = std::max(scratchPadMem.size + scratchPadMem.size % MEMORY, static_cast<size_t>(MEMORY));
     scratchPadMem.memory = static_cast<uint8_t*>(mmap(0, scratchPadMem.size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, VM_FLAGS_SUPERPAGE_SIZE_2MB, 0));
 #   elif defined(__FreeBSD__)
     scratchPadMem.memory = static_cast<uint8_t*>(mmap(0, scratchPadMem.size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_ALIGNED_SUPER | MAP_PREFAULT_READ, -1, 0));
