@@ -24,7 +24,7 @@
  */
 
 #include <Mem.h>
-#include <argon2.h>
+//#include <argon2.h>
 #include "crypto/HashSelector.h"
 #include "crypto/Argon2.h"
 #include "crypto/CryptoNight.h"
