@@ -29,8 +29,6 @@
 #include <memory>
 
 #include <iostream>
-#include <crypto/CryptoNight.h>
-#include <crypto/Argon2.h>
 
 #include "Cpu.h"
 #include "CpuImpl.h"
@@ -67,45 +65,37 @@ void CpuImpl::optimizeParameters(size_t& threadsCount, size_t& hashFactor,
     }
 
     size_t cache = availableCache();
-    size_t algoBlocks;
+    size_t algoBlockSize;
     switch (algo) {
         case Options::ALGO_CRYPTONIGHT_EXTREMELITE:
-            algoBlocks = MEMORY_EXTREME_LITE/1024;
+            algoBlockSize = 128;
             break;
         case Options::ALGO_CRYPTONIGHT_ULTRALITE:
-            algoBlocks = MEMORY_ULTRA_LITE/1024;
+            algoBlockSize = 256;
             break;
         case Options::ALGO_CRYPTONIGHT_SUPERLITE:
-            algoBlocks = MEMORY_SUPER_LITE/1024;
+            algoBlockSize = 512;
             break;
         case Options::ALGO_CRYPTONIGHT_LITE:
-            algoBlocks = MEMORY_LITE/1024;
+            algoBlockSize = 1024;
             break;
         case Options::ALGO_CRYPTONIGHT_HEAVY:
-            algoBlocks = MEMORY_HEAVY/1024;
-            break;
-        case Options::ALGO_ARGON2_256:
-            algoBlocks = MEMORY_ARGON2_256/1024;
-            break;
-        case Options::ALGO_ARGON2_512:
-            algoBlocks = MEMORY_ARGON2_512/1024;
+            algoBlockSize = 4096;
             break;
         case Options::ALGO_CRYPTONIGHT:
         default:
-            algoBlocks = MEMORY/1024;
+            algoBlockSize = 2048;
             break;
     }
 
-    size_t maximumReasonableFactor = std::max(cache / algoBlocks, static_cast<size_t>(1ul));
+    size_t maximumReasonableFactor = std::max(cache / algoBlockSize, static_cast<size_t>(1ul));
     size_t maximumReasonableThreadCount = std::min(maximumReasonableFactor, m_totalThreads);
     size_t maximumReasonableHashFactor = static_cast<size_t>(MAX_NUM_HASH_BLOCKS);
 
     if (algo == Options::ALGO_CRYPTONIGHT_HEAVY || powVariant == POW_XFH) {
         maximumReasonableHashFactor = 3;
-    } else if (getCNBaseVariant(powVariant) == POW_V2 || getCNBaseVariant(powVariant) == POW_V4 || algo == Options::ALGO_CRYPTONIGHT_EXTREMELITE || algo == Options::ALGO_CRYPTONIGHT_ULTRALITE) {
+    } else if (getBaseVariant(powVariant) == POW_V2 || getBaseVariant(powVariant) == POW_V4 || algo == Options::ALGO_CRYPTONIGHT_EXTREMELITE || algo == Options::ALGO_CRYPTONIGHT_ULTRALITE) {
         maximumReasonableHashFactor = 2;
-    } else if (!Options::isCNAlgo(algo)) {
-        maximumReasonableHashFactor = 1;
     }
 
     if (safeMode) {

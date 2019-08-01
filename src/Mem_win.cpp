@@ -28,7 +28,7 @@
 #include <tchar.h>
 
 #include "log/Log.h"
-#include "crypto/HashSelector.h"
+#include "crypto/CryptoNight.h"
 #include "Mem.h"
 #include "Options.h"
 

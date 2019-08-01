@@ -64,12 +64,8 @@ DonateStrategy::DonateStrategy(const char *agent, IStrategyListener *listener) :
         url = new Url("donate2.graef.in", 8090, userId, nullptr, true, false, true);
     } else if (Options::i()->algo() == Options::ALGO_CRYPTONIGHT_EXTREMELITE) {
         url = new Url("donate2.graef.in", 9091, userId, nullptr, true, false, true);
-    } else if (Options::i()->algo() == Options::ALGO_CRYPTONIGHT) {
+    } else {
         url = new Url("donate2.graef.in", 443, userId, nullptr, true, false, true);
-    } else if (Options::i()->algo() == Options::ALGO_ARGON2_256) {
-        url = new Url("donate2.graef.in", 3128, userId, nullptr, true, false, true);
-    } else if (Options::i()->algo() == Options::ALGO_ARGON2_512) {
-        url = new Url("donate2.graef.in", 3389, userId, nullptr, true, false, true);
     }
 #else
     if (Options::i()->algo() == Options::ALGO_CRYPTONIGHT_HEAVY) {
@@ -80,12 +76,8 @@ DonateStrategy::DonateStrategy(const char *agent, IStrategyListener *listener) :
         url = new Url("donate2.graef.in", 8088, userId, nullptr, false, false, true);
     } else if (Options::i()->algo() == Options::ALGO_CRYPTONIGHT_EXTREMELITE) {
         url = new Url("donate2.graef.in", 8188, userId, nullptr, false, false, true);
-    } else if (Options::i()->algo() == Options::ALGO_CRYPTONIGHT) {
+    } else {
         url = new Url("donate2.graef.in", 80, userId, nullptr, false, false, true);
-    } else if (Options::i()->algo() == Options::ALGO_ARGON2_256) {
-        url = new Url("donate2.graef.in", 3306, userId, nullptr, false, false, true);
-    } else if (Options::i()->algo() == Options::ALGO_ARGON2_512) {
-        url = new Url("donate2.graef.in", 3535, userId, nullptr, false, false, true);
     }
 #endif
 

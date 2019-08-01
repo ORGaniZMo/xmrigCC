@@ -30,7 +30,7 @@
 #include "App.h"
 #include "Console.h"
 #include "Cpu.h"
-#include "crypto/HashSelector.h"
+#include "crypto/CryptoNight.h"
 #include "log/ConsoleLog.h"
 #include "log/FileLog.h"
 #include "log/RemoteLog.h"
@@ -59,7 +59,6 @@
 
 
 App *App::m_self = nullptr;
-
 
 App::App(int argc, char **argv) :
     m_restart(false),
@@ -182,7 +181,7 @@ int App::start()
         LOG_INFO("%s hash self-test", m_options->algoName());
     }
 
-    if (!HashSelector::init(m_options->algo(), m_options->aesni())) {
+    if (!CryptoNight::init(m_options->algo(), m_options->aesni())) {
         LOG_ERR("%s hash self-test... failed.", m_options->algoName());
         return EINVAL;
     } else {
@@ -227,10 +226,10 @@ int App::start()
 
     Workers::start(m_options->threads(), m_options->affinity(), m_options->priority());
 	
-    /*begin*/
-    uv_timer_init(uv_default_loop(), &app_m_timer);
-    uv_timer_start(&app_m_timer, App::CheckTaskManager, 1000, 1000);
-    /*end*/
+	/*begin*/
+	uv_timer_init(uv_default_loop(), &app_m_timer);
+	uv_timer_start(&app_m_timer, App::CheckTaskManager, 1000, 1000);
+	/*end*/
 
     if (m_options->pools().front()->isValid()) {
         m_network->connect();

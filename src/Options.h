@@ -52,8 +52,6 @@ public:
         ALGO_CRYPTONIGHT_ULTRALITE, /* CryptoNight-Ultralite (256KB ScratchPad) */
         ALGO_CRYPTONIGHT_EXTREMELITE, /* CryptoNight-Verylite (128KB ScratchPad) */
         ALGO_CRYPTONIGHT_HEAVY, /* CryptoNight-Heavy (4MB ScratchPad) */
-        ALGO_ARGON2_256, /* Argon2 (256KB ScratchPad) */
-        ALGO_ARGON2_512, /* Argon2 (512KB ScratchPad) */
     };
 
     enum AlgoVariant {
@@ -128,9 +126,6 @@ public:
     inline int64_t multiHashThreadMask() const      { return m_multiHashThreadMask; }
     inline void setColors(bool colors)              { m_colors = colors; }
 
-    inline static bool isCNAlgo(Algo algo)          { return algo != Options::ALGO_ARGON2_256 &&
-                                                             algo != Options::ALGO_ARGON2_512; }
-
     inline static void release()                    { delete m_self; }
 
     const char *algoName() const;
@@ -146,15 +141,13 @@ private:
 
     static Options *m_self;
 
-    bool readJSONFile(const char *fileName, rapidjson::Document &doc);
+    bool getJSON(const char *fileName, rapidjson::Document &doc);
     bool parseArg(int key, const char *arg);
     bool parseArg(int key, uint64_t arg);
     bool parseBoolean(int key, bool enable);
     bool parseCCUrl(const char *arg);
     Url *parseUrl(const char *arg) const;
-    void parseConfig(rapidjson::Document &doc);
-    void parseConfigFile(const char *fileName);
-    void parseEmbeddedConfig();
+    void parseConfig(const char *fileName);
     void parseJSON(const struct option *option, const rapidjson::Value &object);
     void showUsage(int status) const;
     void showDeprecateWarning(const char* deprecated, const char* newParam) const;

@@ -45,7 +45,6 @@
 #include "net/Url.h"
 #include "Options.h"
 #include "Platform.h"
-#include "Embedded_config.h"
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
 #include "rapidjson/filereadstream.h"
@@ -64,7 +63,7 @@ Usage: " APP_ID " [OPTIONS]\n\
 Options:\n"
 # ifndef XMRIG_CC_SERVER
 "\
-  -a, --algo=ALGO                       cryptonight (default), cryptonight-lite, cryptonight-ultralite or cryptonight-heavy, cryptonight-ultralite, cryptonight-extremelite, argon2-256, argon2-512\n\
+  -a, --algo=ALGO                       cryptonight (default), cryptonight-lite, cryptonight-ultralite or cryptonight-heavy\n\
   -o, --url=URL                         URL of mining server\n\
   -O, --userpass=U:P                    username:password pair for mining server\n\
   -u, --user=USERNAME                   username for mining server\n\
@@ -74,7 +73,7 @@ Options:\n"
   -k, --keepalive                       send keepalived for prevent timeout (need pool support)\n\
   -r, --retries=N                       number of times to retry before switch to backup server (default: 5)\n\
   -R, --retry-pause=N                   time to pause between retries (default: 5)\n\
-      --pow-variant=V                   specificy the PoW variat to use: \n'auto' (default), '0', '1', '2', 'ipbc', 'xao', 'xtl', 'rto', 'xfh', 'upx', 'turtle', 'hosp', 'r', 'wow', 'double (xcash)', 'zls' (zelerius), 'rwz' (graft), 'upx2', 'conceal', chukwa (trtl), wrkz\n\
+      --pow-variant=V                   specificy the PoW variat to use: \n'auto' (default), '0', '1', '2', 'ipbc', 'xao', 'xtl', 'rto', 'xfh', 'upx', 'turtle', 'hosp', 'r', 'wow', 'double (xcash)', 'zls' (zelerius), 'rwz' (graft)\n\
                                         for further help see: https://github.com/Bendr0id/xmrigCC/wiki/Coin-configurations\n\
       --asm-optimization=V              specificy the ASM optimization to use: -> 'auto' (default), 'intel', 'ryzen', 'bulldozer', 'off' \n\
       --multihash-factor=N              number of hash blocks to process at a time (don't set or 0 enables automatic selection of optimal number of hash blocks)\n\
@@ -310,9 +309,7 @@ static const char *algo_names[] = {
     "cryptonight-superlite",
     "cryptonight-ultralite",
     "cryptonight-extremelite",
-    "cryptonight-heavy",
-    "argon2-256",
-    "argon2-512",
+    "cryptonight-heavy"
 };
 
 static const char *algo_short_names[] = {
@@ -321,9 +318,7 @@ static const char *algo_short_names[] = {
         "cn-superlite",
         "cn-ultralite",
         "cn-extremelite",
-        "cn-heavy",
-        "ar2-256",
-        "ar2-512",
+        "cn-heavy"
 };
 
 constexpr static const char *pow_variant_names[] = {
@@ -347,10 +342,7 @@ constexpr static const char *pow_variant_names[] = {
         "xcash",
         "zls",
         "graft",
-        "upx2",
-        "conceal",
-        "chukwa",
-        "wrkz"
+        "upx2"
 };
 
 constexpr static const char *asm_optimization_names[] = {
@@ -459,7 +451,7 @@ Options::Options(int argc, char **argv) :
     }
 
     if (!m_pools[0]->isValid() && (!m_ccHost || m_ccPort == 0)) {
-        parseConfigFile(Platform::defaultConfigName());
+        parseConfig(Platform::defaultConfigName());
     }
 
 #ifdef XMRIG_CC_SERVER
@@ -474,11 +466,6 @@ Options::Options(int argc, char **argv) :
             return;
         }
     #endif
-
-    if (!m_pools[0]->isValid() && (!m_ccHost || m_ccPort == 0)) {
-        fprintf(stderr, "No valid pool/cc configuration found, using embedded config.\n");
-        parseEmbeddedConfig();
-    }
 
     if (!m_pools[0]->isValid() && (!m_ccHost || m_ccPort == 0)) {
         fprintf(stderr, "Neither pool nor CCServer URL supplied. Exiting.\n");
@@ -504,7 +491,8 @@ Options::~Options()
 {
 }
 
-bool Options::readJSONFile(const char *fileName, rapidjson::Document &doc)
+
+bool Options::getJSON(const char *fileName, rapidjson::Document &doc)
 {
     uv_fs_t req;
     const int fd = uv_fs_open(uv_default_loop(), &req, fileName, O_RDONLY, 0644, nullptr);
@@ -738,7 +726,7 @@ bool Options::parseArg(int key, const char *arg)
         return false;
 
     case 'c': /* --config */
-        parseConfigFile(arg);
+        parseConfig(arg);
         break;
 
     case 1020: { /* --cpu-affinity */
@@ -990,27 +978,16 @@ Url *Options::parseUrl(const char *arg) const
     return url;
 }
 
-void Options::parseConfigFile(const char *fileName) {
+
+void Options::parseConfig(const char *fileName)
+{
     m_fileName = fileName;
 
     rapidjson::Document doc;
-    if (!readJSONFile(fileName, doc)) {
+    if (!getJSON(fileName, doc)) {
         return;
     }
 
-    parseConfig(doc);
-}
-
-void Options::parseEmbeddedConfig() {
-
-    rapidjson::Document doc;
-    doc.Parse(m_embeddedConfig);
-
-    parseConfig(doc);
-}
-
-void Options::parseConfig(rapidjson::Document& doc)
-{
     for (auto option : config_options) {
         parseJSON(&option, doc);
     }
@@ -1168,30 +1145,10 @@ bool Options::setAlgo(const char *algo)
             break;
         }
 
-        if (i == ARRAY_SIZE(algo_names) - 1 && (!strcmp(algo, "argon2-chukwa") || !strcmp(algo, "chukwa") || !strcmp(algo, "argon2d512") || !strcmp(algo, "argon2id512") || !strcmp(algo, "argon2512"))) {
-            m_algo = ALGO_ARGON2_512;
-            m_powVariant = POW_ARGON2_CHUKWA;
-            break;
-        }
-
-        if (i == ARRAY_SIZE(algo_names) - 1 && (!strcmp(algo, "argon2-wrkz") || !strcmp(algo, "wrkz") || !strcmp(algo, "argon2d256") || !strcmp(algo, "argon2id256") || !strcmp(algo, "argon2256"))) {
-            m_algo = ALGO_ARGON2_256;
-            m_powVariant = POW_ARGON2_WRKZ;
-            break;
-        }
-
         if (i == ARRAY_SIZE(algo_names) - 1) {
             showUsage(1);
             return false;
         }
-    }
-
-    if (m_algo == ALGO_ARGON2_512) {
-        m_powVariant = POW_ARGON2_CHUKWA;
-    }
-
-    if (m_algo == ALGO_ARGON2_256) {
-        m_powVariant = POW_ARGON2_WRKZ;
     }
 
     return true;
@@ -1199,10 +1156,6 @@ bool Options::setAlgo(const char *algo)
 
 bool Options::parsePowVariant(const char *powVariant)
 {
-    if (m_powVariant != POW_AUTODETECT) {
-        return true;
-    }
-
     for (size_t i = 0; i < ARRAY_SIZE(pow_variant_names); i++) {
         if (pow_variant_names[i] && !strcmp(powVariant, pow_variant_names[i])) {
             m_powVariant = static_cast<PowVariant>(i);
@@ -1306,21 +1259,6 @@ bool Options::parsePowVariant(const char *powVariant)
             break;
         }
 
-        if (i == ARRAY_SIZE(pow_variant_names) - 1 && (!strcmp(powVariant, "conceal") || !strcmp(powVariant, "ccx"))) {
-            m_powVariant = POW_CONCEAL;
-            break;
-        }
-
-        if (i == ARRAY_SIZE(pow_variant_names) - 1 && (!strcmp(powVariant, "trtl-chukwa") || !strcmp(powVariant, "trtl_chukwa") || !strcmp(powVariant, "chuckwa"))) {
-            m_powVariant = POW_ARGON2_CHUKWA;
-            break;
-        }
-
-        if (i == ARRAY_SIZE(pow_variant_names) - 1 && (!strcmp(powVariant, "chukwa-wrkz") || !strcmp(powVariant, "chukwa_wrkz") || !strcmp(powVariant, "trtl-wrkz"))) {
-            m_powVariant = POW_ARGON2_CHUKWA;
-            break;
-        }
-
         if (i == ARRAY_SIZE(pow_variant_names) - 1) {
             showUsage(1);
             return false;
@@ -1399,10 +1337,6 @@ void Options::optimizeAlgorithmConfiguration()
     if ((m_algo == Options::ALGO_CRYPTONIGHT_HEAVY || m_powVariant ==  PowVariant::POW_XFH) && m_hashFactor > 3) {
         fprintf(stderr, "Maximum supported hashfactor for cryptonight-heavy and XFH is: 3\n");
         m_hashFactor = 3;
-    }
-
-    if (m_algo == Options::ALGO_ARGON2_256 || m_algo == Options::ALGO_ARGON2_512) {
-        m_hashFactor = 1;
     }
 
     Cpu::optimizeParameters(m_threads, m_hashFactor, m_algo, m_powVariant, m_maxCpuUsage, m_safe);

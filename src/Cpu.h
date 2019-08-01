@@ -34,8 +34,7 @@ public:
     enum Flags {
         X86_64 = 1,
         AES    = 2,
-        BMI2   = 4,
-        AVX2   = 8
+        BMI2   = 4
     };
 
     static void init();
