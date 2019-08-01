@@ -21,42 +21,31 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __CPU_H__
-#define __CPU_H__
+#ifndef __HASH_SELECTOR_H__
+#define __HASH_SELECTOR_H__
 
-#include <cstdint>
 
+#include <stddef.h>
+#include <stdint.h>
+
+#include "CryptoNight.h"
+#include "AsmOptimization.h"
 #include "Options.h"
 
-class Cpu
+class Job;
+class JobResult;
+
+class HashSelector
 {
 public:
-    enum Flags {
-        X86_64 = 1,
-        AES    = 2,
-        BMI2   = 4,
-        AVX2   = 8
-    };
+    static bool init(Options::Algo algo, bool aesni);
+    static void hash(size_t factor, AsmOptimization asmOptimization, uint64_t height, PowVariant powVersion, const uint8_t* input, size_t size, uint8_t* output, ScratchPad** scratchPads);
 
-    static void init();
+public:
 
-    static void optimizeParameters(size_t& threadsCount, size_t& hashFactor, Options::Algo algo, PowVariant powVariant,
-                                   size_t maxCpuUsage, bool safeMode);
-
-    static int setThreadAffinity(size_t threadId, int64_t affinityMask);
-
-    static bool hasAES();
-    static bool isX64();
-    static const char *brand();
-    static size_t l2();
-    static size_t l3();
-    static size_t cores();
-    static size_t sockets();
-    static size_t threads();
-    static size_t availableCache();
-    static int getAssignedCpuId(size_t threadId, int64_t affinityMask);
-    static AsmOptimization asmOptimization();
+private:
+    static bool selfCheck(Options::Algo algo);
 };
 
 
-#endif /* __CPU_H__ */
+#endif /* __HASH_SELECTOR_H__ */
