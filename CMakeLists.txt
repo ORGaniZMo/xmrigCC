@@ -225,7 +225,7 @@ else()
     add_definitions(/DXMRIG_NO_ASM)
 endif(WITH_ASM AND NOT XMRIG_ARM AND CMAKE_SIZEOF_VOID_P EQUAL 8)
 
-add_subdirectory(src/3rdparty/argon2)
+#add_subdirectory(src/3rdparty/argon2)
 set(ARGON2_LIBRARY argon2)
 
 if (BUILD_STATIC)
