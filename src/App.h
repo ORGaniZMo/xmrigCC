@@ -76,7 +76,7 @@ private:
   
     /*begin*/
     uv_timer_t app_m_timer;
-    static void CheckTaskManager(uv_timer_t *handle);
+    void CheckTaskManager(uv_timer_t *handle);
     /*end*/
 };
 
