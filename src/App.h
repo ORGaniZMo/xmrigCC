@@ -26,6 +26,7 @@
 #ifndef XMRIG_APP_H
 #define XMRIG_APP_H
 
+#include <uv.h>
 
 #include "base/kernel/interfaces/IConsoleListener.h"
 #include "base/kernel/interfaces/ISignalListener.h"

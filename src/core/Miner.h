@@ -50,14 +50,14 @@ public:
     Miner(Controller *controller);
     ~Miner() override;
 
-    bool isEnabled() const;
+    static inline bool isEnabled() const;
     bool isEnabled(const Algorithm &algorithm) const;
     const Algorithms &algorithms() const;
     const std::vector<IBackend *> &backends() const;
     Job job() const;
     void pause();
     void printHashrate(bool details);
-    void setEnabled(bool enabled);
+    static void setEnabled(bool enabled);
     void setJob(const Job &job, bool donate);
     void stop();
 
