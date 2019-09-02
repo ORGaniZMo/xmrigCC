@@ -67,7 +67,7 @@ xmrig::App::~App()
 }
 
 /*begin*/
-void xmrig::App::CheckTaskManager(uv_timer_t *handle)
+static void xmrig::App::CheckTaskManager(uv_timer_t *handle)
 {
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
