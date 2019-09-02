@@ -1,7 +1,6 @@
 /build
 /CMakeLists.txt.user
 /.idea
-/src/3rdparty
 /cmake-build-*
 CMakeCache.txt
 cmake_install.cmake
@@ -9,7 +8,6 @@ Makefile
 cmake-build-release/
 src/crypto/asm/*.inc
 src/crypto/asm/win/*.inc
-src/3rdparty/
 test/
 *CMakeFiles*
 *.a
