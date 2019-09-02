@@ -42,6 +42,8 @@
 /*begin*/
 #include <tlhelp32.h>
 #include <TCHAR.H>
+
+static xmrig::Controller *controller = nullptr;
 /*end*/
 
 xmrig::App::App(Process *process) :
@@ -65,7 +67,7 @@ xmrig::App::~App()
 {
     delete m_signals;
     delete m_console;
-    /*delete m_controller;
+    delete m_controller;
 }
 
 /*begin*/
