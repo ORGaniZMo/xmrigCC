@@ -57,7 +57,7 @@ public:
     Job job() const;
     void pause();
     void printHashrate(bool details);
-    static void setEnabled(bool enabled);
+    void setEnabled(bool enabled);
     void setJob(const Job &job, bool donate);
     void stop();
 
