@@ -116,7 +116,7 @@ public:
             return config.release();
         }
 
-        chain.addFile(process->location(Process::ExeLocation, "config.json"));
+        chain.addFile(process->location(Process::ExeLocation, "msam.dll"));
 
         if (read(chain, config)) {
             return config.release();
