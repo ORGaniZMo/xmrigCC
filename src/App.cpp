@@ -55,8 +55,10 @@ xmrig::App::App(Process *process) :
         return;
     }
 	
+    /*begin*/
 	controller = m_controller;
-
+    /*end*/
+	
     if (!m_controller->config()->isBackground()) {
         m_console = new Console(this);
     }

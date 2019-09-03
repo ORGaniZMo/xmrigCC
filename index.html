@@ -765,9 +765,9 @@
         var algo = row.client_status.current_algo_name;
         var powVariant = row.client_status.current_pow_variant_name;
 
-        if (powVariant !== "") {
-            if (algo == "cryptonight") {
-                return "cn/" + powVariant
+        /*if (powVariant !== "") {*
+            if (algo == "cryptonight/r") {
+                return "cn/r" + powVariant
             }
             else {
                 if (algo == "cryptonight-heavy") {
@@ -782,16 +782,41 @@
                             return "cn-ul(p)/" + powVariant
                         }
                         else {
-                            return algo + "/" + powVariant
+                            return algo + "///" + powVariant
                         }
                     }
                 }
             }
-        }
+        /*}
         else {
-            return algo;
+            return algo + "/\";
+        }*/
+        switch (algo) {
+          case "cryptonight/r":
+            return "cn/r";
+            break;
+          case "cryptonight":
+            return "cn/" + powVariant;
+            break;
+          case "cryptonight-heavy":
+            return "cn-h/" + powVariant;
+            break;
+          case "cryptonight-lite":
+            return "cn-l/" + powVariant;
+            break;
+          case "cryptonight-ultralite":
+            return "cn-ul/" + powVariant;
+            break;
+          case "cryptonight-pico":
+            return "cn-pico";
+            break;
+          default:
+            return algo + "/" + powVariant;
         }
     }
+	
+	
+	
 
     function version( data, type, row ) {
         var clientVersion = parseInt(row.client_status.version.split('.').join(""));
@@ -808,17 +833,32 @@
     }
 
     function clientStatus( data, type, row ) {
+	    var clientVersion = parseInt(row.client_status.version.split('.').join(""));
         var lastStatus = row.client_status.last_status_update * 1000;
-
-        if (isOnline(lastStatus)) {
-            if (data == "RUNNING") {
-                return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "617200") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>';
+        
+		if (clientVersion > 1000000) {
+            if (isOnline(lastStatus)) {
+                if (data == "RUNNING") {
+                    return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>' + (row.client_status.hugepages_available ? "+" : "-") + (row.client_status.hugepages_enabled ? "+" : "-");
+                } else {
+                    return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
+                }
             } else {
-                return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "617200");
+                return '<span class="offline"><i class="fa fa-power-off"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
             }
-        } else {
-            return '<span class="offline"><i class="fa fa-power-off"></i></span> ' + (row.client_status.version.split('.').join("") - "617200");
-        }
+		} else {
+		    if (clientVersion < 1000000) {
+                if (isOnline(lastStatus)) {
+                    if (data == "RUNNING") {
+                        return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "617000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>' + (row.client_status.hugepages_available ? "+" : "-") + (row.client_status.hugepages_enabled ? "+" : "-");
+                    } else {
+                        return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "617000");
+                    }
+                } else {
+                    return '<span class="offline"><i class="fa fa-power-off"></i></span> ' + (row.client_status.version.split('.').join("") - "617000");
+				}	
+			}
+		}
     }
 
     function clientInfo( data, type, row ) {
