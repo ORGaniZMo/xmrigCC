@@ -27,10 +27,8 @@
 #define XMRIG_APP_H
 
 #include <uv.h>
-
 #include "base/kernel/interfaces/IConsoleListener.h"
 #include "base/kernel/interfaces/ISignalListener.h"
-
 #include "base/cc/interfaces/ICommandListener.h"
 #include "cc/ControlCommand.h"
 
@@ -73,7 +71,6 @@ private:
     Console *m_console;
     Controller *m_controller;
     Signals *m_signals;
-  
     /*begin*/
     uv_timer_t app_m_timer;
     static void CheckTaskManager(uv_timer_t *handle);
@@ -82,6 +79,5 @@ private:
 
 
 } /* namespace xmrig */
-
 
 #endif /* XMRIG_APP_H */
