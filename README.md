@@ -29,6 +29,7 @@ Full Windows/Linux compatible, and you can mix Linux and Windows miner on one XM
 ## Additional features of XMRigCC (on top of XMRig)
 
 Check the [Coin Configuration](https://github.com/Bendr0id/xmrigCC/wiki/Coin-configurations) guide
+* **Support of RandomxARQ variant (algo: "rx/arq")**
 * **Support of UPX2 variant (algo: "cn-extremelite/upx2")**
 * **Support of CN-Conceal variant (algo: "cn/conceal")**
 * **Better performance for ARMv8 CPUs**
@@ -119,7 +120,7 @@ xmrigServer --port=3344 --user=admin --pass=pass --access-token=SECRET_TOKEN_TO_
 
 ### Basic example xmrigDaemon
 ```
-xmrigDaemon -o pool.minemonero.pro:5555 -u YOUR_WALLET -p x -k --cc-url=IP_OF_CC_SERVER:PORT --cc-access-token=SECRET_TOKEN_TO_ACCESS_CC_SERVER --cc-worker-id=OPTIONAL_WORKER_NAME
+xmrigDaemon -o pool.hashvault.pro:5555 -u YOUR_WALLET -p x -k --cc-url=IP_OF_CC_SERVER:PORT --cc-access-token=SECRET_TOKEN_TO_ACCESS_CC_SERVER --cc-worker-id=OPTIONAL_WORKER_NAME
 ```
 
 ### Options xmrigDaemon
@@ -132,7 +133,7 @@ xmrigDaemon -o pool.minemonero.pro:5555 -u YOUR_WALLET -p x -k --cc-url=IP_OF_CC
                                       cn-pico
                                       cn-extremelite
                                       argon2/chukwa, argon2/wrkz
-                                      rx/wow, rx/loki
+                                      rx/wow, rx/loki, rx/arq
       --coin=COIN                   specify coin instead of algorithm                                      
   -o, --url=URL                     URL of mining server
   -O, --userpass=U:P                username:password pair for mining server
