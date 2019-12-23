@@ -84,6 +84,8 @@ static const option options[] = {
     { "daemon-poll-interval",  1, nullptr, IConfig::DaemonPollKey         },
     { "randomx-init",          1, nullptr, IConfig::RandomXInitKey        },
     { "randomx-no-numa",       0, nullptr, IConfig::RandomXNumaKey        },
+    { "max-cpu-usage",         1, nullptr, IConfig::CPUMaxThreadsKey      },
+    { "cpu-max-threads-hint",  1, nullptr, IConfig::CPUMaxThreadsKey      },
     // xmrigCC related
     { "daemonized",            0, nullptr, IConfig::CCDaemonizedKey       },
     { "cc-disabled",           0, nullptr, IConfig::CCEnabledKey          },

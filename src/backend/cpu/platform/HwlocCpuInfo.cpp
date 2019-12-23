@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <hwloc.h>
+#include <cmath>
 
 
 #if HWLOC_API_VERSION < 0x00010b00
@@ -202,10 +203,10 @@ xmrig::HwlocCpuInfo::~HwlocCpuInfo()
 }
 
 
-xmrig::CpuThreads xmrig::HwlocCpuInfo::threads(const Algorithm &algorithm) const
+xmrig::CpuThreads xmrig::HwlocCpuInfo::threads(const Algorithm &algorithm, uint32_t limit) const
 {
     if (L2() == 0 && L3() == 0) {
-        return BasicCpuInfo::threads(algorithm);
+        return BasicCpuInfo::threads(algorithm, limit);
     }
 
     const unsigned depth = L3() > 0 ? 3 : 2;
@@ -218,21 +219,37 @@ xmrig::CpuThreads xmrig::HwlocCpuInfo::threads(const Algorithm &algorithm) const
 
     findCache(hwloc_get_root_obj(m_topology), depth, depth, [&caches](hwloc_obj_t found) { caches.emplace_back(found); });
 
-    for (hwloc_obj_t cache : caches) {
-        processTopLevelCache(cache, algorithm, threads);
+    if (limit > 0 && limit < 100 && !caches.empty()) {
+        const double maxTotalThreads = round(m_threads * (limit / 100.0));
+        const auto maxPerCache       = std::max(static_cast<int>(round(maxTotalThreads / caches.size())), 1);
+        int remaining                = std::max(static_cast<int>(maxTotalThreads), 1);
+
+        for (hwloc_obj_t cache : caches) {
+            processTopLevelCache(cache, algorithm, threads, std::min(maxPerCache, remaining));
+
+            remaining -= maxPerCache;
+            if (remaining <= 0) {
+                break;
+            }
+        }
+    }
+    else {
+        for (hwloc_obj_t cache : caches) {
+            processTopLevelCache(cache, algorithm, threads, 0);
+        }
     }
 
     if (threads.isEmpty()) {
         LOG_WARN("hwloc auto configuration for algorithm \"%s\" failed.", algorithm.shortName());
 
-        return BasicCpuInfo::threads(algorithm);
+        return BasicCpuInfo::threads(algorithm, limit);
     }
 
     return threads;
 }
 
 
-void xmrig::HwlocCpuInfo::processTopLevelCache(hwloc_obj_t cache, const Algorithm &algorithm, CpuThreads &threads) const
+void xmrig::HwlocCpuInfo::processTopLevelCache(hwloc_obj_t cache, const Algorithm &algorithm, CpuThreads &threads, size_t limit) const
 {
     constexpr size_t oneMiB = 1024u * 1024u;
 
@@ -306,6 +323,10 @@ void xmrig::HwlocCpuInfo::processTopLevelCache(hwloc_obj_t cache, const Algorith
         cacheHashes = std::min<size_t>(std::max<size_t>(L2 / algorithm.l2(), cores.size()), cacheHashes);
     }
 #   endif
+
+    if (limit > 0) {
+        cacheHashes = std::min(cacheHashes, limit);
+    }
 
     if (cacheHashes >= PUs) {
         for (hwloc_obj_t core : cores) {

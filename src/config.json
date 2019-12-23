@@ -24,6 +24,7 @@
         "hw-aes": null,
         "priority": null,
         "asm": true,
+        "max-threads-hint": 50,
         "argon2-impl": null,
         "cn/0": false,
         "cn-lite/0": false
@@ -47,14 +48,15 @@
         }
     ],
     "cc-client": {
-        "enabled" : true,
+        "enabled": true,
         "url": "localhost:3344",
-        "use-tls" : false,
         "access-token": "mySecret",
+        "use-tls": false,
+        "use-remote-logging": true,
+        "upload-config-on-start": true,
         "worker-id": null,
-        "update-interval-s": 10,
-        "use-remote-logging" : true,
-        "upload-config-on-start" : true
+        "reboot-cmd": null,
+        "update-interval-s": 10
     },
     "print-time": 60,
     "retries": 5,

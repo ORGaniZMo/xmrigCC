@@ -93,6 +93,7 @@ Options:\n\
   -R, --retry-pause=N               time to pause between retries (default: 5)\n\
       --cpu-affinity                set process affinity to CPU core(s), mask 0x3 for cores 0 and 1\n\
       --cpu-priority                set process priority (0 idle, 2 normal to 5 highest)\n\
+      --cpu-max-threads-hint=N      maximum CPU threads count (in percentage) hint for autoconfig\n\
       --no-huge-pages               disable huge pages support\n\
       --no-color                    disable colored output\n\
       --donate-level=N              donate level, default 5%% (5 minutes in 100 minutes)\n\

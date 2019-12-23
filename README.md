@@ -2,7 +2,7 @@
 
 **:warning: Monero will change PoW algorithm to RandomX on November 30. Make sure you upgrade to the latest Release before that**
 
-XMRig is a high performance RandomX, CryptoNight and Argon2 CPU miner, with official support for Windows.
+XMRigCC is a high performance RandomX, CryptoNight and Argon2 CPU miner, with official support for Windows.
 
 :bulb: **This is the CPU variant of XMRigCC, if you're looking for the AMD GPU (OpenCL) variant [click here](https://github.com/Bendr0id/xmrigCC-amd/).**
 
@@ -29,7 +29,9 @@ Full Windows/Linux compatible, and you can mix Linux and Windows miner on one XM
 ## Additional features of XMRigCC (on top of XMRig)
 
 Check the [Coin Configuration](https://github.com/Bendr0id/xmrigCC/wiki/Coin-configurations) guide
-* **Support of RandomxARQ variant (algo: "rx/arq")**
+* **Support of RandomV variant (algo: "rx/v")**
+* **Support of RandomSFX variant (algo: "rx/sfx")**
+* **Support of RandomARQ variant (algo: "rx/arq")**
 * **Support of UPX2 variant (algo: "cn-extremelite/upx2")**
 * **Support of CN-Conceal variant (algo: "cn/conceal")**
 * **Better performance for ARMv8 CPUs**
@@ -133,7 +135,7 @@ xmrigDaemon -o pool.hashvault.pro:5555 -u YOUR_WALLET -p x -k --cc-url=IP_OF_CC_
                                       cn-pico
                                       cn-extremelite
                                       argon2/chukwa, argon2/wrkz
-                                      rx/wow, rx/loki, rx/arq
+                                      rx/wow, rx/loki, rx/arq, rx/sfx, rx/v
       --coin=COIN                   specify coin instead of algorithm                                      
   -o, --url=URL                     URL of mining server
   -O, --userpass=U:P                username:password pair for mining server
@@ -152,6 +154,7 @@ xmrigDaemon -o pool.hashvault.pro:5555 -u YOUR_WALLET -p x -k --cc-url=IP_OF_CC_
   -R, --retry-pause=N               time to pause between retries (default: 5)
       --cpu-affinity                set process affinity to CPU core(s), mask 0x3 for cores 0 and 1
       --cpu-priority                set process priority (0 idle, 2 normal to 5 highest)
+      --cpu-max-threads-hint=N      maximum CPU threads count (in percentage) hint for autoconfig
       --no-huge-pages               disable huge pages support
       --no-color                    disable colored output
       --donate-level=N              donate level, default 5% (5 minutes in 100 minutes)

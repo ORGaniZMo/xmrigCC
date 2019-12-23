@@ -1,5 +1,5 @@
 # version format
-version: 6.1.7220.{build}
+version: 6.1.7223.{build}
 
 # build only tags
 skip_non_tags: true

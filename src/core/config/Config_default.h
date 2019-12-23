@@ -58,6 +58,7 @@ R"===(
         "hw-aes": null,
         "priority": null,
         "asm": true,
+        "max-threads-hint": 100,
         "argon2-impl": null,
         "cn/0": false,
         "cn-lite/0": false

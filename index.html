@@ -5,13 +5,14 @@
     <title>XMRigCC Dashboard</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" type="text/css"
           href="https://cdn.datatables.net/buttons/1.5.0/css/buttons.bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.5/css/select.dataTables.min.css">
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.1.1/css/rowGroup.dataTables.min.css">
 
     <link rel="shortcut icon" href="https://root.graef.in:8443/static/xmrigcc/favicon.ico">
 
@@ -71,11 +72,11 @@
         }
     </style>
 
-    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script type="text/javascript" language="javascript"
-            src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+            src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" language="javascript"
-            src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
+            src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap.min.js"></script>
     <script type="text/javascript" language="javascript"
             src="https://cdn.datatables.net/buttons/1.5.0/js/dataTables.buttons.min.js"></script>
     <script type="text/javascript" language="javascript"
@@ -84,6 +85,8 @@
             src="https://cdn.datatables.net/select/1.2.4/js/dataTables.select.min.js"></script>
     <script type="text/javascript" language="javascript"
             src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.colVis.min.js"></script>
+    <script type="text/javascript" language="javascript"
+            src="https://cdn.datatables.net/rowgroup/1.1.1/js/dataTables.rowGroup.min.js"></script>
     <script type="text/javascript" language="javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.6.1/jquery.timeago.min.js"></script>
     <script type="text/javascript" language="javascript"
@@ -132,7 +135,6 @@
         );
 
         $(document).ready(function () {
-            var groupColumn = 5;
             var table = $('#clientStatusList').DataTable({
                 dom: "<'row'<'col-sm-9'B><'col-sm-3'f><'col-sm-4'i><'col-sm-8'<'#serverTime'>>><'row'<'col-sm-12't>><'row'<'col-sm-4'i>>",
                 stateSave: true,
@@ -141,10 +143,10 @@
                     url: "/admin/getClientStatusList",
                     dataSrc: 'client_status_list'
                 },
-                deferRender: true,
-                columnDefs: [
-                    {"visible": false, "targets": groupColumn}
-                ],
+                orderFixed: [5, 'asc'],
+                rowGroup: {
+                    dataSrc: "client_status.current_algo_name"
+                },
                 columns: [
                     {
                         data: null,
@@ -205,37 +207,8 @@
                 },
                 order: [1, 'asc'],
                 lengthChange: false,
-                drawCallback: function (settings) {
-                    var api = this.api();
-                    var rows = api.rows({page: 'current'}).nodes();
-                    var last = null;
-                    var groupByAlgo = $('#groupByAlgo').prop('checked');
-
-                    api.column(groupColumn, {page: 'current'}).data().each(function (group, i) {
-                        if (last !== group && groupByAlgo === true) {
-                            $(rows).eq(i).before(
-                                '<tr class="group"><td colspan="5"><b>' + group + '</b></td></tr>'
-                            );
-
-                            last = group;
-                        }
-                    });
-                },
                 buttons: [
                     'colvis',
-                    {
-                        text: '<i class="fa fa-download"></i>',
-                        className: 'btn-info',
-                        enabled: false,
-                        action: function () {
-                            table.rows({selected: true}).eq(0).each(function (index) {
-                                var row = table.row(index);
-                                var data = row.data();
-
-                                sendAction("PUBLISH_CONFIG", data.client_status.client_id);
-                            });
-                        }
-                    },
                     {
                         text: '<i class="fa fa-upload"></i>',
                         className: 'btn-primary',
@@ -246,6 +219,19 @@
                                 var data = row.data();
 
                                 sendAction("UPDATE_CONFIG", data.client_status.client_id);
+                            });
+                        }
+                    },
+                    {
+                        text: '<i class="fa fa-download"></i>',
+                        className: 'btn-info',
+                        enabled: false,
+                        action: function () {
+                            table.rows({selected: true}).eq(0).each(function (index) {
+                                var row = table.row(index);
+                                var data = row.data();
+
+                                sendAction("PUBLISH_CONFIG", data.client_status.client_id);
                             });
                         }
                     },
@@ -331,7 +317,7 @@
                                         htmlContent += "<option>" + data["templates"][i] + "</option>";
                                     }
 
-                                    if (arrayLength > 0 ) {
+                                    if (arrayLength > 0) {
                                         $('#assignTemplate').prop('disabled', false);
 
                                         $('#assignTemplateSelector').html(htmlContent);
@@ -550,7 +536,17 @@
             });
 
             $('#groupByAlgo').change(function () {
-                table.draw();
+                if ($('#groupByAlgo').prop('checked')) {
+                    table.rowGroup().enable().draw();
+                    table.order.fixed( {
+                        pre: [ 5, 'asc' ]
+                    } ).draw();
+                } else {
+                    table.rowGroup().disable().draw();
+                    table.order.fixed( {
+                        pre: []
+                    } ).draw();
+                }
             });
 
             $('#resetClientStatusList').click(function () {
@@ -844,32 +840,6 @@
             var algo = row.client_status.current_algo_name;
             var powVariant = row.client_status.current_pow_variant_name;
 
-            /*if (powVariant !== "") {*
-                if (algo == "cryptonight/r") {
-                    return "cn/r" + powVariant
-                }
-                else {
-                    if (algo == "cryptonight-heavy") {
-                        return "cn-h/" + powVariant
-                    }
-                    else {
-                        if (algo == "cryptonight-lite") {
-                            return "cn-l/" + powVariant
-                        }
-                        else {
-                            if (algo == "cryptonight-ultralite") {
-                                return "cn-ul(p)/" + powVariant
-                            }
-                            else {
-                                return algo + "///" + powVariant
-                            }
-                        }
-                    }
-                }
-            /*}
-            else {
-                return algo + "/\";
-            }*/
             switch (algo) {
               case "cryptonight/r":
                 return "cn/r";
@@ -898,8 +868,11 @@
               case "randomx/loki":
                 return "rx/loki";
                 break;
-              case "randomx":
-                return "rx";
+              case "randomx/0":
+                return "rx/0";
+                break;
+              case "argon2/chukwa":
+                return "a2/c";
                 break;
               default:
     		    if (powVariant !== "") {
@@ -1003,8 +976,7 @@
 
                 if (online) {
                     return '<span data-toggle="tooltip" title="' + tooltip + '"><div class="online">' + data + '</div></span>';
-                }
-                else {
+                } else {
                     return '<span data-toggle="tooltip" title="' + tooltip + '"><div class="offline">' + data + '</div></span>';
                 }
             }
@@ -1084,7 +1056,7 @@
                 url: "/admin/deleteClientConfig?clientId=template_" + templateId,
                 type: 'POST',
                 dataType: "text",
-                data : '{}',
+                data: '{}',
                 success: function (data) {
                     setSuccess('<strong>Successfully deleted template: ' + templateId + '</strong>');
                 },

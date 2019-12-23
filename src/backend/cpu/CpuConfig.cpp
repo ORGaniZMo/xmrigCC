@@ -36,6 +36,7 @@ static const char *kEnabled             = "enabled";
 static const char *kHugePages           = "huge-pages";
 static const char *kHwAes               = "hw-aes";
 static const char *kPriority            = "priority";
+static const char *kCpuLimit            = "max-threads-hint";
 
 #ifdef XMRIG_FEATURE_ASM
 static const char *kAsm = "asm";
@@ -64,7 +65,10 @@ static const char *kCnExtremelite = "cn-extremelite";
 #ifdef XMRIG_ALGO_RANDOMX
 static const char *kRx    = "rx";
 static const char *kRxWOW = "rx/wow";
+static const char *kRxLOKI = "rx/loki";
 static const char *kRxARQ = "rx/arq";
+static const char *kRxSFX = "rx/sfx";
+static const char *kRxV = "rx/v";
 #endif
 
 #ifdef XMRIG_ALGO_ARGON2
@@ -99,6 +103,7 @@ rapidjson::Value xmrig::CpuConfig::toJSON(rapidjson::Document &doc) const
     obj.AddMember(StringRef(kHugePages),    m_hugePages, allocator);
     obj.AddMember(StringRef(kHwAes),        m_aes == AES_AUTO ? Value(kNullType) : Value(m_aes == AES_HW), allocator);
     obj.AddMember(StringRef(kPriority),     priority() != -1 ? Value(priority()) : Value(kNullType), allocator);
+    obj.AddMember(StringRef(kCpuLimit),     m_limit, allocator);
 
 #   ifdef XMRIG_FEATURE_ASM
     obj.AddMember(StringRef(kAsm), m_assembly.toJSON(), allocator);
@@ -138,6 +143,7 @@ void xmrig::CpuConfig::read(const rapidjson::Value &value, uint32_t version)
     if (value.IsObject()) {
         m_enabled       = Json::getBool(value, kEnabled, m_enabled);
         m_hugePages     = Json::getBool(value, kHugePages, m_hugePages);
+        m_limit         = Json::getInt(value, kCpuLimit, m_limit);
 
         setAesMode(Json::getValue(value, kHwAes));
         setPriority(Json::getInt(value,  kPriority, -1));
@@ -151,65 +157,68 @@ void xmrig::CpuConfig::read(const rapidjson::Value &value, uint32_t version)
 #       endif
 
         if (!m_threads.read(value)) {
-            generate();
+            generate(m_limit);
         }
 
         if (version == 0) {
-            generateArgon2();
+            generateArgon2(m_limit);
         }
     }
     else if (value.IsBool() && value.IsFalse()) {
         m_enabled = false;
     }
     else {
-        generate();
+        generate(m_limit);
     }
 }
 
 
-void xmrig::CpuConfig::generate()
+void xmrig::CpuConfig::generate(uint32_t limit)
 {
     m_shouldSave  = true;
     ICpuInfo *cpu = Cpu::info();
 
     m_threads.disable(Algorithm::CN_0);
-    m_threads.move(kCn, cpu->threads(Algorithm::CN_0));
+    m_threads.move(kCn, cpu->threads(Algorithm::CN_0, limit));
 
 #   ifdef XMRIG_ALGO_CN_GPU
-    m_threads.move(kCnGPU, cpu->threads(Algorithm::CN_GPU));
+    m_threads.move(kCnGPU, cpu->threads(Algorithm::CN_GPU, limit));
 #   endif
 
 #   ifdef XMRIG_ALGO_CN_LITE
     m_threads.disable(Algorithm::CN_LITE_0);
-    m_threads.move(kCnLite, cpu->threads(Algorithm::CN_LITE_1));
+    m_threads.move(kCnLite, cpu->threads(Algorithm::CN_LITE_1, limit));
 #   endif
 
 #   ifdef XMRIG_ALGO_CN_HEAVY
-    m_threads.move(kCnHeavy, cpu->threads(Algorithm::CN_HEAVY_0));
+    m_threads.move(kCnHeavy, cpu->threads(Algorithm::CN_HEAVY_0, limit));
 #   endif
 
 #   ifdef XMRIG_ALGO_CN_PICO
-    m_threads.move(kCnPico, cpu->threads(Algorithm::CN_PICO_0));
+    m_threads.move(kCnPico, cpu->threads(Algorithm::CN_PICO_0, limit));
 #   endif
 
 #   ifdef XMRIG_ALGO_CN_EXTREMELITE
-    m_threads.move(kCnExtremelite, cpu->threads(Algorithm::CN_EXTREMELITE_0));
+    m_threads.move(kCnExtremelite, cpu->threads(Algorithm::CN_EXTREMELITE_0, limit));
 #   endif
 
 #   ifdef XMRIG_ALGO_RANDOMX
-    m_threads.move(kRx, cpu->threads(Algorithm::RX_0));
-    m_threads.move(kRxWOW, cpu->threads(Algorithm::RX_WOW));
-    m_threads.move(kRxARQ, cpu->threads(Algorithm::RX_ARQ));
+    m_threads.move(kRx, cpu->threads(Algorithm::RX_0, limit));
+    m_threads.move(kRxWOW, cpu->threads(Algorithm::RX_WOW, limit));
+    m_threads.move(kRxLOKI, cpu->threads(Algorithm::RX_LOKI, limit));
+    m_threads.move(kRxARQ, cpu->threads(Algorithm::RX_ARQ, limit));
+    m_threads.move(kRxSFX, cpu->threads(Algorithm::RX_SFX, limit));
+    m_threads.move(kRxV, cpu->threads(Algorithm::RX_V, limit));
 #   endif
 
-    generateArgon2();
+    generateArgon2(limit);
 }
 
 
-void xmrig::CpuConfig::generateArgon2()
+void xmrig::CpuConfig::generateArgon2(uint32_t limit)
 {
 #   ifdef XMRIG_ALGO_ARGON2
-    m_threads.move(kArgon2, Cpu::info()->threads(Algorithm::AR2_CHUKWA));
+    m_threads.move(kArgon2, Cpu::info()->threads(Algorithm::AR2_CHUKWA, limit));
 #   endif
 }
 

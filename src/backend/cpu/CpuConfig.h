@@ -60,8 +60,8 @@ public:
     inline int priority() const                         { return m_priority; }
 
 private:
-    void generate();
-    void generateArgon2();
+    void generate(uint32_t limit);
+    void generateArgon2(uint32_t limit);
     void setAesMode(const rapidjson::Value &aesMode);
 
     inline void setPriority(int priority)   { m_priority = (priority >= -1 && priority <= 5) ? priority : -1; }
@@ -72,6 +72,7 @@ private:
     bool m_hugePages     = true;
     bool m_shouldSave    = false;
     int m_priority       = -1;
+    int32_t  m_limit     = 100;
     String m_argon2Impl;
     Threads<CpuThreads> m_threads;
 };
