@@ -16,14 +16,19 @@
     "colors": true,
     "randomx": {
         "init": -1,
+        "mode": "auto",
+        "1gb-pages": false,
+        "rdmsr": true,
+        "wrmsr": true,
         "numa": true
     },
     "cpu": {
         "enabled": true,
         "huge-pages": true,
         "hw-aes": null,
-        "priority": 0,
+        "priority": 1,
         "asm": true,
+        "max-threads-hint": 50,
         "argon2-impl": null,
         "cn/0": false,
         "cn-lite/0": false
@@ -33,6 +38,7 @@
     "pools": [
         {
             "algo": null,
+            "coin": null,
             "url": "donate.graef.in:80",
             "user": "YOUR_WALLET_ADDRESS",
             "pass": "x",
@@ -46,14 +52,15 @@
         }
     ],
     "cc-client": {
-        "enabled" : true,
+        "enabled": true,
         "url": "localhost:3344",
-        "use-tls" : false,
         "access-token": "mySecret",
+        "use-tls": true,
+        "use-remote-logging": true,
+        "upload-config-on-start": true,
         "worker-id": null,
-        "update-interval-s": 10,
-        "use-remote-logging" : true,
-        "upload-config-on-start" : true
+        "reboot-cmd": null,
+        "update-interval-s": 10
     },
     "print-time": 60,
     "retries": 5,
