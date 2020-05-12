@@ -6,8 +6,8 @@
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
  * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
  * Copyright 2014-2019 heapwolf    <https://github.com/heapwolf>
- * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
- * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2018-2020 SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -28,10 +28,10 @@
 #define XMRIG_HTTPSCLIENT_H
 
 
-typedef struct bio_st BIO;
-typedef struct ssl_ctx_st SSL_CTX;
-typedef struct ssl_st SSL;
-typedef struct x509_st X509;
+using BIO       = struct bio_st;
+using SSL_CTX   = struct ssl_ctx_st;
+using SSL       = struct ssl_st;
+using X509      = struct x509_st;
 
 
 #include "base/net/http/HttpClient.h"
@@ -44,7 +44,9 @@ namespace xmrig {
 class HttpsClient : public HttpClient
 {
 public:
-    HttpsClient(int method, const String &url, IHttpListener *listener, const char *data, size_t size, const String &fingerprint);
+    XMRIG_DISABLE_COPY_MOVE_DEFAULT(HttpsClient)
+
+    HttpsClient(int method, const String &url, const std::weak_ptr<IHttpListener> &listener, const char *data, size_t size, const String &fingerprint);
     ~HttpsClient() override;
 
     const char *fingerprint() const;

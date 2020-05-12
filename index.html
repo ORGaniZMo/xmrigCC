@@ -6,15 +6,14 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap.min.css">
-    <link rel="stylesheet" type="text/css"
-          href="https://cdn.datatables.net/buttons/1.5.0/css/buttons.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.0/css/buttons.bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.5/css/select.dataTables.min.css">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.1.1/css/rowGroup.dataTables.min.css">
 
-    <link rel="shortcut icon" href="https://root.graef.in:8443/static/xmrigcc/favicon.ico">
+    <link href="data:image/x-icon;base64,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hP8YFA3/AAAA/wMCAv//2Yf/9dCC/+XDev8YFQ3/AAAA/wAAAP8AAAD/kpKS////////////////////////////////////////////////////////////////////////////e3t7/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAPAAAAD/AAAA/xYTDP/qx3z/9dCC//jShP8YFQ3/AAAA/wMCAv//2Yf/9dCC/+XCev8YFQ3/AAAA/wAAAP8AAAD/aGho////////////////////////////////////////////////////////////////////////////VVVV/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAPEAAAD1AAAA/w8NCP/oxXv/9dCC//jSg/8jHRL/AAAA/wAAAP//2oj/9dCC/+rHfP8gGxH/AAAA/wAAAP8AAAD/AQEB/1NTU/+CgoL/wsLC////////////x8fH/39/f/+AgID/zs7O////////////ysrK/4KCgv9UVFT/AgIC/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAANwAAADcAAAA/wMCAf/mxHr/9dCC//fSg/86MR//AAAA/wAAAP/ZuHP/99GD//TQgv8vKRn/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/f39/////////////ioqK/wAAAP8AAAD/mJiY////////////kJCQ/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAMUAAAC2AAAA/wAAAP/Ssm//9tGD//bRgv9dTzL/AAAA/wAAAP+Qe03/+dSE//jSg/9yYD3/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/g4OD////////////jY2N/wAAAP8AAAD/m5ub////////////k5OT/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAKcAAACDAAAA/wAAAP+MeEv/+9WF//XQgv+Nd0v/AAAA/wAAAP8wKRn//NaG//bRgv/fvnb/AAAA/wAAAP8AAAD/AAAA/2NjY/98fHz/v7+/////////////jY2N/wAAAP8AAAD/m5ub////////////yMjI/3x8fP9fX1//AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAH0AAABEAAAA/wAAAP81LRz//9uJ//XQgv/KrGv/AAAA/wAAAP8LCQb/2rl0//XQgv/914b/Wkww/wAAAP8AAAD/aWlp////////////////////////////jY2N/wAAAP8AAAD/m5ub////////////////////////////UlJS/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/gAAAFAAAAAjAAAA9QAAAP8AAAD/6MV8//XQgv//2If/HxoR/wAAAP8AAAD/lH1P//fSg//10IL/2blz/wYFA/8AAAD/ZGRk////////////////////////////YWFh/wAAAP8AAAD/c3Nz////////////////////////////UFBQ/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA+gAAACYAAAAGAAAA4QAAAP8AAAD/kXtN//XQgv/504T/s5df/wAAAP8AAAD/CQgF//rUhP/10IL/+dSE/5F7Tf8AAAD/AAAA/2ZmZv+ZmZn/mZmZ/5mZmf9lZWX/AAAA/wAAAP8AAAD/AAAA/2tra/+ZmZn/mZmZ/5mZmf9lZWX/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA7AAAAAAAAAAAAAAAiQAAAP8AAAD/PDMg//TPgv/10IL/9dCC/yokF/8AAAD/AAAA/09DKv/40oP/9dCC//3Whv+JdEn/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAA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AP8AAAD/AAAA/wAAAP8AAAD0AAAA4QAAAIQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAACMAAABEAAAAgwAAALYAAADcAAAA9QAAAP8AAAD/AAAA9AAAANoAAAC0AAAAgQAAAEMAAAAiAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//4AB//8AAP/+AAB//wAA//AAAA//AAD/4AAAB/8AAP+AAAAB/wAA/wAAAAD/AAD+AAAAAH8AAPwAAAAAPwAA+AAAAAAfAADwAAAAAA8AAPAAAAAADwAA4AAAAAAHAADAAAAAAAMAAMAAAAAAAwAAwAAAAAADAACAAAAAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAgAAAAAABAACAAAAAAAMAAMAAAAAAAwAAwAAAAAADAADgAAAAAAcAAPAAAAAADwAA8AAAAAAPAAD4AAAAAB8AAPwAAAAAPwAA/gAAAAB/AAD/AAAAAP8AAP+AAAAB/wAA/+AAAAf/AAD/8AAAD/8AAP/8AAB//wAA//8AAP//AAA="
+          rel="icon" type="image/x-icon">
 
     <style>
         .right {
@@ -98,9 +97,14 @@
 
     <script src="https://use.fontawesome.com/6b3cdfc597.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes"></script>
+	
     <script type="text/javascript">
         var TRESHOLD_IN_MS = 60 * 1000;
         var RELOAD_INTERVAL_IN_MS = 10 * 1000;
+        var CHART_RELOAD_INTERVAL_IN_MS = 60 * 1000;
 
         var latestRelease = "";
         var currentServerTime = 0;
@@ -114,6 +118,7 @@
 
                 var hideOffline = $('#hideOffline').prop('checked');
                 var showNotification = $('#showOfflineNotification').prop('checked');
+                var groupByAlgo = $('#groupByAlgo').prop('checked');
 
                 var clientId = settings.aoData[dataIndex]._aData.client_status.client_id;
                 var lastStatus = settings.aoData[dataIndex]._aData.client_status.last_status_update * 1000;
@@ -538,14 +543,14 @@
             $('#groupByAlgo').change(function () {
                 if ($('#groupByAlgo').prop('checked')) {
                     table.rowGroup().enable().draw();
-                    table.order.fixed( {
-                        pre: [ 5, 'asc' ]
-                    } ).draw();
+                    table.order.fixed({
+                        pre: [5, 'asc']
+                    }).draw();
                 } else {
                     table.rowGroup().disable().draw();
-                    table.order.fixed( {
+                    table.order.fixed({
                         pre: []
-                    } ).draw();
+                    }).draw();
                 }
             });
 
@@ -748,9 +753,159 @@
                 }
             });
 
+
+            var hashrateChart = new Chart(document.getElementById("hashrateChart").getContext("2d"), {
+	      			type: "line",
+	      			data: {
+	      				datasets: []
+	      			},
+	      			options: {
+      				    title:{
+  							display:true,
+  							text:'Hashrates'
+					    },
+					    tooltips: {
+					      mode: 'nearest',
+					      intersect: false,
+					    },
+						scales: { 
+						   yAxes: [
+						   	{
+						   	  id: 'hashrate',
+						   	  position: 'left',
+			        		  scalePositionLeft: true,
+						   	  stacked: false,
+						      ticks: {
+						             beginAtZero: true
+					          },
+						      scaleLabel: {
+						             display: true,
+						             labelString: 'Hashrate',
+						             fontSize: 16
+						      }
+						    }
+						  ],
+						  xAxes: [{
+						   	  type: 'time',
+						   	  distribution: 'series',
+						   	  time: {
+			        			unit: 'minute',
+			        			displayFormats: {
+			           				minute: 'HH:mm'
+			        		  	}
+			        		  },
+			        		  ticks: {
+			        		  	stepSize: 10,
+			        		  	autoSkip: true,
+			        			maxTicksLimit: 60
+			        		  }
+						    }]
+						  },
+						  elements: {
+			                point:{
+			        		    radius: 0
+			              	}
+			              },
+						  responsive: true,
+			    		  maintainAspectRatio: false
+			    	},
+	      			plugins: {
+	      				colorschemes: {
+	    					scheme: 'brewer.Paired12'
+	  					}		
+	      			}
+				});
+
+			var minerChart = new Chart(document.getElementById("minerChart").getContext("2d"), {
+      			type: "line",
+      			data: {
+      				datasets: []
+      			},
+				options: {
+    				title:{
+							display:true,
+							text:'Miners'
+				    },
+				    tooltips: {
+				      mode: 'nearest',
+				      intersect: false,
+				    },
+				    scales: { 
+					   yAxes: [
+					   {
+					      id: 'miner',
+					      position: 'left',
+		        	      scalePositionLeft: true,
+					      stacked: false,
+					      ticks: {
+					             beginAtZero: true,
+					             callback: function(value) {if (value % 1 === 0) {return value;}}
+					           },
+					      scaleLabel: {
+					             display: true,
+					             labelString: 'Miner',
+					             fontSize: 16
+					           }
+					    }
+					  ],
+					  xAxes: [{
+					   	  type: 'time',
+					   	  distribution: 'series',
+					   	  time: {
+		        			unit: 'minute',
+		        			displayFormats: {
+		           				minute: 'HH:mm'
+		        		  	}
+		        		  },
+		        		  ticks: {
+		        		  	stepSize: 10,
+		        		  	autoSkip: true,
+		        			maxTicksLimit: 60
+		        		  }
+					    }]
+					},
+					elements: {
+		            	point:{
+		        		    radius: 0
+		            	}
+		            },
+					responsive: true,
+					maintainAspectRatio: false
+		    	},      			
+      			plugins: {
+      				colorschemes: {
+    					scheme: 'brewer.Paired12'
+  					}		
+      			}
+			});
+
+			Chart.plugins.register({
+				afterDraw: function(chart) {
+			  	if (chart.data.datasets.length === 0) {
+			    	// No data is present
+			      var ctx = chart.chart.ctx;
+			      var width = chart.chart.width;
+			      var height = chart.chart.height
+			      
+			      ctx.save();
+			      ctx.textAlign = 'center';
+			      ctx.textBaseline = 'middle';
+			      ctx.font = "16px normal 'Helvetica Nueue'";
+			      ctx.fillText('No data to display', width / 2, height / 2);
+			      ctx.restore();
+			    }
+			  }
+			});
+
+			updateCharts(hashrateChart, minerChart);
+
             setInterval(function () {
                 table.ajax.reload();
             }, RELOAD_INTERVAL_IN_MS);
+
+		    setInterval(function () {
+                updateCharts(hashrateChart, minerChart);
+            }, CHART_RELOAD_INTERVAL_IN_MS);
         });
 
         function sendAction(action, clientId) {
@@ -904,7 +1059,7 @@
             if (clientVersion > 70000000) {
                 if (isOnline(lastStatus)) {
                     if (data == "RUNNING") {
-                        return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "617600000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>' + (row.client_status.hugepages_available ? "+" : "-") + (row.client_status.hugepages_enabled ? "+" : "-");
+                        return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "617600000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? "*" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>' + (row.client_status.hugepages_available ? "+" : "-") + (row.client_status.hugepages_enabled ? "+" : "-");
                     } else {
                         return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "617600000");
                     }
@@ -915,7 +1070,7 @@
     			if (clientVersion > 1000000) {
                     if (isOnline(lastStatus)) {
                         if (data == "RUNNING") {
-                            return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>' + (row.client_status.hugepages_available ? "+" : "-") + (row.client_status.hugepages_enabled ? "+" : "-");
+                            return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? "*" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>' + (row.client_status.hugepages_available ? "+" : "-") + (row.client_status.hugepages_enabled ? "+" : "-");
                         } else {
                             return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "61760000");
                         }
@@ -926,7 +1081,7 @@
         		    if (clientVersion < 1000000) {
                         if (isOnline(lastStatus)) {
                             if (data == "RUNNING") {
-                                return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "617000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? " *" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>' + (row.client_status.hugepages_available ? "+" : "-") + (row.client_status.hugepages_enabled ? "+" : "-");
+                                return '<span class="online"><i class="fa fa-play"></i></span> ' + (row.client_status.version.split('.').join("") - "617000") + '<span class="paused">' + (row.client_status.cpu_is_x64 ? "*" : "") + '</span>' + '<span class="online">' + (row.client_status.cpu_has_aes ? "*" : "") + '</span>' + (row.client_status.hugepages_available ? "+" : "-") + (row.client_status.hugepages_enabled ? "+" : "-");
                             } else {
                                 return '<span class="paused"><i class="fa fa-pause"></i></span> ' + (row.client_status.version.split('.').join("") - "617000");
                             }
@@ -1052,7 +1207,7 @@
         }
 
         function deleteTemplateConfig(templateId) {
-            $.ajax({
+            $.ajax(	{
                 url: "/admin/deleteClientConfig?clientId=template_" + templateId,
                 type: 'POST',
                 dataType: "text",
@@ -1065,12 +1220,55 @@
                 }
             });
         }
+
+		function updateCharts(hashrateChart, minerChart) {
+
+		  $.ajax({
+		    url: '/admin/getClientStatistics',
+		    dataType: 'json',
+		  }).done(function (results) {
+
+		  	var algos = results["client_statistics"].map(function(e) {
+			   return e.algo;
+			});
+			
+			var statistics = results["client_statistics"].map(function(e) {
+			   return e.statistics;
+			});
+		  
+		  	var hashrateDatasets=[], minerDatasets=[];
+			for(var j = 0; j < results["client_statistics"].length; j++) {
+				var hashrates = statistics[j].map(function(e) {
+					return {
+						x: new Date(e.timestamp),
+						y: e.hashrate
+					}
+				});
+
+				var miners = statistics[j].map(function(e) {
+					return {
+						x: new Date(e.timestamp),
+						y: e.miner
+					}
+				});
+
+				hashrateDatasets.push({label: algos[j], type: 'line', data: hashrates, spanGraphs: false, fill: true});
+  				minerDatasets.push({label: algos[j], type: 'line', data: miners, spanGraphs: false, fill: false});
+			}
+
+			hashrateChart.data.datasets = hashrateDatasets;
+			hashrateChart.update();
+    		
+    		minerChart.data.datasets = minerDatasets;
+    		minerChart.update();
+		});
+	}
     </script>
 
 </head>
 <body>
 <br/>
-<div style="width: 95%; margin:0 auto;">
+<div style="width: 96%; margin:0 auto;">
     <div id="updateNotificationBar"></div>
     <div id="notificationBar"></div>
     <div id="statusBar"></div>
@@ -1080,12 +1278,9 @@
     </div>
 
     <form style="padding-bottom: 5px; margin-top: -75px">
-        <label><input id="hideOffline" type="checkbox" checked data-toggle="toggle" data-size="mini"
-                      data-onstyle="success" data-offstyle="danger"/><span>Hide offline miners</span>
-               <input id="showOfflineNotification" type="checkbox" data-toggle="toggle" data-size="mini"
-			          data-onstyle="success" data-offstyle="danger"/><span>Notify when miner went offline</span>
-               <input id="groupByAlgo" type="checkbox" data-toggle="toggle" data-size="mini"
-                      data-onstyle="success" data-offstyle="danger"/><span>Group by Algo</span>
+        <label><input id="hideOffline" type="checkbox" checked data-toggle="toggle" data-size="mini" data-onstyle="success" data-offstyle="danger"/><span>Hide offline miners</span>
+               <input id="showOfflineNotification" type="checkbox" data-toggle="toggle" data-size="mini" data-onstyle="success" data-offstyle="danger"/><span>Notify when miner went offline</span>
+               <input id="groupByAlgo" type="checkbox" checked data-toggle="toggle" data-size="mini" data-onstyle="success" data-offstyle="danger"/><span>Group by Algo</span>
 			 
                <button id="resetClientStatusList" type="button" class="btn btn-danger fa fa-trash-o"></button>
         </label>
@@ -1173,6 +1368,13 @@
     </table>
 
     <br/>
+
+    <div style="height: 30vh; margin:0 auto;">
+        <canvas id="hashrateChart"></canvas>
+        <br/><br/>
+        <canvas id="minerChart"></canvas>
+	</div>
+	
     <div class="modal fade" id="minerEditor" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

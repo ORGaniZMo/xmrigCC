@@ -97,3 +97,9 @@ Allow override automatically detected Argon2 implementation, this option added m
 
 #### `max-threads-hint` (since v2.2.2)
 Maximum CPU threads count (in percentage) hint for autoconfig. [CPU_MAX_USAGE.md](CPU_MAX_USAGE.md)
+
+#### `memory-pool` (since v2.2.0)
+Use continuous, persistent memory block for mining threads, useful for preserve huge pages allocation while algorithm swithing. Possible values `false` (feature disabled, by default) or `true` or specific count of 2 MB huge pages.
+
+#### `yield` (since 2.5.0)
+Prefer system better system res

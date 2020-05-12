@@ -25,6 +25,7 @@
 
 #include "ClientStatus.h"
 #include "version.h"
+#include "ControlCommand.h"
 
 #ifdef TYPE_AMD_GPU
 #include "amd/GpuContext.h"
@@ -55,7 +56,7 @@ public:
 
     ~CCClient();
 
-    inline void addClientStatusListener(IClientStatusListener *listener) { m_ClientStatislisteners.push_back(listener); }
+    inline void addClientStatusListener(IClientStatusListener *listener) { m_ClientStatuslisteners.push_back(listener); }
     inline void addCommandListener(ICommandListener *listener) { m_Commandlisteners.push_back(listener); }
 
     void start();
@@ -66,7 +67,7 @@ protected:
     void onTimer(const Timer *timer) override;
 
 private:
-    static void publishThread(CCClient* handle);
+    void publishThread();
 
     void publishClientStatusReport();
     void updateAuthorization();
@@ -92,9 +93,10 @@ private:
     std::string m_authorization;
     bool m_configPublishedOnStart;
 
-    Timer *m_timer;
+    Timer* m_timer;
+    std::thread m_thread;
     std::vector<ICommandListener *> m_Commandlisteners;
-    std::vector<IClientStatusListener *> m_ClientStatislisteners;
+    std::vector<IClientStatusListener *> m_ClientStatuslisteners;
 };
 }
 

@@ -21,6 +21,7 @@
 #include <3rdparty/rapidjson/stringbuffer.h>
 #include <3rdparty/rapidjson/prettywriter.h>
 #include <crypto/common/VirtualMemory.h>
+#include <base/kernel/Env.h>
 
 #include "backend/cpu/Cpu.h"
 #include "base/tools/Timer.h"
@@ -33,7 +34,6 @@
 
 #include "CCClient.h"
 #include "App.h"
-#include "ControlCommand.h"
 #include "version.h"
 
 #ifdef TYPE_AMD_GPU
@@ -88,6 +88,7 @@ xmrig::CCClient::CCClient(Base* base)
 
 xmrig::CCClient::~CCClient()
 {
+  LOG_DEBUG("CCClient::~CCCLient()");
   delete m_timer;
 }
 
@@ -98,7 +99,7 @@ void xmrig::CCClient::start()
   Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") CSI "1;%dm%s",
              "CC Server",
              (m_base->config()->ccClient().useTLS() ? 32 : 36),
-             m_base->config()->ccClient().url()
+              m_base->config()->ccClient().url()
   );
 
   updateAuthorization();
@@ -129,10 +130,7 @@ void xmrig::CCClient::updateClientInfo()
   }
   else
   {
-    char hostname[128];
-    memset(hostname, 0, sizeof(hostname));
-    gethostname(hostname, sizeof(hostname) - 1);
-    clientId = std::string(hostname);
+    clientId = Env::hostname();
   }
 
   auto cpuInfo = xmrig::Cpu::info();
@@ -174,13 +172,18 @@ void xmrig::CCClient::stop()
   {
     m_timer->stop();
   }
+
+  if (m_thread.joinable())
+  {
+    m_thread.join();
+  }
 }
 
 void xmrig::CCClient::updateStatistics()
 {
   LOG_DEBUG("CCClient::updateStatistics");
 
-  for (IClientStatusListener* listener : m_ClientStatislisteners)
+  for (IClientStatusListener* listener : m_ClientStatuslisteners)
   {
     listener->onUpdateRequest(m_clientStatus);
   }
@@ -280,9 +283,9 @@ void xmrig::CCClient::publishClientStatusReport()
         LOG_WARN(CLEAR "%s " YELLOW("Command: REBOOT received -> trigger reboot"), tag);
       }
 
-      for (ICommandListener* listener : m_Commandlisteners)
+      for (ICommandListener *listener : m_Commandlisteners)
       {
-        listener->onCommandReceived(controlCommand);
+        listener->onCommandReceived(controlCommand.getCommand());
       }
     }
     else
@@ -472,24 +475,26 @@ void xmrig::CCClient::onConfigChanged(Config* config, Config* previousConfig)
 void xmrig::CCClient::onTimer(const xmrig::Timer* timer)
 {
   LOG_DEBUG("CCClient::onTimer");
-  std::thread(CCClient::publishThread, this).detach();
+
+  if (!m_thread.joinable())
+  {
+    m_thread = std::thread(&CCClient::publishThread, this);
+    m_thread.detach();
+  }
 }
 
-void xmrig::CCClient::publishThread(CCClient* handle)
+void xmrig::CCClient::publishThread()
 {
-  LOG_DEBUG("CCClient::publishThread");
-  if (handle)
+  LOG_DEBUG("CCClient::publishThread()");
+  if (!m_configPublishedOnStart && m_base->config()->ccClient().uploadConfigOnStartup())
   {
-    if (!handle->m_configPublishedOnStart && handle->m_base->config()->ccClient().uploadConfigOnStartup())
-    {
-      handle->m_configPublishedOnStart = true;
-      handle->publishConfig();
-    }
-
-    handle->updateUptime();
-    handle->updateLog();
-    handle->updateStatistics();
-
-    handle->publishClientStatusReport();
+    m_configPublishedOnStart = true;
+    publishConfig();
   }
+
+  updateUptime();
+  updateLog();
+  updateStatistics();
+
+  publishClientStatusReport();
 }

@@ -34,7 +34,7 @@
 
 #include "base/tools/Buffer.h"
 #include "base/tools/String.h"
-#include "crypto/common/Algorithm.h"
+#include "base/crypto/Algorithm.h"
 
 
 namespace xmrig {

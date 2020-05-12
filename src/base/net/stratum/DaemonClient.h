@@ -5,9 +5,9 @@
  * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
  * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
- * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
  * Copyright 2019      Howard Chu  <https://github.com/hyc>
- * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2018-2020 SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -27,9 +27,13 @@
 #define XMRIG_DAEMONCLIENT_H
 
 
-#include "base/net/stratum/BaseClient.h"
 #include "base/kernel/interfaces/ITimerListener.h"
-#include "base/kernel/interfaces/IHttpListener.h"
+#include "base/net/http/HttpListener.h"
+#include "base/net/stratum/BaseClient.h"
+#include "base/tools/Object.h"
+
+
+#include <memory>
 
 
 namespace xmrig {
@@ -38,6 +42,8 @@ namespace xmrig {
 class DaemonClient : public BaseClient, public ITimerListener, public IHttpListener
 {
 public:
+    XMRIG_DISABLE_COPY_MOVE_DEFAULT(DaemonClient)
+
     DaemonClient(int id, IClientListener *listener);
     ~DaemonClient() override;
 
@@ -51,12 +57,14 @@ protected:
     void onHttpData(const HttpData &data) override;
     void onTimer(const Timer *timer) override;
 
-    inline bool hasExtension(Extension) const noexcept override { return false; }
-    inline const char *mode() const override                    { return "daemon"; }
-    inline const char *tlsFingerprint() const override          { return m_tlsFingerprint; }
-    inline const char *tlsVersion() const override              { return m_tlsVersion; }
-    inline void deleteLater() override                          { delete this; }
-    inline void tick(uint64_t) override                         {}
+    inline bool hasExtension(Extension) const noexcept override         { return false; }
+    inline const char *mode() const override                            { return "daemon"; }
+    inline const char *tlsFingerprint() const override                  { return m_tlsFingerprint; }
+    inline const char *tlsVersion() const override                      { return m_tlsVersion; }
+    inline int64_t send(const rapidjson::Value &, Callback) override    { return -1; }
+    inline int64_t send(const rapidjson::Value &) override              { return -1; }
+    inline void deleteLater() override                                  { delete this; }
+    inline void tick(uint64_t) override                                 {}
 
 private:
     bool isOutdated(uint64_t height, const char *hash) const;
@@ -68,8 +76,15 @@ private:
     void send(int method, const char *url, const rapidjson::Document &doc);
     void setState(SocketState state);
 
-    bool m_monero;
+    enum {
+        API_CRYPTONOTE_DEFAULT,
+        API_MONERO,
+        API_DERO,
+    } m_apiVersion;
+
+    std::shared_ptr<IHttpListener> m_httpListener;
     String m_blocktemplate;
+    String m_blockhashingblob;
     String m_prevHash;
     String m_tlsFingerprint;
     String m_tlsVersion;

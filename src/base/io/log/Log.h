@@ -26,7 +26,7 @@
 #ifndef XMRIG_LOG_H
 #define XMRIG_LOG_H
 
-
+#include <cstddef>
 #include <cstdint>
 
 

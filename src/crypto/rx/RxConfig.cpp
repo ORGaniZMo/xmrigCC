@@ -5,8 +5,8 @@
  * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
  * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
- * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
- * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2018-2020 SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ constexpr size_t kMsrArraySize = 4;
 static const std::array<MsrItems, kMsrArraySize> msrPresets = {
     MsrItems(),
     MsrItems{{ 0xC0011020, 0x0 }, { 0xC0011021, 0x40, ~0x20ULL }, { 0xC0011022, 0x510000 }, { 0xC001102b, 0x1808cc16 }},
-    MsrItems{{ 0x1a4, 0x6 }},
+    MsrItems{{ 0x1a4, 0xf }},
     MsrItems()
 };
 

@@ -5,8 +5,8 @@
  * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
  * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
- * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
- * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2018-2020 SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <iterator>
 
 
@@ -38,7 +38,7 @@
 #include "core/config/Config.h"
 #include "core/Controller.h"
 #include "core/Miner.h"
-#include "crypto/common/keccak.h"
+#include "base/crypto/keccak.h"
 #include "net/Network.h"
 #include "net/strategies/DonateStrategy.h"
 #include "rapidjson/document.h"
@@ -55,17 +55,10 @@ static const char *kDonateHost = "donate.graef.in";
 
 
 xmrig::DonateStrategy::DonateStrategy(Controller *controller, IStrategyListener *listener) :
-    m_tls(false),
-    m_userId(),
     m_donateTime(static_cast<uint64_t>(controller->config()->pools().donateLevel()) * 0 * 1000),
     m_idleTime((100 - static_cast<uint64_t>(controller->config()->pools().donateLevel())) * 0 * 1000),
     m_controller(controller),
-    m_proxy(nullptr),
-    m_strategy(nullptr),
-    m_listener(listener),
-    m_state(STATE_NEW),
-    m_now(0),
-    m_timestamp(0)
+    m_listener(listener)
 {
     uint8_t hash[200];
 
@@ -81,10 +74,10 @@ xmrig::DonateStrategy::DonateStrategy(Controller *controller, IStrategyListener 
     m_pools.emplace_back(kDonateHost, 4100, m_userId, nullptr, 0, true);
 
     if (m_pools.size() > 1) {
-        m_strategy = new FailoverStrategy(m_pools, 1, 2, this, true);
+        m_strategy = new FailoverStrategy(m_pools, 10, 2, this, true);
     }
     else {
-        m_strategy = new SinglePoolStrategy(m_pools.front(), 1, 2, this, true);
+        m_strategy = new SinglePoolStrategy(m_pools.front(), 10, 2, this, true);
     }
 
     m_timer = new Timer(this);
@@ -116,9 +109,7 @@ void xmrig::DonateStrategy::connect()
     if (m_proxy) {
         m_proxy->connect();
     }
-    else if (m_controller->config()->pools().proxyDonate() == Pools::PROXY_DONATE_ALWAYS) {
-        setState(STATE_IDLE);
-    }
+
     else {
         m_strategy->connect();
     }
@@ -130,6 +121,12 @@ void xmrig::DonateStrategy::setAlgo(const xmrig::Algorithm &algo)
     m_algorithm = algo;
 
     m_strategy->setAlgo(algo);
+}
+
+
+void xmrig::DonateStrategy::setProxy(const ProxyUrl &proxy)
+{
+    m_strategy->setProxy(proxy);
 }
 
 
@@ -222,13 +219,25 @@ void xmrig::DonateStrategy::onLoginSuccess(IClient *client)
 }
 
 
+void xmrig::DonateStrategy::onVerifyAlgorithm(const IClient *client, const Algorithm &algorithm, bool *ok)
+{
+    m_listener->onVerifyAlgorithm(this, client, algorithm, ok);
+}
+
+
+void xmrig::DonateStrategy::onVerifyAlgorithm(IStrategy *, const  IClient *client, const Algorithm &algorithm, bool *ok)
+{
+    m_listener->onVerifyAlgorithm(this, client, algorithm, ok);
+}
+
+
 void xmrig::DonateStrategy::onTimer(const Timer *)
 {
     setState(isActive() ? STATE_WAIT : STATE_CONNECT);
 }
 
 
-xmrig::Client *xmrig::DonateStrategy::createProxy()
+xmrig::IClient *xmrig::DonateStrategy::createProxy()
 {
     if (m_controller->config()->pools().proxyDonate() == Pools::PROXY_DONATE_NONE) {
         return nullptr;
@@ -242,10 +251,11 @@ xmrig::Client *xmrig::DonateStrategy::createProxy()
     const IClient *client = strategy->client();
     m_tls                 = client->hasExtension(IClient::EXT_TLS);
 
-    Pool pool(client->ip(), client->pool().port(), m_userId, client->pool().password(), 0, true, client->isTLS());
+    Pool pool(client->pool().proxy().isValid() ? client->pool().host() : client->ip(), client->pool().port(), m_userId, client->pool().password(), 0, true, client->isTLS());
     pool.setAlgo(client->pool().algorithm());
+    pool.setProxy(client->pool().proxy());
 
-    Client *proxy = new Client(-1, Platform::userAgent(), this);
+    IClient *proxy = new Client(-1, Platform::userAgent(), this);
     proxy->setPool(pool);
     proxy->setQuiet(true);
 

@@ -1,10 +1,8 @@
 # XMRigCC 
 
-**:warning: Monero will change PoW algorithm to RandomX on November 30. Make sure you upgrade to the latest Release before that**
+XMRigCC is a high performance RandomX, CryptoNight, Argon2 and AstroBWT CPU miner for support for Windows, Linux and MacOS.
 
-XMRigCC is a high performance RandomX, CryptoNight and Argon2 CPU miner, with official support for Windows.
-
-:bulb: **This is the CPU variant of XMRigCC, if you're looking for the AMD GPU (OpenCL) variant [click here](https://github.com/Bendr0id/xmrigCC-amd/).**
+:bulb: **This is the CPU variant of XMRigCC, if you're looking for the AMD GPU (OpenCL, Cryptonight only) variant [click here](https://github.com/Bendr0id/xmrigCC-amd/).**
 
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/l8v7cuuy320a4tpd?svg=true)](https://ci.appveyor.com/project/Bendr0id/xmrigcc)
 [![Docker Build status](https://img.shields.io/docker/build/bendr0id/xmrigcc.svg)](https://hub.docker.com/r/bendr0id/xmrigcc/)
@@ -26,20 +24,21 @@ PushOver or Telegram automatically so that you dont need to watch your miners al
 
 Full Windows/Linux compatible, and you can mix Linux and Windows miner on one XMRigCCServer.
 
-## Additional features of XMRigCC (on top of XMRig)
+## Features of XMRigCC
 
-Check the [Coin Configuration](https://github.com/Bendr0id/xmrigCC/wiki/Coin-configurations) guide
+* **Support of AstroBWT variant (algo: "astrobwt")**
+* **Support of RandomKEVA variant (algo: "rx/keva")**
 * **Support of CN-Talleo variant (algo: "cn-pico/tlo")**
 * **Support of RandomSFX variant (algo: "rx/sfx")**
 * **Support of RandomARQ variant (algo: "rx/arq")**
-* **Support of UPX2 variant (algo: "cn-extremelite/upx2")**
+* **Support of UPX2 variant (algo: "cn-extremelite/upx2")** b
 * **Support of CN-Conceal variant (algo: "cn/conceal")**
-* **Better performance for ARMv8 CPUs**
+* **Better performance on ARMv8 CPUs**
 * Full SSL/TLS support
 * NUMA support
 * Command and control server
 * CC Dashboard with:
-    * statistics of all connected miners
+    * statistics of all connected miners with graphs
     * remote control miners (start/stop/restart/shutdown) 
     * remote configuration changes of miners
     * simple config editor for miner / config templates 
@@ -127,58 +126,55 @@ xmrigDaemon -o pool.hashvault.pro:5555 -u YOUR_WALLET -p x -k --cc-url=IP_OF_CC_
 
 ### Options xmrigDaemon
 ```
-  -a, --algo=ALGO                   specify the algorithm to use
-                                      cn/r, cn/2, cn/1, cn/0, cn/double, cn/half, cn/fast,
-                                      cn/rwz, cn/zls, cn/xao, cn/rto, cn/conceal,
-                                      cn-lite/1,
-                                      cn-heavy/xhv, cn-heavy/tube, cn-heavy/0,
-                                      cn-pico, cn-pico/tlo
-                                      cn-extremelite
-                                      argon2/chukwa, argon2/wrkz
-                                      rx/0, rx/wow, rx/loki, rx/arq
-      --coin=COIN                   specify coin instead of algorithm
-  -o, --url=URL                     URL of mining server
-  -O, --userpass=U:P                username:password pair for mining server
-  -u, --user=USERNAME               username for mining server
-  -p, --pass=PASSWORD               password for mining server
-      --rig-id=ID                   rig identifier for pool-side statistics (needs pool support)
-  -t, --threads=N                   number of miner threads
-  -v, --av=N                        algorithm variation, 0 auto select
-  -k, --keepalive                   send keepalived packet for prevent timeout (needs pool support)
-      --nicehash                    enable nicehash.com support
-      --tls                         enable SSL/TLS support (needs pool support)
-      --tls-fingerprint=F           pool TLS certificate fingerprint, if set enable strict certificate pinning
-      --daemon                      use daemon RPC instead of pool for solo mining
-      --daemon-poll-interval=N      daemon poll interval in milliseconds (default: 1000)
-  -r, --retries=N                   number of times to retry before switch to backup server (default: 5)
-  -R, --retry-pause=N               time to pause between retries (default: 5)
-      --cpu-affinity                set process affinity to CPU core(s), mask 0x3 for cores 0 and 1
-      --cpu-priority                set process priority (0 idle, 2 normal to 5 highest)
-      --cpu-max-threads-hint=N      maximum CPU threads count (in percentage) hint for autoconfig
-      --no-huge-pages               disable huge pages support
-      --no-color                    disable colored output
-      --donate-level=N              donate level, default 5% (5 minutes in 100 minutes)
-      --user-agent                  set custom user-agent string for pool
-  -B, --background                  run the miner in the background
-  -c, --config=FILE                 load a JSON-format configuration file
-  -l, --log-file=FILE               log all output to a file
-  -S, --syslog                      use system log for output messages
-      --asm=ASM                     ASM optimizations, possible values: auto, none, intel, ryzen, bulldozer.
-      --print-time=N                print hashrate report every N seconds
-      --api-worker-id=ID            custom worker-id for API
-      --api-id=ID                   custom instance ID for API
-      --http-enabled                enable HTTP API
-      --http-host=HOST              bind host for HTTP API (default: 127.0.0.1)
-      --http-port=N                 bind port for HTTP API
-      --http-access-token=T         access token for HTTP API
-      --http-no-restricted          enable full remote access to HTTP API (only if access token set)
-      --randomx-init=N              threads count to initialize RandomX dataset
-      --randomx-no-numa             disable NUMA support for RandomX
-      --randomx-mode=MODE           RandomX mode: auto, fast, light
-      --randomx-1gb-pages           use 1GB hugepages for dataset (Linux only)
-      --randomx-wrmsr=N             write custom value (0-15) to Intel MSR register 0x1a4 or disable MSR mod (-1)
-      --randomx-no-rdmsr            disable reverting initial MSR values on exit
-      --export-topology             export hwloc topology to a XML file and exit
+Network:
+  -o, --url=URL                 URL of mining server
+  -a, --algo=ALGO               mining algorithm (https://github.com/Bendr0id/xmrigCC/blob/master/doc/ALGORITHMS.md)
+      --coin=COIN               specify coin instead of algorithm
+  -u, --user=USERNAME           username for mining server
+  -p, --pass=PASSWORD           password for mining server
+  -O, --userpass=U:P            username:password pair for mining server
+  -x, --proxy=HOST:PORT         connect through a SOCKS5 proxy
+  -k, --keepalive               send keepalived packet for prevent timeout (needs pool support)
+      --nicehash                enable nicehash.com support
+      --rig-id=ID               rig identifier for pool-side statistics (needs pool support)
+      --tls                     enable SSL/TLS support (needs pool support)
+      --tls-fingerprint=HEX     pool TLS certificate fingerprint for strict certificate pinning
+      --daemon                  use daemon RPC instead of pool for solo mining
+      --daemon-poll-interval=N  daemon poll interval in milliseconds (default: 1000)
+      --self-select=URL         self-select block templates from URL
+  -r, --retries=N               number of times to retry before switch to backup server (default: 5)
+  -R, --retry-pause=N           time to pause between retries (default: 5)
+      --user-agent              set custom user-agent string for pool
+      --donate-level=N          donate level, default 5%% (5 minutes in 100 minutes)
+      --donate-over-proxy=N     control donate over xmrig-proxy feature
+
+CPU backend:
+      --no-cpu                  disable CPU mining backend
+  -t, --threads=N               number of CPU threads
+  -v, --av=N                    algorithm variation, 0 auto select
+      --cpu-affinity            set process affinity to CPU core(s), mask 0x3 for cores 0 and 1
+      --cpu-priority            set process priority (0 idle, 2 normal to 5 highest)
+      --cpu-max-threads-hint=N  maximum CPU threads count (in percentage) hint for autoconfig
+      --cpu-memory-pool=N       number of 2 MB pages for persistent memory pool, -1 (auto), 0 (disable)
+      --cpu-no-yield            prefer maximum hashrate rather than system response/stability
+      --no-huge-pages           disable huge pages support
+      --asm=ASM                 ASM optimizations, possible values: auto, none, intel, ryzen, bulldozer
+      --randomx-init=N          threads count to initialize RandomX dataset
+      --randomx-no-numa         disable NUMA support for RandomX
+      --randomx-mode=MODE       RandomX mode: auto, fast, light
+      --randomx-1gb-pages       use 1GB hugepages for dataset (Linux only)
+      --randomx-wrmsr=N         write custom value (0-15) to Intel MSR register 0x1a4 or disable MSR mod (-1)
+      --randomx-no-rdmsr        disable reverting initial MSR values on exit
+
+API:
+      --api-worker-id=ID        custom worker-id for API
+      --api-id=ID               custom instance ID for API
+      --http-host=HOST          bind host for HTTP API (default: 127.0.0.1)
+      --http-port=N             bind port for HTTP API
+      --http-access-token=T     access token for HTTP API
+      --http-no-restricted      enable full remote access to HTTP API (only if access token set)
+
+CC feature:
       --cc-disabled                 disable CC Client feature
       --cc-url=URL                  url of the CC Server
       --cc-access-token=T           access token for CC Server
@@ -188,9 +184,21 @@ xmrigDaemon -o pool.hashvault.pro:5555 -u YOUR_WALLET -p x -k --cc-url=IP_OF_CC_
       --cc-use-remote-logging       enable remote logging on CC Server
       --cc-upload-config-on-start   upload current miner config to CC Server on startup
       --cc-reboot-cmd=CMD           command/bat to execute to Reboot miner machine
-      --dry-run                     test configuration and exit
-  -h, --help                        display this help and exit
-  -V, --version                     output version information and exit
+
+Logging:
+  -S, --syslog                  use system log for output messages
+  -l, --log-file=FILE           log all output to a file
+      --print-time=N            print hashrate report every N seconds
+      --no-color                disable colored output
+      --verbose                 verbose output
+
+Misc:
+  -c, --config=FILE             load a JSON-format configuration file
+  -B, --background              run the miner in the background
+  -V, --version                 output version information and exit
+  -h, --help                    display this help and exit
+      --dry-run                 test configuration and exit
+      --export-topology         export hwloc topology to a XML file and exit
 ```
 
 
@@ -234,6 +242,6 @@ BTC:  `1P7ujsXeX7GxQwHNnJsRMgAdNkFZmNVqJT`
 
 ## Contact
 * ben [at] graef.in
-* Telegram: @BenDr0id
+* [telegram](https://telegram.me/bendr0id)
 * [discord](https://discord.gg/r3rCKTB)
 * [reddit](https://www.reddit.com/user/BenDr0id/)

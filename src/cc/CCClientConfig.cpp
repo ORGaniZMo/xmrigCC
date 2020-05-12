@@ -22,17 +22,17 @@
 
 namespace xmrig {
 
-static const char *kEnabled                 = "enabled";
-static const char *kUseTLS                  = "use-tls";
-static const char *kUseRemoteLog            = "use-remote-logging";
-static const char *kUploadConfigOnStartup   = "upload-config-on-start";
+const char *CCClientConfig::kEnabled                 = "enabled";
+const char *CCClientConfig::kUseTLS                  = "use-tls";
+const char *CCClientConfig::kUseRemoteLog            = "use-remote-logging";
+const char *CCClientConfig::kUploadConfigOnStartup   = "upload-config-on-start";
 
-static const char *kUrl                     = "url";
-static const char *kAccessToken             = "access-token";
-static const char *kWorkerId                = "worker-id";
-static const char *kRebootCmd               = "reboot-cmd";
+const char *CCClientConfig::kUrl                     = "url";
+const char *CCClientConfig::kAccessToken             = "access-token";
+const char *CCClientConfig::kWorkerId                = "worker-id";
+const char *CCClientConfig::kRebootCmd               = "reboot-cmd";
 
-static const char *kUpdateInterval          = "update-interval-s";
+const char *CCClientConfig::kUpdateInterval          = "update-interval-s";
 
 }
 

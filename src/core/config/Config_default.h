@@ -45,11 +45,14 @@ R"===(
         "restricted": true
     },
     "autosave": true,
-    "version": 1,
     "background": false,
     "colors": true,
     "randomx": {
         "init": -1,
+        "mode": "auto",
+        "1gb-pages": false,
+        "rdmsr": true,
+        "wrmsr": true,
         "numa": true
     },
     "cpu": {
@@ -57,13 +60,17 @@ R"===(
         "huge-pages": true,
         "hw-aes": null,
         "priority": null,
-        "asm": true,
+        "memory-pool": false,
+        "yield": true,
         "max-threads-hint": 100,
+        "asm": true,
         "argon2-impl": null,
+        "astrobwt-max-size": 550,
         "cn/0": false,
         "cn-lite/0": false
     },
     "donate-level": 5,
+    "donate-over-proxy": 1,
     "log-file": null,
     "pools": [
         {
@@ -78,24 +85,29 @@ R"===(
             "enabled": true,
             "tls": false,
             "tls-fingerprint": null,
-            "daemon": false
+            "daemon": false,
+            "socks5": null,
+            "self-select": null
         }
     ],
     "cc-client": {
-        "enabled" : true,
+        "enabled": true,
         "url": "localhost:3344",
-        "use-tls" : false,
         "access-token": "mySecret",
+        "use-tls": false,
+        "use-remote-logging": true,
+        "upload-config-on-start": true,
         "worker-id": null,
-        "update-interval-s": 10,
-        "use-remote-logging" : true,
-        "upload-config-on-start" : true
+        "reboot-cmd": null,
+        "update-interval-s": 10
     },
     "print-time": 60,
+    "health-print-time": 60,
     "retries": 5,
     "retry-pause": 5,
     "syslog": false,
     "user-agent": null,
+    "verbose": 0,
     "watch": true
 }
 )===";

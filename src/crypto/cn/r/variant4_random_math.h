@@ -2,11 +2,9 @@
 #define VARIANT4_RANDOM_MATH_H
 
 
-#include <string.h>
+#include <cstring>
 
-
-#include "crypto/common/Algorithm.h"
-
+#include "base/crypto/Algorithm.h"
 
 extern "C"
 {

@@ -21,6 +21,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <utility>
 
 #ifdef WIN32
 #include "win_dirent.h"
@@ -40,8 +41,8 @@
 #include "version.h"
 #include "Service.h"
 
-Service::Service(const std::shared_ptr<CCServerConfig>& config)
-  : m_config(config)
+Service::Service(std::shared_ptr<CCServerConfig> config)
+  : m_config(std::move(config))
 {
 
 }
@@ -53,14 +54,14 @@ Service::~Service()
 
 bool Service::start()
 {
-#ifdef XMRIG_FEATURE_TLS
-  if (m_config->usePushover() || m_config->useTelegram())
+  m_timer = std::make_shared<Timer>([&]()
   {
-    m_timer = std::make_shared<Timer>([&]()
-    {
-      auto time_point = std::chrono::system_clock::now();
-      auto now = static_cast<uint64_t>(std::chrono::system_clock::to_time_t(time_point) * 1000);
+    auto time_point = std::chrono::system_clock::now();
+    auto now = static_cast<uint64_t>(std::chrono::system_clock::to_time_t(time_point) * 1000);
 
+#ifdef XMRIG_FEATURE_TLS
+    if (m_config->usePushover() || m_config->useTelegram())
+    {
       if (m_config->pushOfflineMiners())
       {
         sendMinerOfflinePush(now);
@@ -79,11 +80,17 @@ bool Service::start()
           m_lastStatusUpdateTime = now;
         }
       }
-    }, TIMER_INTERVAL);
-
-    m_timer->start();
-  }
+    }
 #endif
+
+    if (now > (m_lastStatisticsUpdateTime + STATISTICS_UPDATE_INTERVAL))
+    {
+      updateStatistics(now);
+      m_lastStatisticsUpdateTime = now;
+    }
+  }, TIMER_INTERVAL);
+
+  m_timer->start();
 
   return true;
 }
@@ -122,6 +129,10 @@ int Service::handleGET(const httplib::Request& req, httplib::Response& res)
   else if (req.path.rfind("/admin/getClientConfigTemplates", 0) == 0)
   {
     resultCode = getClientConfigTemplates(res);
+  }
+  else if (req.path.rfind("/admin/getClientStatistics", 0) == 0)
+  {
+    resultCode = getClientStatistics(res);
   }
   else
   {
@@ -239,10 +250,10 @@ int Service::getAdminPage(httplib::Response& res)
 
 int Service::getClientStatusList(httplib::Response& res)
 {
-  rapidjson::Document document;
-  document.SetObject();
+  rapidjson::Document respDocument;
+  respDocument.SetObject();
 
-  auto& allocator = document.GetAllocator();
+  auto& allocator = respDocument.GetAllocator();
 
   rapidjson::Value clientStatusList(rapidjson::kArrayType);
   for (auto& clientStatus : m_clientStatus)
@@ -255,18 +266,58 @@ int Service::getClientStatusList(httplib::Response& res)
   auto time_point = std::chrono::system_clock::now();
   m_currentServerTime = static_cast<uint64_t>(std::chrono::system_clock::to_time_t(time_point));
 
-  document.AddMember("current_server_time", m_currentServerTime, allocator);
-  document.AddMember("current_version", rapidjson::StringRef(APP_VERSION), allocator);
-  document.AddMember("client_status_list", clientStatusList, allocator);
+  respDocument.AddMember("current_server_time", m_currentServerTime, allocator);
+  respDocument.AddMember("current_version", rapidjson::StringRef(APP_VERSION), allocator);
+  respDocument.AddMember("client_status_list", clientStatusList, allocator);
 
   rapidjson::StringBuffer buffer(0, 4096);
   rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
   writer.SetMaxDecimalPlaces(10);
-  document.Accept(writer);
+  respDocument.Accept(writer);
 
   res.set_content(buffer.GetString(), CONTENT_TYPE_JSON);
 
   return HTTP_OK;
+}
+
+int Service::getClientStatistics(httplib::Response& res)
+{
+    rapidjson::Document respDocument;
+    respDocument.SetObject();
+
+    auto& allocator = respDocument.GetAllocator();
+
+    rapidjson::Value clientStatistics(rapidjson::kArrayType);
+    for (const auto& statistics : m_statistics)
+    {
+      rapidjson::Value algoStatistics(rapidjson::kObjectType);
+      algoStatistics.AddMember("algo", rapidjson::StringRef(statistics.first.c_str()), allocator);
+
+      rapidjson::Value algoStatisticEntries(rapidjson::kArrayType);
+      for (const auto& algoStatistic : statistics.second)
+      {
+        rapidjson::Value algoStatisticEntry(rapidjson::kObjectType);
+        algoStatisticEntry.AddMember("timestamp", algoStatistic.first, allocator);
+        algoStatisticEntry.AddMember("hashrate", algoStatistic.second.first, allocator);
+        algoStatisticEntry.AddMember("miner", algoStatistic.second.second, allocator);
+
+        algoStatisticEntries.PushBack(algoStatisticEntry, allocator);
+      }
+
+      algoStatistics.AddMember("statistics", algoStatisticEntries, allocator);
+      clientStatistics.PushBack(algoStatistics, allocator);
+    }
+
+    respDocument.AddMember("client_statistics", clientStatistics, allocator);
+
+    rapidjson::StringBuffer buffer(0, 4096);
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    writer.SetMaxDecimalPlaces(10);
+    respDocument.Accept(writer);
+
+    res.set_content(buffer.GetString(), CONTENT_TYPE_JSON);
+
+    return HTTP_OK;
 }
 
 int Service::setClientStatus(const httplib::Request& req, const std::string& clientId, httplib::Response& res)
@@ -275,11 +326,11 @@ int Service::setClientStatus(const httplib::Request& req, const std::string& cli
 
   std::string removeAddr = req.get_header_value("REMOTE_ADDR");
 
-  rapidjson::Document document;
-  if (!document.Parse(req.body.c_str()).HasParseError())
+  rapidjson::Document respDocument;
+  if (!respDocument.Parse(req.body.c_str()).HasParseError())
   {
     ClientStatus clientStatus;
-    clientStatus.parseFromJson(document);
+    clientStatus.parseFromJson(respDocument);
     clientStatus.setExternalIp(removeAddr);
 
     setClientLog(static_cast<size_t>(m_config->clientLogHistory()), clientId, clientStatus.getLog());
@@ -298,7 +349,7 @@ int Service::setClientStatus(const httplib::Request& req, const std::string& cli
   else
   {
     LOG_ERR("[%s] ClientStatus for client '%s' - Parse Error Occured: %d",
-            removeAddr.c_str(), clientId.c_str(), document.GetParseError());
+            removeAddr.c_str(), clientId.c_str(), respDocument.GetParseError());
   }
 
   return resultCode;
@@ -442,15 +493,15 @@ int Service::getClientConfig(const std::string& clientId, httplib::Response& res
 
   if (data.tellp() > 0)
   {
-    rapidjson::Document document;
-    document.Parse(data.str().c_str());
+    rapidjson::Document respDocument;
+    respDocument.Parse(data.str().c_str());
 
-    if (!document.HasParseError())
+    if (!respDocument.HasParseError())
     {
       rapidjson::StringBuffer buffer(0, 4096);
       rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
       writer.SetMaxDecimalPlaces(10);
-      document.Accept(writer);
+      respDocument.Accept(writer);
 
       res.set_content(buffer.GetString(), CONTENT_TYPE_JSON);
 
@@ -502,8 +553,8 @@ int Service::setClientConfig(const httplib::Request& req, const std::string& cli
 {
   int resultCode = HTTP_BAD_REQUEST;
 
-  rapidjson::Document document;
-  if (!document.Parse(req.body.c_str()).HasParseError())
+  rapidjson::Document respDocument;
+  if (!respDocument.Parse(req.body.c_str()).HasParseError())
   {
     std::string clientConfigFileName = getClientConfigFileName(clientId);
     std::ofstream clientConfigFile(clientConfigFileName);
@@ -513,7 +564,7 @@ int Service::setClientConfig(const httplib::Request& req, const std::string& cli
       rapidjson::StringBuffer buffer(0, 4096);
       rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
       writer.SetMaxDecimalPlaces(10);
-      document.Accept(writer);
+      respDocument.Accept(writer);
 
       clientConfigFile << buffer.GetString();
       clientConfigFile.close();
@@ -539,10 +590,10 @@ int Service::setClientCommand(const httplib::Request& req, const std::string& cl
 
   ControlCommand controlCommand;
 
-  rapidjson::Document document;
-  if (!document.Parse(req.body.c_str()).HasParseError())
+  rapidjson::Document respDocument;
+  if (!respDocument.Parse(req.body.c_str()).HasParseError())
   {
-    controlCommand.parseFromJson(document);
+    controlCommand.parseFromJson(respDocument);
 
     m_clientCommand[clientId] = controlCommand;
 
@@ -604,10 +655,9 @@ void Service::sendMinerOfflinePush(uint64_t now)
 {
   uint64_t offlineThreshold = now - OFFLINE_TRESHOLD_IN_MS;
 
-  for (auto clientStatus : m_clientStatus)
+  for (const auto& clientStatus : m_clientStatus)
   {
     uint64_t lastStatus = clientStatus.second.getLastStatusUpdate() * 1000;
-
     if (lastStatus < offlineThreshold)
     {
       if (std::find(m_offlineNotified.begin(), m_offlineNotified.end(), clientStatus.first) == m_offlineNotified.end())
@@ -641,7 +691,7 @@ void Service::sendMinerZeroHashratePush(uint64_t now)
 {
   uint64_t offlineThreshold = now - OFFLINE_TRESHOLD_IN_MS;
 
-  for (auto clientStatus : m_clientStatus)
+  for (const auto& clientStatus : m_clientStatus)
   {
     if (offlineThreshold < clientStatus.second.getLastStatusUpdate() * 1000)
     {
@@ -692,7 +742,7 @@ void Service::sendServerStatusPush(uint64_t now)
   uint64_t sharesTotal = 0;
   uint64_t offlineThreshold = now - OFFLINE_TRESHOLD_IN_MS;
 
-  for (auto clientStatus : m_clientStatus)
+  for (const auto& clientStatus : m_clientStatus)
   {
     if (offlineThreshold < clientStatus.second.getLastStatusUpdate() * 1000)
     {
@@ -772,5 +822,36 @@ void Service::sendViaTelegram(const std::string& title, const std::string& messa
   if (res)
   {
     LOG_WARN("Telegram response: %s", res->body.c_str());
+  }
+}
+
+void Service::updateStatistics(uint64_t now)
+{
+  auto offlineThreshold = now - OFFLINE_TRESHOLD_IN_MS;
+
+  for (const auto& clientStatus : m_clientStatus)
+  {
+    uint64_t lastStatus = clientStatus.second.getLastStatusUpdate() * 1000;
+    if (lastStatus > offlineThreshold)
+    {
+      auto& algoStatistics = m_statistics[clientStatus.second.getCurrentAlgoName()];
+      algoStatistics[now].first += clientStatus.second.getHashrateMedium();
+      algoStatistics[now].second++;
+    }
+  }
+
+  for (auto& algoStatistic : m_statistics)
+  {
+    for (const auto& statistics : algoStatistic.second)
+    {
+      if (statistics.first < (now - 86400000))
+      {
+        algoStatistic.second.erase(statistics.first);
+      }
+      else
+      {
+        break;
+      }
+    }
   }
 }

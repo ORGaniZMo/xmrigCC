@@ -26,6 +26,16 @@ namespace xmrig {
 class CCClientConfig
 {
 public:
+    static const char *kEnabled;
+    static const char *kUseTLS;
+    static const char *kUseRemoteLog;
+    static const char *kUploadConfigOnStartup;
+    static const char *kUrl;
+    static const char *kAccessToken;
+    static const char *kWorkerId;
+    static const char *kRebootCmd;
+    static const char *kUpdateInterval;
+
     bool read(const rapidjson::Value &value);
     rapidjson::Value toJSON(rapidjson::Document &doc) const;
 

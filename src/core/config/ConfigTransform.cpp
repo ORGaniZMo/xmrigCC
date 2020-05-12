@@ -140,6 +140,14 @@ void xmrig::ConfigTransform::transform(rapidjson::Document &doc, int key, const 
     case IConfig::YieldKey: /* --cpu-no-yield */
         return set(doc, kCpu, "yield", false);
 
+#   ifdef XMRIG_ALGO_ASTROBWT
+    case IConfig::AstroBWTMaxSizeKey: /* --astrobwt-max-size */
+        return set(doc, kCpu, "astrobwt-max-size", static_cast<uint64_t>(strtol(arg, nullptr, 10)));
+
+    case IConfig::AstroBWTAVX2Key: /* --astrobwt-avx2 */
+        return set(doc, kCpu, "astrobwt-avx2", true);
+#   endif
+
 #   ifndef XMRIG_NO_ASM
     case IConfig::AssemblyKey: /* --asm */
         return set(doc, kCpu, "asm", arg);

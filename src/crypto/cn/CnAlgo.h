@@ -31,7 +31,7 @@
 #include <cstdint>
 
 
-#include "crypto/common/Algorithm.h"
+#include "base/crypto/Algorithm.h"
 
 
 namespace xmrig

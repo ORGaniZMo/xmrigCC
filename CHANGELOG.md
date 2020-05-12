@@ -1,3 +1,24 @@
+# 2.6.5
+* Added Miner/Hashrate statistics (graphs) of the last 24h to the Dashboard
+* Embedded image resources in the Dashboard for faster loading
+* Fixed possible freeze on remote stop/restart command
+* Merged upstream **v.5.11.1** changes (Thx to @xmrig and @SChernykh)
+    * Only acquire MSR registers on RX algos
+    * Hashrate improvement on some CPUS for RX algos
+    * Pooled memory allocations of RandomX VMs (speedup on Zen2)
+    * RandomX JIT refactoring
+    * AVX2 optimized code for AstroBWT
+# 2.6.2
+* Fixed auto CPU configuration for cn-extremelite (upx2)
+# 2.6.1
+* Integrated RandomKEVA algo (`rx/keva`) or coin (`keva` for autoswitch) for upcoming Kevacoin fork
+* Fixed #298 Miner hangs on restart command
+    * Merged upstream **v5.8.2** highlights (Thx to @xmrig and @SChernykh) 
+        * Integrated AstroBWT algo (`astrobwt`) or coin (`dero` for autoswitch) for upcoming DERO fork
+        * RandomX hashrate improvements
+        * Added SOCKS5 proxies support for Tor or other tunnels
+        * Fixed for duplicate jobs in daemon (solo) mining client
+        * ...
 # 2.5.0
 * Removed outdated algo CryptonightWOW (`cn/wow`)
 * Huge hashrate improvements on RandomX based Algos (Thx to @xmrig and @SChernykh)

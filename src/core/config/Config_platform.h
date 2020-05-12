@@ -93,6 +93,10 @@ static const option options[] = {
     { "randomx-no-rdmsr",      0, nullptr, IConfig::RandomXRdmsrKey       },
     { "no-rdmsr",              0, nullptr, IConfig::RandomXRdmsrKey       },
 #   endif
+#ifdef XMRIG_ALGO_ASTROBWT
+    { "astrobwt-max-size",     1, nullptr, IConfig::AstroBWTMaxSizeKey    },
+    { "astrobwt-avx2",         0, nullptr, IConfig::AstroBWTAVX2Key       },
+#endif
     { "max-cpu-usage",         1, nullptr, IConfig::CPUMaxThreadsKey      },
     { "cpu-max-threads-hint",  1, nullptr, IConfig::CPUMaxThreadsKey      },
     { "cpu-memory-pool",       1, nullptr, IConfig::MemoryPoolKey         },

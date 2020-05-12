@@ -35,7 +35,7 @@
 #include "base/kernel/interfaces/ITimerListener.h"
 #include "base/tools/Object.h"
 #include "base/cc/interfaces/IClientStatusListener.h"
-#include "crypto/common/Algorithm.h"
+#include "base/crypto/Algorithm.h"
 
 
 namespace xmrig {

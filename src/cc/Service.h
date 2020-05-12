@@ -39,13 +39,19 @@ constexpr static int HTTP_NOT_FOUND = 404;
 constexpr static int HTTP_INTERNAL_ERROR = 500;
 
 constexpr static int TIMER_INTERVAL = 10000;
-constexpr static int OFFLINE_TRESHOLD_IN_MS = 60000;
+constexpr static int OFFLINE_TRESHOLD_IN_MS = 90000;
 constexpr static int STATUS_UPDATE_INTERVAL = 3600000;
+constexpr static int STATISTICS_UPDATE_INTERVAL = 60000;
+constexpr static int DAY_IN_MS = 86400000;
 
 class Service
 {
 public:
-  explicit Service(const std::shared_ptr<CCServerConfig>& config);
+  using Statistic = std::pair<double, size_t>;
+  using AlgoStatistic = std::map<uint64_t, Statistic>;
+  using Statistics = std::map<std::string, AlgoStatistic>;
+
+  explicit Service(std::shared_ptr<CCServerConfig>  config);
   ~Service();
 
 public:
@@ -59,6 +65,7 @@ private:
   int getAdminPage(httplib::Response& res);
 
   int getClientStatusList(httplib::Response& res);
+  int getClientStatistics(httplib::Response& res);
   int getClientCommand(const std::string& clientId, httplib::Response& res);
   int getClientConfigTemplates(httplib::Response& res);
   int getClientConfig(const std::string& clientId, httplib::Response& res);
@@ -80,6 +87,7 @@ private:
   void triggerPush(const std::string& title, const std::string& message);
   void sendViaPushover(const std::string& title, const std::string& message);
   void sendViaTelegram(const std::string& title, const std::string& message);
+  void updateStatistics(uint64_t now);
 
 private:
   std::shared_ptr<CCServerConfig> m_config;
@@ -87,10 +95,13 @@ private:
 
   uint64_t m_currentServerTime = 0;
   uint64_t m_lastStatusUpdateTime = 0;
+  uint64_t m_lastStatisticsUpdateTime = 0;
 
   std::map<std::string, ClientStatus> m_clientStatus;
   std::map<std::string, ControlCommand> m_clientCommand;
   std::map<std::string, std::list<std::string>> m_clientLog;
+
+  Statistics m_statistics;
 
   std::list<std::string> m_offlineNotified;
   std::list<std::string> m_zeroHashNotified;

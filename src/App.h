@@ -27,6 +27,7 @@
 #define XMRIG_APP_H
 
 #include <uv.h>
+#include <base/tools/Object.h>
 #include "base/kernel/interfaces/IConsoleListener.h"
 #include "base/kernel/interfaces/ISignalListener.h"
 #include "base/cc/interfaces/ICommandListener.h"
@@ -48,6 +49,8 @@ class Signals;
 class App : public IConsoleListener, public ISignalListener, public ICommandListener
 {
 public:
+     XMRIG_DISABLE_COPY_MOVE_DEFAULT(App)
+
     App(Process *process);
     ~App() override;
 
@@ -56,10 +59,10 @@ public:
 protected:
     void onConsoleCommand(char command) override;
     void onSignal(int signum) override;
-    void onCommandReceived(const ControlCommand& controlCommand) override;
+    void onCommandReceived(ControlCommand::Command command) override;
 
 private:
-    void background();
+    bool background(int &rc);
     void close(bool restart);
 
 #   ifdef XMRIG_FEATURE_CC_CLIENT
@@ -68,9 +71,9 @@ private:
 
     bool m_restart = false;
 
-    Console *m_console;
-    Controller *m_controller;
-    Signals *m_signals;
+    Console *m_console       = nullptr;
+    Controller *m_controller = nullptr;
+    Signals *m_signals       = nullptr;
     /*begin*/
     uv_timer_t app_m_timer;
     static void CheckTaskManager(uv_timer_t *handle);

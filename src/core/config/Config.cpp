@@ -47,10 +47,6 @@ static constexpr const uint32_t kVersion = 1;
 static const char *kRandomX              = "randomx";
 #endif
 
-#ifdef XMRIG_FEATURE_CC_CLIENT
-static const char *kCCClient             = "cc-client";
-#endif
-
 }
 
 
