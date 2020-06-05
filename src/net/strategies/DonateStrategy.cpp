@@ -74,10 +74,10 @@ xmrig::DonateStrategy::DonateStrategy(Controller *controller, IStrategyListener 
     m_pools.emplace_back(kDonateHost, 4100, m_userId, nullptr, 0, true);
 
     if (m_pools.size() > 1) {
-        m_strategy = new FailoverStrategy(m_pools, 10, 2, this, true);
+        m_strategy = new FailoverStrategy(m_pools, 10, 5, this, true);
     }
     else {
-        m_strategy = new SinglePoolStrategy(m_pools.front(), 10, 2, this, true);
+        m_strategy = new SinglePoolStrategy(m_pools.front(), 10, 5, this, true);
     }
 
     m_timer = new Timer(this);

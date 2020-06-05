@@ -701,7 +701,7 @@ void Service::sendMinerZeroHashratePush(uint64_t now)
             m_zeroHashNotified.end())
         {
           std::stringstream message;
-          message << "<b>" << clientStatus.first << "</b> reported <b>0</b>h/s for the last minute!";
+          message << "<b>" << clientStatus.first << "</b> reported <b>0</b>h/s for over a minute!";
 
           LOG_WARN("Send miner %s 0 hashrate push", clientStatus.first.c_str());
           triggerPush(APP_NAME " Hashrate Monitor", message.str());
@@ -717,7 +717,7 @@ void Service::sendMinerZeroHashratePush(uint64_t now)
           std::stringstream message;
           message << "<b>" << clientStatus.first << "</b> hashrate recovered. Reported <b>"
                   << clientStatus.second.getHashrateMedium()
-                  << "</b>h/s for the last minute!";
+                  << "</b>h/s within the last minute!";
 
           LOG_WARN("Send miner %s hashrate recovered push", clientStatus.first.c_str());
           triggerPush(APP_NAME " Hashrate Monitor", message.str());

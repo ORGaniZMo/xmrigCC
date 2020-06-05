@@ -39,7 +39,7 @@ constexpr static int HTTP_NOT_FOUND = 404;
 constexpr static int HTTP_INTERNAL_ERROR = 500;
 
 constexpr static int TIMER_INTERVAL = 10000;
-constexpr static int OFFLINE_TRESHOLD_IN_MS = 90000;
+constexpr static int OFFLINE_TRESHOLD_IN_MS = 120000;
 constexpr static int STATUS_UPDATE_INTERVAL = 3600000;
 constexpr static int STATISTICS_UPDATE_INTERVAL = 60000;
 constexpr static int DAY_IN_MS = 86400000;
