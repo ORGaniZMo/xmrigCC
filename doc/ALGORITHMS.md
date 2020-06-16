@@ -3,7 +3,7 @@
 Algorithm can be defined in 3 ways:
 
 1. By pool, using algorithm negotiation, in this case no need specify algorithm on miner side.
-2. Per pool `coin` option, currently only usable value for this option is `monero`.
+2. Per pool `coin` option, currently only usable value for this option is `monero`, `aqrma`, `dero`, `keva`, `pengo`
 3. Per pool `algo` option.
 
 Option `coin` useful for pools without algorithm negotiation support or daemon to allow automatically switch algorithm in next hard fork.
@@ -12,6 +12,8 @@ Option `coin` useful for pools without algorithm negotiation support or daemon t
 
 | Name | Memory | Version | Notes |
 |------|--------|---------|-------|
+| `pengo` | 256 KB | 2.7.0+ | Chukwa variant PengolinCoin. |
+| `ninja` | 256 KB | 2.7.0+ | Chukwa variant NinjaCoin. |
 | `astroBWT` | 20 MB | 2.6.0+ | AstroBWT. |
 | `rx/keva` | 1 MB | 2.6.0+ | RandomKEVA. |
 | `cn-pico/tlo` | 256 KB | 2.5.0+ | CryptoNight-Pico. (Talleo) |
@@ -22,14 +24,12 @@ Option `coin` useful for pools without algorithm negotiation support or daemon t
 | `rx/loki` | 2 MB | 2.0.0+ | RandomXL. |
 | `cn/conceal` | 2 MB | 1.9.5+ | CryptoNight variant 1 (modified). |
 | `argon2/chukwa` | 512 KB | 1.9.5+ | Argon2id (Chukwa). |
-| `argon2/wrkz` | 256 KB | 1.9.5+ | Argon2id (WRKZ). |
 | `cn-extremelite/upx2` | 128 KB | <1.9.5 | CryptoNight-Extremelite variant UPX2 with reversed shuffle. |
 | `cn/fast` | 2 MB | <1.9.5+ | CryptoNight variant 1 with half iterations. |
 | `cn/rwz` | 2 MB | <1.9.5+ | CryptoNight variant 2 with 3/4 iterations and reversed shuffle operation. |
 | `cn/zls` | 2 MB | <1.9.5+ | CryptoNight variant 2 with 3/4 iterations. |
 | `cn/double` | 2 MB | <1.9.5+ | CryptoNight variant 2 with double iterations. |
 | `cn/r` | 2 MB | <1.9.5+ | CryptoNightR (Monero's variant 4). |
-| `cn/wow` | 2 MB | <1.9.5+ | CryptoNightR (Wownero). |
 | `cn-pico` | 256 KB | <1.9.5+ | CryptoNight-Pico. (Turtle) |
 | `cn/half` | 2 MB | <1.9.5+ | CryptoNight variant 2 with half iterations. |
 | `cn/2` | 2 MB | <1.9.5+ | CryptoNight variant 2. |

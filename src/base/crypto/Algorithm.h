@@ -73,7 +73,7 @@ public:
         RX_SFX,        // "rx/sfx"           RandomSFX (Safex Cash).
         RX_KEVA,       // "rx/keva"          RandomKV (Keva).
         AR2_CHUKWA,    // "argon2/chukwa"    Argon2id (Chukwa).
-        AR2_WRKZ,      // "argon2/wrkz"      Argon2id (WRKZ)
+        AR2_CHUKWA_LITE,// "argon2/chukwa-lite" Argon2id (Chukwa-Lite).
         ASTROBWT_DERO, // "astrobwt/dero"    AstroBWT (Dero)
         MAX
     };

@@ -1,3 +1,9 @@
+# 2.7.0
+* Integrated pengolincoin algo (`pengo`) or coin (`pengo` for autoswitch) for upcoming hardfork 
+* Integrated ninjacoin algo (`ninja`)
+* Fixed CN invalid shares when compiled with gcc 10.1 
+* Updated http lib to improve performance
+* Fixed freezes in XMRigServer
 # 2.6.5
 * Added Miner/Hashrate statistics (graphs) of the last 24h to the Dashboard
 * Embedded image resources in the Dashboard for faster loading

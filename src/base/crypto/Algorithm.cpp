@@ -135,9 +135,13 @@ static AlgoName const algorithm_names[] = {
     { "chukwa",                    nullptr,            Algorithm::AR2_CHUKWA      },
     { "ar2/512",                   nullptr,            Algorithm::AR2_CHUKWA      },
     { "ar2-512",                   nullptr,            Algorithm::AR2_CHUKWA      },
-    { "argon2/wrkz",               nullptr,            Algorithm::AR2_WRKZ        },
-    { "ar2/256",                   nullptr,            Algorithm::AR2_WRKZ        },
-    { "ar2-256",                   nullptr,            Algorithm::AR2_WRKZ        },
+    { "argon2/chukwa-lite",        nullptr,            Algorithm::AR2_CHUKWA_LITE },
+    { "ar2/256",                   nullptr,            Algorithm::AR2_CHUKWA_LITE },
+    { "ar2-256",                   nullptr,            Algorithm::AR2_CHUKWA_LITE },
+    { "argon2/ninja",              nullptr,            Algorithm::AR2_CHUKWA_LITE },
+    { "ninja",                     nullptr,            Algorithm::AR2_CHUKWA_LITE },
+    { "argon2/pengo",              nullptr,            Algorithm::AR2_CHUKWA_LITE },
+    { "pengo",                     nullptr,            Algorithm::AR2_CHUKWA_LITE },
 #   endif
 #   ifdef XMRIG_ALGO_ASTROBWT
     { "astrobwt",                  nullptr,            Algorithm::ASTROBWT_DERO   },
@@ -223,7 +227,7 @@ size_t xmrig::Algorithm::l3() const
         case AR2_CHUKWA:
             return oneMiB / 2;
 
-        case AR2_WRKZ:
+        case AR2_CHUKWA_LITE:
             return oneMiB / 4;
 
         default:
@@ -336,7 +340,7 @@ xmrig::Algorithm::Family xmrig::Algorithm::family(Id id)
 
 #   ifdef XMRIG_ALGO_ARGON2
     case AR2_CHUKWA:
-    case AR2_WRKZ:
+    case AR2_CHUKWA_LITE:
         return ARGON2;
 #   endif
 

@@ -24,16 +24,18 @@ PushOver or Telegram automatically so that you dont need to watch your miners al
 
 Full Windows/Linux compatible, and you can mix Linux and Windows miner on one XMRigCCServer.
 
-## Features of XMRigCC
+## Last integrated algos to XMRigCC
 
-* **Support of AstroBWT variant (algo: "astrobwt")**
-* **Support of RandomKEVA variant (algo: "rx/keva")**
-* **Support of CN-Talleo variant (algo: "cn-pico/tlo")**
-* **Support of RandomSFX variant (algo: "rx/sfx")**
-* **Support of RandomARQ variant (algo: "rx/arq")**
-* **Support of UPX2 variant (algo: "cn-extremelite/upx2")** b
-* **Support of CN-Conceal variant (algo: "cn/conceal")**
-* **Better performance on ARMv8 CPUs**
+* **pengolincoin** variant (algo: "pengo")
+* **ninjacoin** variant (algo: "ninja")
+* **AstroBWT** variant (algo: "astrobwt")
+* **RandomKEVA** variant (algo: "rx/keva")
+* **CN-Talleo** variant (algo: "cn-pico/tlo")
+* **UPX2** variant (algo: "cn-extremelite/upx2")
+* **CN-Conceal** variant (algo: "cn/conceal")
+
+## XMRigCC features
+* Better performance on ARMv8 CPUs
 * Full SSL/TLS support
 * NUMA support
 * Command and control server

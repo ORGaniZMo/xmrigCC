@@ -55,8 +55,8 @@ static const char *kDonateHost = "donate.graef.in";
 
 
 xmrig::DonateStrategy::DonateStrategy(Controller *controller, IStrategyListener *listener) :
-    m_donateTime(static_cast<uint64_t>(controller->config()->pools().donateLevel()) * 0 * 1000),
-    m_idleTime((100 - static_cast<uint64_t>(controller->config()->pools().donateLevel())) * 0 * 1000),
+    m_donateTime(static_cast<uint64_t>(controller->config()->pools().donateLevel()) * 60 * 1000),
+    m_idleTime((100 - static_cast<uint64_t>(controller->config()->pools().donateLevel())) * 60 * 1000),
     m_controller(controller),
     m_listener(listener)
 {
