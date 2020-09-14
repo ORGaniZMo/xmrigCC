@@ -84,6 +84,26 @@ void ClientStatus::setCurrentPool(const std::string& currentPool)
     m_currentPool = currentPool;
 }
 
+std::string ClientStatus::getCurrentPoolUser() const
+{
+  return m_currentPoolUser;
+}
+
+void ClientStatus::setCurrentPoolUser(const std::string& currentPoolUser)
+{
+  m_currentPoolUser = currentPoolUser;
+}
+
+std::string ClientStatus::getCurrentPoolPass() const
+{
+  return m_currentPoolPass;
+}
+
+void ClientStatus::setCurrentPoolPass(const std::string& currentPoolPass)
+{
+  m_currentPoolPass = currentPoolPass;
+}
+
 void ClientStatus::setCurrentAlgoName(const std::string& algoName)
 {
     m_currentAlgoName = algoName;
@@ -423,6 +443,14 @@ bool ClientStatus::parseFromJson(const rapidjson::Document& document)
             m_currentPool = clientStatus["current_pool"].GetString();
         }
 
+        if (clientStatus.HasMember("current_pool_user")) {
+          m_currentPoolUser = clientStatus["current_pool_user"].GetString();
+        }
+
+        if (clientStatus.HasMember("current_pool_pass")) {
+          m_currentPoolPass = clientStatus["current_pool_pass"].GetString();
+        }
+
         if (clientStatus.HasMember("current_algo_name")) {
             m_currentAlgoName = clientStatus["current_algo_name"].GetString();
         }
@@ -569,6 +597,8 @@ rapidjson::Value ClientStatus::toJson(rapidjson::MemoryPoolAllocator<rapidjson::
 
     clientStatus.AddMember("client_id", rapidjson::StringRef(m_clientId.c_str()), allocator);
     clientStatus.AddMember("current_pool", rapidjson::StringRef(m_currentPool.c_str()), allocator);
+    clientStatus.AddMember("current_pool_user", rapidjson::StringRef(m_currentPoolUser.c_str()), allocator);
+    clientStatus.AddMember("current_pool_pass", rapidjson::StringRef(m_currentPoolPass.c_str()), allocator);
     clientStatus.AddMember("current_algo_name", rapidjson::StringRef(m_currentAlgoName.c_str()), allocator);
     clientStatus.AddMember("current_pow_variant_name", rapidjson::StringRef(m_currentPowVariantName.c_str()), allocator);
     clientStatus.AddMember("cpu_brand", rapidjson::StringRef(m_cpuBrand.c_str()), allocator);

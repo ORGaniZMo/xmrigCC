@@ -254,6 +254,14 @@ xmrig::CpuThreads xmrig::BasicCpuInfo::threads(const Algorithm &algorithm, uint3
             return count;
         }
 
+        if (algorithm == Algorithm::RX_XLA) {
+            CpuThreads threads;
+            for (size_t i = 0; i < std::max<size_t>(count / 2, 1); ++i) {
+                threads.add(i, 0);
+            }
+            return threads;
+        }
+
         return std::max<size_t>(count / 2, 1);
     }
 #   endif

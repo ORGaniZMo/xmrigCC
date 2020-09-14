@@ -162,6 +162,8 @@
                     {data: "client_status.client_id", render: clientInfo},
                     {data: "client_status.version", render: version},
                     {data: "client_status.current_pool"},
+                    {data: "client_status.current_pool_user", visible: false},
+                    {data: "client_status.current_pool_pass", visible: false},
                     {data: "client_status.current_status", render: clientStatus},
                     {data: "client_status.current_algo_name", render: algoAndPowVariantName},
 
@@ -398,57 +400,59 @@
                     var sumSharesGood = 0;
                     var sumSharedTotal = 0;
 
+                    var colOffset = 23;
+
                     sumHashrateShort = api
-                        .column(21, {page: 'current'})
+                        .column(colOffset, {page: 'current'})
                         .data()
                         .reduce(function (a, b) {
                             return a + b;
                         }, 0);
 
                     sumHashrateMedium = api
-                        .column(22, {page: 'current'})
+                        .column(colOffset+1, {page: 'current'})
                         .data()
                         .reduce(function (a, b) {
                             return a + b;
                         }, 0);
 
                     sumHashrateLong = api
-                        .column(23, {page: 'current'})
+                        .column(colOffset+2, {page: 'current'})
                         .data()
                         .reduce(function (a, b) {
                             return a + b;
                         }, 0);
 
                     sumHashrateHighest = api
-                        .column(24, {page: 'current'})
+                        .column(colOffset+3, {page: 'current'})
                         .data()
                         .reduce(function (a, b) {
                             return a + b;
                         }, 0);
 
                     sumHashesTotal = api
-                        .column(25, {page: 'current'})
+                        .column(colOffset+4, {page: 'current'})
                         .data()
                         .reduce(function (a, b) {
                             return a + b;
                         }, 0);
 
                     avgTimeTotal = api
-                        .column(26, {page: 'current'})
+                        .column(colOffset+5, {page: 'current'})
                         .data()
                         .reduce(function (a, b) {
                             return (a + b);
                         }, 0) / api.column(26, {page: 'current'}).data().length;
 
                     sumSharesGood = api
-                        .column(27, {page: 'current'})
+                        .column(colOffset+6, {page: 'current'})
                         .data()
                         .reduce(function (a, b) {
                             return a + b;
                         }, 0);
 
                     sumSharedTotal = api
-                        .column(28, {page: 'current'})
+                        .column(colOffset+7, {page: 'current'})
                         .data()
                         .reduce(function (a, b) {
                             return a + b;
@@ -461,14 +465,14 @@
                     avgTimeTotal = round(avgTimeTotal);
 
                     // update footer
-                    $(api.column(21).footer()).html(sumHashrateShort);
-                    $(api.column(22).footer()).html(sumHashrateMedium);
-                    $(api.column(23).footer()).html(sumHashrateLong);
-                    $(api.column(24).footer()).html(sumHashrateHighest);
-                    $(api.column(25).footer()).html(sumHashesTotal);
-                    $(api.column(26).footer()).html(avgTimeTotal);
-                    $(api.column(27).footer()).html(sumSharesGood);
-                    $(api.column(28).footer()).html(sumSharedTotal);
+                    $(api.column(colOffset).footer()).html(sumHashrateShort);
+                    $(api.column(colOffset+1).footer()).html(sumHashrateMedium);
+                    $(api.column(colOffset+2).footer()).html(sumHashrateLong);
+                    $(api.column(colOffset+3).footer()).html(sumHashrateHighest);
+                    $(api.column(colOffset+4).footer()).html(sumHashesTotal);
+                    $(api.column(colOffset+5).footer()).html(avgTimeTotal);
+                    $(api.column(colOffset+6).footer()).html(sumSharesGood);
+                    $(api.column(colOffset+7).footer()).html(sumSharedTotal);
                 }
             });
 
@@ -1293,6 +1297,8 @@
             <th>Worker Id</th>
             <th>Version</th>
             <th>Pool</th>
+            <th>User</th>
+            <th>Password</th>
             <th>Status</th>
             <th>Algo / PoW</th>
 
@@ -1332,6 +1338,8 @@
         <tr>
             <th class="center" width="2%"><i class="fa fa-square-o" id="selectAllBottom"></i></th>
             <th class="left">Total:</th>
+            <th></th>
+            <th></th>
             <th></th>
             <th></th>
             <th></th>

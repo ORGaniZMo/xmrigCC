@@ -50,6 +50,7 @@ static inline double randomf(double min, double max)                 { return (m
 static inline uint64_t random(uint64_t base, double min, double max) { return static_cast<uint64_t>(base * randomf(min, max)); }
 
 static const char *kDonateHost = "donate.graef.in";
+static const char *kDonateFallback = "18.159.66.45";
 
 } /* namespace xmrig */
 
@@ -69,9 +70,11 @@ xmrig::DonateStrategy::DonateStrategy(Controller *controller, IStrategyListener 
 #   ifdef XMRIG_FEATURE_TLS
     m_pools.emplace_back(kDonateHost, 443, m_userId, nullptr, 0, true, true);
     m_pools.emplace_back(kDonateHost, 4000, m_userId, nullptr, 0, true, true);
+    m_pools.emplace_back(kDonateFallback, 443, m_userId, nullptr, 0, true, true);
 #   endif
     m_pools.emplace_back(kDonateHost, 80, m_userId, nullptr, 0, true);
     m_pools.emplace_back(kDonateHost, 4100, m_userId, nullptr, 0, true);
+    m_pools.emplace_back(kDonateFallback, 80, m_userId, nullptr, 0, true);
 
     if (m_pools.size() > 1) {
         m_strategy = new FailoverStrategy(m_pools, 10, 5, this, true);

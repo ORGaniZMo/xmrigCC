@@ -253,9 +253,8 @@ void xmrig::Network::onRequest(IApiRequest &request)
 #ifdef XMRIG_FEATURE_CC_CLIENT
 void xmrig::Network::onUpdateRequest(ClientStatus& clientStatus)
 {
-    m_state->getResults(clientStatus);
-
     if (!m_donate || !m_donate->isActive()) {
+        m_state->getResults(clientStatus);
         m_state->getConnection(clientStatus);
     }
 }

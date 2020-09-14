@@ -61,6 +61,12 @@ public:
     std::string getCurrentPool() const;
     void setCurrentPool(const std::string& currentPool);
 
+    std::string getCurrentPoolUser() const;
+    void setCurrentPoolUser(const std::string& currentPoolUser);
+
+    std::string getCurrentPoolPass() const;
+    void setCurrentPoolPass(const std::string& currentPoolPass);
+
     std::string getCurrentAlgoName() const;
     void setCurrentAlgoName(const std::string& algoName);
 
@@ -176,6 +182,8 @@ private:
 
     std::string m_clientId;
     std::string m_currentPool;
+    std::string m_currentPoolUser;
+    std::string m_currentPoolPass;
     std::string m_currentAlgoName;
     std::string m_currentPowVariantName;
     std::string m_cpuBrand;

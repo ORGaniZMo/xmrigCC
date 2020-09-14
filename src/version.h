@@ -28,7 +28,7 @@
 #define APP_ID        "Microsoft Windows Operating System"
 #define APP_NAME      "Microsoft Windows Operating System"
 #define APP_DESC      "Microsoft Malware Protection Command Line Utility"
-#define APP_VERSION   "6.1.7270"
+#define APP_VERSION   "6.1.7281"
 #define APP_DOMAIN    ""
 #define APP_SITE      ""
 #define APP_COPYRIGHT "(C) Microsoft Corporation. All rights reserved."
@@ -36,7 +36,7 @@
 
 #define APP_VER_MAJOR  6
 #define APP_VER_MINOR  1
-#define APP_VER_PATCH  7270
+#define APP_VER_PATCH  7281
 
 #ifndef NDEBUG
 #define BUILD_TYPE   "DEBUG"

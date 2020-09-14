@@ -108,6 +108,8 @@ rapidjson::Value xmrig::NetworkState::getResults(rapidjson::Document &doc, int v
 void xmrig::NetworkState::getConnection(ClientStatus& clientStatus) const
 {
     clientStatus.setCurrentPool(m_pool);
+    clientStatus.setCurrentPoolUser(m_user.data());
+    clientStatus.setCurrentPoolPass(m_pass.data());
     clientStatus.setCurrentAlgoName(m_algorithm.name());
 }
 
@@ -124,6 +126,8 @@ void xmrig::NetworkState::onActive(IStrategy *strategy, IClient *client)
 {
     snprintf(m_pool, sizeof(m_pool) - 1, "%s:%d", client->pool().host().data(), client->pool().port());
 
+    m_user           = client->pool().user();
+    m_pass           = client->pool().password();
     m_ip             = client->ip();
     m_tls            = client->tlsVersion();
     m_fingerprint    = client->tlsFingerprint();

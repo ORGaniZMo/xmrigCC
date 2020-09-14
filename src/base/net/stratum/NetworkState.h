@@ -77,6 +77,8 @@ private:
     std::array<uint64_t, 10> topDiff { { } };
     std::vector<uint16_t> m_latency;
     String m_fingerprint;
+    String m_user;
+    String m_pass;
     String m_ip;
     String m_tls;
     uint64_t m_accepted         = 0;
