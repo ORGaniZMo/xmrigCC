@@ -139,7 +139,6 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<CpuThreads> &threads, uint32
     }
 
     count += generate("rx", threads, Algorithm::RX_0, limit);
-    count += generate("rx/loki", threads, Algorithm::RX_0, limit);
     count += generate("rx/keva", threads, Algorithm::RX_KEVA, limit);
 
     return count;
@@ -151,7 +150,7 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<CpuThreads> &threads, uint32
 template<>
 size_t inline generate<Algorithm::ARGON2>(Threads<CpuThreads> &threads, uint32_t limit)
 {
-    return generate("argon2", threads, Algorithm::AR2_CHUKWA, limit);
+    return generate("argon2", threads, Algorithm::AR2_CHUKWA_V2, limit);
 }
 #endif
 

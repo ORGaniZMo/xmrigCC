@@ -12,6 +12,7 @@ Option `coin` useful for pools without algorithm negotiation support or daemon t
 
 | Name | Memory | Version | Notes |
 |------|--------|---------|-------|
+| `argon2/chukwav2` | 1 MB | 2.8.2+ | Argon2id (Chukwa v2). |
 | `panthera` | 256 KB | 2.8.0+ | RandomX variant Panthera (Scala [XLA]). |
 | `ninja` | 256 KB | 2.7.0+ | Chukwa variant NinjaCoin. |
 | `astroBWT` | 20 MB | 2.6.0+ | AstroBWT. |
@@ -21,7 +22,7 @@ Option `coin` useful for pools without algorithm negotiation support or daemon t
 | `rx/arq` | 256 KB | 2.2.0+ | RandomX (Arqma). |
 | `rx/0` | 2 MB | 2.1.0+ | RandomX (Monero). |
 | `rx/wow` | 1 MB | 2.0.0+ | RandomWOW. |
-| `rx/loki` | 2 MB | 2.0.0+ | RandomXL. |
+| `rx/loki` | 2 MB | <2.8.2 | RandomXL. |
 | `cn/conceal` | 2 MB | 1.9.5+ | CryptoNight variant 1 (modified). |
 | `argon2/chukwa` | 512 KB | 1.9.5+ | Argon2id (Chukwa). |
 | `cn-extremelite/upx2` | 128 KB | <1.9.5 | CryptoNight-Extremelite variant UPX2 with reversed shuffle. |

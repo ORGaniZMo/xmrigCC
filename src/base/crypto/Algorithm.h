@@ -68,12 +68,12 @@ public:
         CN_EXTREMELITE_0,// "cn-extremelite" CryptoNight-Extremelite (UPX)
         RX_0,          // "rx/0"             RandomX (reference configuration).
         RX_WOW,        // "rx/wow"           RandomWOW (Wownero).
-        RX_LOKI,       // "rx/loki"          RandomXL (Loki).
         RX_ARQ,        // "rx/arq"           RandomARQ (Arqma).
         RX_SFX,        // "rx/sfx"           RandomSFX (Safex Cash).
         RX_KEVA,       // "rx/keva"          RandomKV (Keva).
         RX_XLA,        // "rx/xla"           RandomX-Panthera (Scala)
         AR2_CHUKWA,    // "argon2/chukwa"    Argon2id (Chukwa).
+        AR2_CHUKWA_V2, // "argon2/chukwav2"  Argon2id (Chukwa v2).
         AR2_CHUKWA_LITE,// "argon2/chukwa-lite" Argon2id (Chukwa-Lite).
         ASTROBWT_DERO, // "astrobwt/dero"    AstroBWT (Dero)
         MAX

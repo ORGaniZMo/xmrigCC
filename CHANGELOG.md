@@ -1,3 +1,10 @@
+# 2.8.2
+* Added turtlecoin Chukwa v2 algo (`chukwav2`) or coin (`turtle` for autoswitch) for upcoming hard fork at block 3,000,000
+* Removed obsolete rx/loki randomx variant (Loki switched to PoS)
+* Fixed libuv (1.29+) performance issue on linux (Thx to @cohcho)
+# 2.8.1
+* Improved autodetect for rx/panthera (runs best on real cores)
+* Added pool user/pass to the dashboard #316
 # 2.8.0
 * Integrated Randomx variant "Panthera" used by Scala[XLA] algo (`panthera` or `rx/panthera`)
 * Removed obsolete PengolinCoin chukwa variant 

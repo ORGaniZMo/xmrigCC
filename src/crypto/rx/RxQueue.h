@@ -27,7 +27,7 @@
 #ifndef XMRIG_RX_QUEUE_H
 #define XMRIG_RX_QUEUE_H
 
-
+#include "base/io/Async.h"
 #include "base/tools/Object.h"
 #include "crypto/common/HugePagesInfo.h"
 #include "crypto/rx/RxConfig.h"
