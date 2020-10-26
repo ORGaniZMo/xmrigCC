@@ -108,9 +108,9 @@ rapidjson::Value xmrig::NetworkState::getResults(rapidjson::Document &doc, int v
 void xmrig::NetworkState::getConnection(ClientStatus& clientStatus) const
 {
     clientStatus.setCurrentPool(m_pool);
-    clientStatus.setCurrentPoolUser(m_user.data());
-    clientStatus.setCurrentPoolPass(m_pass.data());
     clientStatus.setCurrentAlgoName(m_algorithm.name());
+    clientStatus.setCurrentPoolUser(m_user ? m_user.data() : "");
+    clientStatus.setCurrentPoolPass(m_pass ? m_pass.data() : "");
 }
 
 void xmrig::NetworkState::getResults(ClientStatus& clientStatus) const

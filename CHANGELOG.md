@@ -1,3 +1,6 @@
+# 2.8.3
+* Fixed potential crash when pool user/pass is not initialized
+* Changed mvc build from VS2017 to VS2019 to improve hashrate on argon2/chukwav2
 # 2.8.2
 * Added turtlecoin Chukwa v2 algo (`chukwav2`) or coin (`turtle` for autoswitch) for upcoming hard fork at block 3,000,000
 * Removed obsolete rx/loki randomx variant (Loki switched to PoS)

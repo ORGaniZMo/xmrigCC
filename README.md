@@ -26,6 +26,7 @@ Full Windows/Linux compatible, and you can mix Linux and Windows miner on one XM
 
 ## Last integrated algos in XMRigCC:
 
+* **Turtlecoin** argon2 chukwa variant 2 (algo: "argon2/chukwav2")
 * **Panthera (XLA)** variant (algo: "panthera")
 * **ninjacoin** variant (algo: "ninja")
 * **AstroBWT** variant (algo: "astrobwt")
@@ -234,14 +235,10 @@ Misc:
 ##### BenDroid (XMRigCC):
 XMR:  `4BEn3sSa2SsHBcwa9dNdKnGvvbyHPABr2JzoY7omn7DA2hPv84pVFvwDrcwMCWgz3dQVcrkw3gE9aTC9Mi5HxzkfF9ev1eH`
 
-AEON: `Wmtm4S2cQ8uEBBAVjvbiaVAPv2d6gA1mAUmBmjna4VF7VixLxLRUYag5cvsym3WnuzdJ9zvhQ3Xwa8gWxPDPRfcQ3AUkYra3W`
-
 BTC:  `3Gwq9tveCZtLAiXX7mxhjbrh38GPx1iXdB`
 
-##### xmrig:
-XMR:  `48edfHu7V9Z84YzzMa6fUueoELZ9ZRXq9VetWzYGzKt52XU5xvqgzYnDK9URnRoJMk1j8nLwEVsaSWJ4fhdUyZijBGUicoD`
+ETH:  `0x799611a12F196848967E9002B7bF1d01872D88F8`
 
-BTC:  `1P7ujsXeX7GxQwHNnJsRMgAdNkFZmNVqJT`
 
 ## Contact
 * ben [at] graef.in
