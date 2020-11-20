@@ -619,7 +619,7 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
     __m128i bx1   = _mm_set_epi64x(static_cast<int64_t>(h0[9] ^ h0[11]), static_cast<int64_t>(h0[8] ^ h0[10]));
     __m128 conc_var;
 
-    if (ALGO == Algorithm::CN_CONCEAL) {
+    if (ALGO == Algorithm::CN_CONCEAL || ALGO == Algorithm::CN_CACHE_HASH) {
         SET_ROUNDING_MODE_NEAREST()
         conc_var = _mm_setzero_ps();
     }
@@ -632,7 +632,7 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
 
         const __m128i ax0 = _mm_set_epi64x(static_cast<int64_t>(ah0), static_cast<int64_t>(al0));
 
-        if(ALGO == Algorithm::CN_CONCEAL) {
+        if(ALGO == Algorithm::CN_CONCEAL || ALGO == Algorithm::CN_CACHE_HASH) {
             cryptonight_conceal_tweak(cx, conc_var);
         }
 
@@ -1090,7 +1090,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
     __m128 conc_var0;
     __m128 conc_var1;
 
-    if (ALGO == Algorithm::CN_CONCEAL) {
+    if (ALGO == Algorithm::CN_CONCEAL || ALGO == Algorithm::CN_CACHE_HASH) {
         SET_ROUNDING_MODE_NEAREST()
         conc_var0 = _mm_setzero_ps();
         conc_var1 = _mm_setzero_ps();
@@ -1106,7 +1106,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
         const __m128i ax0 = _mm_set_epi64x(ah0, al0);
         const __m128i ax1 = _mm_set_epi64x(ah1, al1);
 
-        if (ALGO == Algorithm::CN_CONCEAL) {
+        if (ALGO == Algorithm::CN_CONCEAL || ALGO == Algorithm::CN_CACHE_HASH) {
             cryptonight_conceal_tweak(cx0, conc_var0);
             cryptonight_conceal_tweak(cx1, conc_var1);
         }
@@ -1278,7 +1278,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
 
 
 #define CN_STEP2(conc_var, a, b0, b1, c, l, ptr, idx)                                   \
-    if(ALGO == Algorithm::CN_CONCEAL) {                                                 \
+    if(ALGO == Algorithm::CN_CONCEAL || ALGO == Algorithm::CN_CACHE_HASH) {                                                 \
         cryptonight_conceal_tweak(c, conc_var);                                         \
     }                                                                                 	\
     if (IS_CN_HEAVY_TUBE) {                                                             \
@@ -1421,7 +1421,7 @@ inline void cryptonight_triple_hash(const uint8_t *__restrict__ input, size_t si
     __m128 conc_var1;
     __m128 conc_var2;
 
-    if (ALGO == Algorithm::CN_CONCEAL) {
+    if (ALGO == Algorithm::CN_CONCEAL || ALGO == Algorithm::CN_CACHE_HASH) {
         SET_ROUNDING_MODE_NEAREST()
         conc_var0 = _mm_setzero_ps();
         conc_var1 = _mm_setzero_ps();
@@ -1507,7 +1507,7 @@ inline void cryptonight_quad_hash(const uint8_t *__restrict__ input, size_t size
     __m128 conc_var2;
     __m128 conc_var3;
 
-    if (ALGO == Algorithm::CN_CONCEAL) {
+    if (ALGO == Algorithm::CN_CONCEAL || ALGO == Algorithm::CN_CACHE_HASH) {
         SET_ROUNDING_MODE_NEAREST()
         conc_var0 = _mm_setzero_ps();
         conc_var1 = _mm_setzero_ps();
@@ -1603,7 +1603,7 @@ inline void cryptonight_penta_hash(const uint8_t *__restrict__ input, size_t siz
     __m128 conc_var3;
     __m128 conc_var4;
 
-    if (ALGO == Algorithm::CN_CONCEAL) {
+    if (ALGO == Algorithm::CN_CONCEAL || ALGO == Algorithm::CN_CACHE_HASH) {
         SET_ROUNDING_MODE_NEAREST()
         conc_var0 = _mm_setzero_ps();
         conc_var1 = _mm_setzero_ps();

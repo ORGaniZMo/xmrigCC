@@ -3,7 +3,7 @@
 Algorithm can be defined in 3 ways:
 
 1. By pool, using algorithm negotiation, in this case no need specify algorithm on miner side.
-2. Per pool `coin` option, currently only usable value for this option is `monero`, `aqrma`, `dero`, `keva`
+2. Per pool `coin` option, currently only usable value for this option is `monero`, `aqrma`, `dero`, `keva`, `turtle`
 3. Per pool `algo` option.
 
 Option `coin` useful for pools without algorithm negotiation support or daemon to allow automatically switch algorithm in next hard fork.
@@ -12,6 +12,7 @@ Option `coin` useful for pools without algorithm negotiation support or daemon t
 
 | Name | Memory | Version | Notes |
 |------|--------|---------|-------|
+| `cn/cache_hash` | 2 MB | 2.8.4+ | CryptoNight variant 0 (modified) | 
 | `argon2/chukwav2` | 1 MB | 2.8.2+ | Argon2id (Chukwa v2). |
 | `panthera` | 256 KB | 2.8.0+ | RandomX variant Panthera (Scala [XLA]). |
 | `ninja` | 256 KB | 2.7.0+ | Chukwa variant NinjaCoin. |
@@ -23,7 +24,7 @@ Option `coin` useful for pools without algorithm negotiation support or daemon t
 | `rx/0` | 2 MB | 2.1.0+ | RandomX (Monero). |
 | `rx/wow` | 1 MB | 2.0.0+ | RandomWOW. |
 | `rx/loki` | 2 MB | <2.8.2 | RandomXL. |
-| `cn/conceal` | 2 MB | 1.9.5+ | CryptoNight variant 1 (modified). |
+| `cn/conceal` | 2 MB | 1.9.5+ | CryptoNight variant 0 (modified). |
 | `argon2/chukwa` | 512 KB | 1.9.5+ | Argon2id (Chukwa). |
 | `cn-extremelite/upx2` | 128 KB | <1.9.5 | CryptoNight-Extremelite variant UPX2 with reversed shuffle. |
 | `cn/fast` | 2 MB | <1.9.5+ | CryptoNight variant 1 with half iterations. |

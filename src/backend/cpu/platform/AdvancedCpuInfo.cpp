@@ -139,9 +139,13 @@ xmrig::AdvancedCpuInfo::AdvancedCpuInfo() :
         m_aes = true;
 
         if (m_vendor == VENDOR_AMD) {
-            if (data.ext_family >= 23) {
+            if (data.ext_family >= 25) {
                 m_assembly = Assembly::RYZEN;
-                m_msrMod   = MSR_MOD_RYZEN;
+                m_msrMod   = MSR_MOD_RYZEN_19H;
+            }
+            else if (data.ext_family >= 23) {
+                m_assembly = Assembly::RYZEN;
+                m_msrMod   = MSR_MOD_RYZEN_17H;
             }
             else {
                 m_assembly = Assembly::BULLDOZER;
@@ -149,6 +153,7 @@ xmrig::AdvancedCpuInfo::AdvancedCpuInfo() :
         }
         else if (m_vendor == VENDOR_INTEL) {
             m_assembly = Assembly::INTEL;
+            m_msrMod   = MSR_MOD_INTEL;
         }
     }
 

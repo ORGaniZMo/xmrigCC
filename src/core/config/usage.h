@@ -82,6 +82,7 @@ namespace xmrig {
         u += "      --cpu-max-threads-hint=N  maximum CPU threads count (in percentage) hint for autoconfig\n";
         u += "      --cpu-memory-pool=N       number of 2 MB pages for persistent memory pool, -1 (auto), 0 (disable)\n";
         u += "      --cpu-no-yield            prefer maximum hashrate rather than system response/stability\n";
+        u += "      --cpu-force-autoconfig    force cpu autoconfig, but keeps disabled algos\n";
         u += "      --no-huge-pages           disable huge pages support\n";
         u += "      --asm=ASM                 ASM optimizations, possible values: auto, none, intel, ryzen, bulldozer\n";
 

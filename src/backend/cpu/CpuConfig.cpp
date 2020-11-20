@@ -41,6 +41,7 @@ static const char *kMaxThreadsHint      = "max-threads-hint";
 static const char *kMemoryPool          = "memory-pool";
 static const char *kPriority            = "priority";
 static const char *kYield               = "yield";
+static const char *kForceAutoconfig     = "force-autoconfig";
 
 #ifdef XMRIG_FEATURE_ASM
 static const char *kAsm = "asm";
@@ -80,6 +81,7 @@ rapidjson::Value xmrig::CpuConfig::toJSON(rapidjson::Document &doc) const
     obj.AddMember(StringRef(kPriority),     priority() != -1 ? Value(priority()) : Value(kNullType), allocator);
     obj.AddMember(StringRef(kMemoryPool),   m_memoryPool < 1 ? Value(m_memoryPool < 0) : Value(m_memoryPool), allocator);
     obj.AddMember(StringRef(kYield),        m_yield, allocator);
+    obj.AddMember(StringRef(kForceAutoconfig), m_forceAutoconfig, allocator);
 
     if (m_threads.isEmpty()) {
         obj.AddMember(StringRef(kMaxThreadsHint), m_limit, allocator);
@@ -136,6 +138,7 @@ void xmrig::CpuConfig::read(const rapidjson::Value &value)
         m_hugePages  = Json::getBool(value, kHugePages, m_hugePages);
         m_limit      = Json::getUint(value, kMaxThreadsHint, m_limit);
         m_yield      = Json::getBool(value, kYield, m_yield);
+        m_forceAutoconfig = Json::getBool(value, kForceAutoconfig, m_forceAutoconfig);
 
         setAesMode(Json::getValue(value, kHwAes));
         setPriority(Json::getInt(value,  kPriority, -1));
@@ -186,6 +189,10 @@ void xmrig::CpuConfig::generate()
 {
     if (!isEnabled() || m_threads.has("*")) {
         return;
+    }
+
+    if (isForceAutoconfig()) {
+      m_threads.clear();
     }
 
     size_t count = 0;

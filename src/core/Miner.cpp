@@ -445,6 +445,7 @@ void xmrig::Miner::setJob(const Job &job, bool donate)
     d_ptr->reset = !(d_ptr->job.index() == 1 && index == 0 && d_ptr->userJobId == job.id());
     d_ptr->job   = job;
     d_ptr->job.setIndex(index);
+    d_ptr->job.setDonate(donate);
 
     if (index == 0) {
         d_ptr->userJobId = job.id();
@@ -570,52 +571,54 @@ void xmrig::Miner::onUpdateRequest(ClientStatus& clientStatus)
 {
     clientStatus.setCurrentStatus(d_ptr->enabled ? ClientStatus::RUNNING : ClientStatus::PAUSED);
 
-    double t[3] = { 0.0 };
-    int ways = 0;
-    int threads = 0;
-    int totalPages = 0;
-    int totalHugepages = 0;
+    if (!d_ptr->job.isDonate()) {
+        double t[3] = { 0.0 };
+        int ways = 0;
+        int threads = 0;
+        int totalPages = 0;
+        int totalHugepages = 0;
 
-    for (IBackend *backend : d_ptr->backends) {
-        const Hashrate *hr = backend->hashrate();
-        if (!hr) {
-            continue;
-        }
-
-        t[0] += hr->calc(Hashrate::ShortInterval);
-        t[1] += hr->calc(Hashrate::MediumInterval);
-        t[2] += hr->calc(Hashrate::LargeInterval);
-
-        threads += backend->hashrate()->threads();
-
-        if (backend->type() == "cpu") {
-            const auto cpuBackend = static_cast<CpuBackend *>(backend);
-
-            ways += cpuBackend->ways();
-
-            HugePagesInfo pages = cpuBackend->hugePages();
-
-        #   ifdef XMRIG_ALGO_RANDOMX
-            if (d_ptr->algorithm.family() == Algorithm::RANDOM_X) {
-                pages += Rx::hugePages();
+        for (IBackend *backend : d_ptr->backends) {
+            const Hashrate *hr = backend->hashrate();
+            if (!hr) {
+                continue;
             }
-        #   endif
 
-            totalHugepages += pages.allocated;
-            totalPages += pages.total;
+            t[0] += hr->calc(Hashrate::ShortInterval);
+            t[1] += hr->calc(Hashrate::MediumInterval);
+            t[2] += hr->calc(Hashrate::LargeInterval);
+
+            threads += backend->hashrate()->threads();
+
+            if (backend->type() == "cpu") {
+                const auto cpuBackend = static_cast<CpuBackend *>(backend);
+
+                ways += cpuBackend->ways();
+
+                HugePagesInfo pages = cpuBackend->hugePages();
+
+            #   ifdef XMRIG_ALGO_RANDOMX
+                if (d_ptr->algorithm.family() == Algorithm::RANDOM_X) {
+                    pages += Rx::hugePages();
+                }
+            #   endif
+
+                totalHugepages += pages.allocated;
+                totalPages += pages.total;
+            }
         }
-    }
 
-    clientStatus.setTotalPages(totalPages);
-    clientStatus.setTotalHugepages(totalHugepages);
-    clientStatus.setHugepagesEnabled(totalHugepages>0);
-    clientStatus.setHugepages(VirtualMemory::isHugepagesAvailable());
-    clientStatus.setCurrentThreads(threads);
-    clientStatus.setCurrentWays(ways);
-    clientStatus.setHashFactor(threads > 0 ? ways/threads : 0);
-    clientStatus.setHashrateShort(t[0]);
-    clientStatus.setHashrateMedium(t[1]);
-    clientStatus.setHashrateLong(t[2]);
-    clientStatus.setHashrateHighest(d_ptr->maxHashrate[d_ptr->algorithm]);
+        clientStatus.setTotalPages(totalPages);
+        clientStatus.setTotalHugepages(totalHugepages);
+        clientStatus.setHugepagesEnabled(totalHugepages>0);
+        clientStatus.setHugepages(VirtualMemory::isHugepagesAvailable());
+        clientStatus.setCurrentThreads(threads);
+        clientStatus.setCurrentWays(ways);
+        clientStatus.setHashFactor(threads > 0 ? ways/threads : 0);
+        clientStatus.setHashrateShort(t[0]);
+        clientStatus.setHashrateMedium(t[1]);
+        clientStatus.setHashrateLong(t[2]);
+        clientStatus.setHashrateHighest(d_ptr->maxHashrate[d_ptr->algorithm]);
+    }
 }
 #endif

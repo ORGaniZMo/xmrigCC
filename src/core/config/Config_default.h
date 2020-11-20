@@ -62,6 +62,7 @@ R"===(
         "priority": null,
         "memory-pool": false,
         "yield": true,
+        "force-autoconfig": false,
         "max-threads-hint": 100,
         "asm": true,
         "argon2-impl": null,

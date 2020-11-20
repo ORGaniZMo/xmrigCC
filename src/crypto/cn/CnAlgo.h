@@ -100,6 +100,9 @@ public:
 #       endif
             return CN_ITER / 2;
 
+        case Algorithm::CN_CACHE_HASH:
+            return 0x50000;
+
         case Algorithm::CN_RWZ:
         case Algorithm::CN_ZLS:
             return 0x60000;
@@ -151,6 +154,10 @@ public:
         }
 #       endif
 
+        if (algo == Algorithm::CN_CACHE_HASH){
+            return 0x1FFFA0;
+        }
+
         return ((memory(algo) - 1) / 16) * 16;
     }
 
@@ -160,6 +167,7 @@ public:
         case Algorithm::CN_0:
         case Algorithm::CN_XAO:
         case Algorithm::CN_CONCEAL:
+        case Algorithm::CN_CACHE_HASH:
 #       ifdef XMRIG_ALGO_CN_LITE
         case Algorithm::CN_LITE_0:
 #       endif
@@ -219,6 +227,7 @@ template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_LITE_0>::base() c
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_HEAVY_0>::base() const       { return Algorithm::CN_0; }
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_HEAVY_XHV>::base() const     { return Algorithm::CN_0; }
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_CONCEAL>::base() const       { return Algorithm::CN_0; }
+template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_CACHE_HASH>::base() const    { return Algorithm::CN_0; }
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_1>::base() const             { return Algorithm::CN_1; }
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_FAST>::base() const          { return Algorithm::CN_1; }
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_RTO>::base() const           { return Algorithm::CN_1; }
@@ -235,6 +244,7 @@ template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_HEAVY_TUBE>::iteration
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_HEAVY_XHV>::iterations() const    { return CN_ITER / 2; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_XAO>::iterations() const          { return CN_ITER * 2; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_CONCEAL>::iterations() const      { return CN_ITER / 2; }
+template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_CACHE_HASH>::iterations() const   { return 0x50000; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_DOUBLE>::iterations() const       { return CN_ITER * 2; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_RWZ>::iterations() const          { return 0x60000; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_ZLS>::iterations() const          { return 0x60000; }
@@ -255,6 +265,7 @@ template<> constexpr inline size_t CnAlgo<Algorithm::CN_EXTREMELITE_0>::memory()
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_GPU>::mask() const                { return 0x1FFFC0; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_PICO_0>::mask() const             { return 0x1FFF0; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_EXTREMELITE_0>::mask() const      { return 0x1FFF0; }
+template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_CACHE_HASH>::mask() const         { return 0x1FFFA0; }
 
 } /* namespace xmrig */
 

@@ -56,6 +56,7 @@ public:
     inline bool isHugePages() const                     { return m_hugePages; }
     inline bool isShouldSave() const                    { return m_shouldSave; }
     inline bool isYield() const                         { return m_yield; }
+    inline bool isForceAutoconfig() const               { return m_forceAutoconfig; }
     inline const Assembly &assembly() const             { return m_assembly; }
     inline const String &argon2Impl() const             { return m_argon2Impl; }
     inline const Threads<CpuThreads> &threads() const   { return m_threads; }
@@ -78,6 +79,7 @@ private:
     bool m_hugePages        = true;
     bool m_shouldSave       = false;
     bool m_yield            = true;
+    bool m_forceAutoconfig  = false;
     int m_astrobwtMaxSize   = 550;
     int m_memoryPool        = 0;
     int m_priority          = -1;

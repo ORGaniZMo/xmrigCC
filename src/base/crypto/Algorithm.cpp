@@ -75,6 +75,8 @@ static AlgoName const algorithm_names[] = {
     { "cryptonight/double",        "cn/double",        Algorithm::CN_DOUBLE       },
     { "cryptonight/conceal",       "cn/conceal",       Algorithm::CN_CONCEAL      },
     { "cryptonight/ccx",           "cn/ccx",           Algorithm::CN_CONCEAL      },
+    { "cryptonight/cache_hash",    "cn/cache_hash",    Algorithm::CN_CACHE_HASH   },
+    { "cryptonight/cache",         "cn/cache",         Algorithm::CN_CACHE_HASH   },
 #   ifdef XMRIG_ALGO_CN_GPU
     { "cryptonight/gpu",           "cn/gpu",           Algorithm::CN_GPU          },
     { "cryptonight_gpu",           nullptr,            Algorithm::CN_GPU          },
@@ -302,6 +304,7 @@ xmrig::Algorithm::Family xmrig::Algorithm::family(Id id)
     case CN_ZLS:
     case CN_DOUBLE:
     case CN_CONCEAL:
+    case CN_CACHE_HASH:
 #   ifdef XMRIG_ALGO_CN_GPU
     case CN_GPU:
 #   endif

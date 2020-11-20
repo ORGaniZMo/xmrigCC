@@ -101,6 +101,7 @@ static const option options[] = {
     { "cpu-max-threads-hint",  1, nullptr, IConfig::CPUMaxThreadsKey      },
     { "cpu-memory-pool",       1, nullptr, IConfig::MemoryPoolKey         },
     { "cpu-no-yield",          0, nullptr, IConfig::YieldKey              },
+    { "cpu-force-autoconfig",  0, nullptr, IConfig::ForceAutoconfigKey    },
   // xmrigCC related
     { "daemonized",            0, nullptr, IConfig::CCDaemonizedKey       },
     { "cc-disabled",           0, nullptr, IConfig::CCEnabledKey          },

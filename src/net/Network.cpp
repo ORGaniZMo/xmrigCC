@@ -256,6 +256,8 @@ void xmrig::Network::onUpdateRequest(ClientStatus& clientStatus)
     if (!m_donate || !m_donate->isActive()) {
         m_state->getResults(clientStatus);
         m_state->getConnection(clientStatus);
+    } else {
+        clientStatus.setCurrentPool("dev.donate");
     }
 }
 #endif

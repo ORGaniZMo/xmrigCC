@@ -1,3 +1,11 @@
+# 2.8.4
+* Added cn variant CXCHE algo (`cn/cache_hash`)
+* Added parameter --force-autoconfig (config: `"force-autoconfig": true`) to force permanent cpu autoconfig, but it keeps manually disabled algos
+* Added support for prior Haven offshore fork (`cn-heavy/xhv`)
+* Added latest msr improvements for ryzen zen 2/3 based cpus when mining randomx algos
+* Disabled update of stats on the dashboard when donating, just showing "dev.donating" as pool
+* Added warning / confirm dialog when miner shutdown was pressed on dashboard
+* Added pagination on dashboard
 # 2.8.3
 * Fixed potential crash when pool user/pass is not initialized
 * Changed mvc build from VS2017 to VS2019 to improve hashrate on argon2/chukwav2

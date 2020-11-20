@@ -103,3 +103,6 @@ Use continuous, persistent memory block for mining threads, useful for preserve 
 
 #### `yield` (since 2.5.0)
 Prefer system better system res
+
+#### `force-autoconfig` (since 2.8.4)
+Force cpu autoconfig, but keeps disabled algos

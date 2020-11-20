@@ -161,6 +161,7 @@ CPU backend:
       --cpu-max-threads-hint=N  maximum CPU threads count (in percentage) hint for autoconfig
       --cpu-memory-pool=N       number of 2 MB pages for persistent memory pool, -1 (auto), 0 (disable)
       --cpu-no-yield            prefer maximum hashrate rather than system response/stability
+      --cpu-force-autoconfig    force cpu autoconfig, but keeps disabled algos
       --no-huge-pages           disable huge pages support
       --asm=ASM                 ASM optimizations, possible values: auto, none, intel, ryzen, bulldozer
       --randomx-init=N          threads count to initialize RandomX dataset

@@ -24,6 +24,9 @@
             text-align: left;
         }
 
+        .rowPadded {
+            padding-top: 15px;
+        }
         .center {
             text-align: center;
             padding-bottom: 50pt
@@ -98,9 +101,9 @@
     <script src="https://use.fontawesome.com/6b3cdfc597.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes"></script>
-	
+
     <script type="text/javascript">
         var TRESHOLD_IN_MS = 60 * 1000;
         var RELOAD_INTERVAL_IN_MS = 10 * 1000;
@@ -142,8 +145,11 @@
         $(document).ready(function () {
             var table = $('#clientStatusList').DataTable({
                 dom: "<'row'<'col-sm-9'B><'col-sm-3'f><'col-sm-4'i><'col-sm-8'<'#serverTime'>>><'row'<'col-sm-12't>><'row'<'col-sm-4'i>>",
+                lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+                pageLength: -1,
+                bPpaginate: true,
+                pagingType: "full_numbers",
                 stateSave: true,
-                bPaginate: false,
                 ajax: {
                     url: "/admin/getClientStatusList",
                     dataSrc: 'client_status_list'
@@ -213,7 +219,6 @@
                     style: "multi+shift"
                 },
                 order: [1, 'asc'],
-                lengthChange: false,
                 buttons: [
                     'colvis',
                     {
@@ -624,6 +629,15 @@
                 deleteTemplateConfig(templateId, template);
             });
 
+            $('#commandStop').click(function (event) {
+                table.rows({selected: true}).eq(0).each(function (index) {
+                    var row = table.row(index);
+                    var data = row.data();
+
+                    sendAction("SHUTDOWN", data.client_status.client_id);
+                });
+            });
+
             $('#clientStatusList tbody').on('click', 'button#LOG', function () {
                 var data = table.row($(this).parents('tr')).data();
                 var clientId = data['client_status']['client_id'];
@@ -759,155 +773,155 @@
 
 
             var hashrateChart = new Chart(document.getElementById("hashrateChart").getContext("2d"), {
-	      			type: "line",
-	      			data: {
-	      				datasets: []
-	      			},
-	      			options: {
-      				    title:{
-  							display:true,
-  							text:'Hashrates'
-					    },
-					    tooltips: {
-					      mode: 'nearest',
-					      intersect: false,
-					    },
-						scales: { 
-						   yAxes: [
-						   	{
-						   	  id: 'hashrate',
-						   	  position: 'left',
-			        		  scalePositionLeft: true,
-						   	  stacked: false,
-						      ticks: {
-						             beginAtZero: true
-					          },
-						      scaleLabel: {
-						             display: true,
-						             labelString: 'Hashrate',
-						             fontSize: 16
-						      }
-						    }
-						  ],
-						  xAxes: [{
-						   	  type: 'time',
-						   	  distribution: 'series',
-						   	  time: {
-			        			unit: 'minute',
-			        			displayFormats: {
-			           				minute: 'HH:mm'
-			        		  	}
-			        		  },
-			        		  ticks: {
-			        		  	stepSize: 10,
-			        		  	autoSkip: true,
-			        			maxTicksLimit: 60
-			        		  }
-						    }]
-						  },
-						  elements: {
-			                point:{
-			        		    radius: 0
-			              	}
-			              },
-						  responsive: true,
-			    		  maintainAspectRatio: false
-			    	},
-	      			plugins: {
-	      				colorschemes: {
-	    					scheme: 'brewer.Paired12'
-	  					}		
-	      			}
-				});
+                type: "line",
+                data: {
+                    datasets: []
+                },
+                options: {
+                    title:{
+                        display:true,
+                        text:'Hashrates'
+                    },
+                    tooltips: {
+                        mode: 'nearest',
+                        intersect: false,
+                    },
+                    scales: {
+                        yAxes: [
+                            {
+                                id: 'hashrate',
+                                position: 'left',
+                                scalePositionLeft: true,
+                                stacked: false,
+                                ticks: {
+                                    beginAtZero: true
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Hashrate',
+                                    fontSize: 16
+                                }
+                            }
+                        ],
+                        xAxes: [{
+                            type: 'time',
+                            distribution: 'series',
+                            time: {
+                                unit: 'minute',
+                                displayFormats: {
+                                    minute: 'HH:mm'
+                                }
+                            },
+                            ticks: {
+                                stepSize: 10,
+                                autoSkip: true,
+                                maxTicksLimit: 60
+                            }
+                        }]
+                    },
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                },
+                plugins: {
+                    colorschemes: {
+                        scheme: 'brewer.Paired12'
+                    }
+                }
+            });
 
-			var minerChart = new Chart(document.getElementById("minerChart").getContext("2d"), {
-      			type: "line",
-      			data: {
-      				datasets: []
-      			},
-				options: {
-    				title:{
-							display:true,
-							text:'Miners'
-				    },
-				    tooltips: {
-				      mode: 'nearest',
-				      intersect: false,
-				    },
-				    scales: { 
-					   yAxes: [
-					   {
-					      id: 'miner',
-					      position: 'left',
-		        	      scalePositionLeft: true,
-					      stacked: false,
-					      ticks: {
-					             beginAtZero: true,
-					             callback: function(value) {if (value % 1 === 0) {return value;}}
-					           },
-					      scaleLabel: {
-					             display: true,
-					             labelString: 'Miner',
-					             fontSize: 16
-					           }
-					    }
-					  ],
-					  xAxes: [{
-					   	  type: 'time',
-					   	  distribution: 'series',
-					   	  time: {
-		        			unit: 'minute',
-		        			displayFormats: {
-		           				minute: 'HH:mm'
-		        		  	}
-		        		  },
-		        		  ticks: {
-		        		  	stepSize: 10,
-		        		  	autoSkip: true,
-		        			maxTicksLimit: 60
-		        		  }
-					    }]
-					},
-					elements: {
-		            	point:{
-		        		    radius: 0
-		            	}
-		            },
-					responsive: true,
-					maintainAspectRatio: false
-		    	},      			
-      			plugins: {
-      				colorschemes: {
-    					scheme: 'brewer.Paired12'
-  					}		
-      			}
-			});
+            var minerChart = new Chart(document.getElementById("minerChart").getContext("2d"), {
+                type: "line",
+                data: {
+                    datasets: []
+                },
+                options: {
+                    title:{
+                        display:true,
+                        text:'Miners'
+                    },
+                    tooltips: {
+                        mode: 'nearest',
+                        intersect: false,
+                    },
+                    scales: {
+                        yAxes: [
+                            {
+                                id: 'miner',
+                                position: 'left',
+                                scalePositionLeft: true,
+                                stacked: false,
+                                ticks: {
+                                    beginAtZero: true,
+                                    callback: function(value) {if (value % 1 === 0) {return value;}}
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Miner',
+                                    fontSize: 16
+                                }
+                            }
+                        ],
+                        xAxes: [{
+                            type: 'time',
+                            distribution: 'series',
+                            time: {
+                                unit: 'minute',
+                                displayFormats: {
+                                    minute: 'HH:mm'
+                                }
+                            },
+                            ticks: {
+                                stepSize: 10,
+                                autoSkip: true,
+                                maxTicksLimit: 60
+                            }
+                        }]
+                    },
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                },
+                plugins: {
+                    colorschemes: {
+                        scheme: 'brewer.Paired12'
+                    }
+                }
+            });
 
-			Chart.plugins.register({
-				afterDraw: function(chart) {
-			  	if (chart.data.datasets.length === 0) {
-			    	// No data is present
-			      var ctx = chart.chart.ctx;
-			      var width = chart.chart.width;
-			      var height = chart.chart.height
-			      
-			      ctx.save();
-			      ctx.textAlign = 'center';
-			      ctx.textBaseline = 'middle';
-			      ctx.font = "16px normal 'Helvetica Nueue'";
-			      ctx.fillText('No data to display', width / 2, height / 2);
-			      ctx.restore();
-			    }
-			  }
-			});
+            Chart.plugins.register({
+                afterDraw: function(chart) {
+                    if (chart.data.datasets.length === 0) {
+                        // No data is present
+                        var ctx = chart.chart.ctx;
+                        var width = chart.chart.width;
+                        var height = chart.chart.height
 
-			updateCharts(hashrateChart, minerChart);
+                        ctx.save();
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.font = "16px normal 'Helvetica Nueue'";
+                        ctx.fillText('No data to display', width / 2, height / 2);
+                        ctx.restore();
+                    }
+                }
+            });
+
+            updateCharts(hashrateChart, minerChart);
 
             setInterval(function () {
-                table.ajax.reload();
+                table.ajax.reload(null, false);
             }, RELOAD_INTERVAL_IN_MS);
 
-		    setInterval(function () {
+            setInterval(function () {
                 updateCharts(hashrateChart, minerChart);
             }, CHART_RELOAD_INTERVAL_IN_MS);
         });
@@ -1225,48 +1239,48 @@
             });
         }
 
-		function updateCharts(hashrateChart, minerChart) {
+        function updateCharts(hashrateChart, minerChart) {
 
-		  $.ajax({
-		    url: '/admin/getClientStatistics',
-		    dataType: 'json',
-		  }).done(function (results) {
+            $.ajax({
+                url: '/admin/getClientStatistics',
+                dataType: 'json',
+            }).done(function (results) {
 
-		  	var algos = results["client_statistics"].map(function(e) {
-			   return e.algo;
-			});
-			
-			var statistics = results["client_statistics"].map(function(e) {
-			   return e.statistics;
-			});
-		  
-		  	var hashrateDatasets=[], minerDatasets=[];
-			for(var j = 0; j < results["client_statistics"].length; j++) {
-				var hashrates = statistics[j].map(function(e) {
-					return {
-						x: new Date(e.timestamp),
-						y: e.hashrate
-					}
-				});
+                var algos = results["client_statistics"].map(function(e) {
+                    return e.algo;
+                });
 
-				var miners = statistics[j].map(function(e) {
-					return {
-						x: new Date(e.timestamp),
-						y: e.miner
-					}
-				});
+                var statistics = results["client_statistics"].map(function(e) {
+                    return e.statistics;
+                });
 
-				hashrateDatasets.push({label: algos[j], type: 'line', data: hashrates, spanGraphs: false, fill: true});
-  				minerDatasets.push({label: algos[j], type: 'line', data: miners, spanGraphs: false, fill: false});
-			}
+                var hashrateDatasets=[], minerDatasets=[];
+                for(var j = 0; j < results["client_statistics"].length; j++) {
+                    var hashrates = statistics[j].map(function(e) {
+                        return {
+                            x: new Date(e.timestamp),
+                            y: e.hashrate
+                        }
+                    });
 
-			hashrateChart.data.datasets = hashrateDatasets;
-			hashrateChart.update();
-    		
-    		minerChart.data.datasets = minerDatasets;
-    		minerChart.update();
-		});
-	}
+                    var miners = statistics[j].map(function(e) {
+                        return {
+                            x: new Date(e.timestamp),
+                            y: e.miner
+                        }
+                    });
+
+                    hashrateDatasets.push({label: algos[j], type: 'line', data: hashrates, spanGraphs: false, fill: true});
+                    minerDatasets.push({label: algos[j], type: 'line', data: miners, spanGraphs: false, fill: false});
+                }
+
+                hashrateChart.data.datasets = hashrateDatasets;
+                hashrateChart.update();
+
+                minerChart.data.datasets = minerDatasets;
+                minerChart.update();
+            });
+        }
     </script>
 
 </head>
@@ -1381,8 +1395,8 @@
         <canvas id="hashrateChart"></canvas>
         <br/><br/>
         <canvas id="minerChart"></canvas>
-	</div>
-	
+    </div>
+
     <div class="modal fade" id="minerEditor" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -1486,6 +1500,26 @@
                 <div class="modal-footer">
                     <button id="templateEditorDelete" type="button" class="btn btn-danger" data-dismiss="modal">Delete
                     </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="commandDialogStop" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Stop Command</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="templateName">Do you really want to stop the selected miner?<br/>This will require a manual restart of the daemon.</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="commandStop" type="button" class="btn btn-danger" data-dismiss="modal">Stop</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 </div>
             </div>

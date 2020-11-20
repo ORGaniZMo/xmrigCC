@@ -57,6 +57,7 @@ public:
         CN_ZLS,        // "cn/zls"           CryptoNight variant 2 with 3/4 iterations (Zelerius).
         CN_DOUBLE,     // "cn/double"        CryptoNight variant 2 with double iterations (X-CASH).
         CN_CONCEAL,    // "cn/conceal"       CryptoNight variant 0 (modified, Conceal only).
+        CN_CACHE_HASH, // "cn/cache_hash"    CryptoNight variant Cache (CXCHE)
         CN_GPU,        // "cn/gpu"           CryptoNight-GPU (Ryo).
         CN_LITE_0,     // "cn-lite/0"        CryptoNight-Lite variant 0.
         CN_LITE_1,     // "cn-lite/1"        CryptoNight-Lite variant 1.
