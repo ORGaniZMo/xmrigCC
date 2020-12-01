@@ -166,8 +166,8 @@
                         orderable: false
                     },
                     {data: "client_status.client_id", render: clientInfo},
-                    {data: "client_status.version", render: version},
-                    {data: "client_status.current_pool"},
+                    {data: "client_status.version", visible: false},
+                    {data: "client_status.current_pool", visible: false},
                     {data: "client_status.current_pool_user", visible: false},
                     {data: "client_status.current_pool_pass", visible: false},
                     {data: "client_status.current_status", render: clientStatus},
@@ -304,12 +304,7 @@
                         className: 'btn-danger',
                         enabled: false,
                         action: function () {
-                            table.rows({selected: true}).eq(0).each(function (index) {
-                                var row = table.row(index);
-                                var data = row.data();
-
-                                sendAction("SHUTDOWN", data.client_status.client_id);
-                            });
+                            $('#commandDialogStop').modal('show');
                         }
                     },
                     {
