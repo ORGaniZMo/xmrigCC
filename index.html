@@ -188,6 +188,8 @@
                     {data: "client_status.cpu_threads", visible: false},
                     {data: "client_status.cpu_l2", visible: false},
                     {data: "client_status.cpu_l3", visible: false},
+                    {data: "client_status.cpu_nodes", visible: false},
+                    {data: "client_status.max_cpu_usage", visible: false},
 
                     {data: "client_status.hashrate_short", render: round, className: "right"},
                     {data: "client_status.hashrate_medium", render: round, className: "right"},
@@ -1118,6 +1120,10 @@
                 tooltip += '\n';
                 tooltip += "CPU Cache L2/L3: " + (row.client_status.cpu_l2 / 1024) + " MB/" + (row.client_status.cpu_l3 / 1024) + " MB";
                 tooltip += '\n';
+                tooltip += "CPU Nodes: " + row.client_status.cpu_nodes;
+                tooltip += '\n';
+                tooltip += "Max CPU usage: " + (row.client_status.max_cpu_usage > 0 ? row.client_status.max_cpu_usage : "100")  + "%";
+                tooltip += '\n';
                 tooltip += "Huge Pages: " + (row.client_status.hugepages_available ? " available, " : " unavailable, ");
                 tooltip += (row.client_status.hugepages_enabled ? "enabled (" + row.client_status.total_hugepages + "/" + row.client_status.total_pages + ")" : "disabled");
                 tooltip += '\n';
@@ -1326,6 +1332,8 @@
             <th>CPU Threads</th>
             <th>CPU L2</th>
             <th>CPU L3</th>
+            <th>CPU nodes</th>
+            <th>Max CPU usage</th>
 
             <th>HR</th>
             <th>HR 1m</th>
@@ -1347,6 +1355,8 @@
         <tr>
             <th class="center" width="2%"><i class="fa fa-square-o" id="selectAllBottom"></i></th>
             <th class="left">Total:</th>
+            <th></th>
+            <th></th>
             <th></th>
             <th></th>
             <th></th>

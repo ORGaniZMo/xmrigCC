@@ -18,13 +18,11 @@
 #include <memory>
 #include <chrono>
 #include <cstring>
-#include <sstream>
-#include <fstream>
 #include <iostream>
 #include <utility>
 
 #ifdef WIN32
-#include "win_dirent.h"
+#include "win_ports/dirent.h"
 #else
 #include <dirent.h>
 #endif
@@ -33,8 +31,6 @@
 #include <3rdparty/rapidjson/stringbuffer.h>
 #include <3rdparty/rapidjson/writer.h>
 #include <3rdparty/rapidjson/filewritestream.h>
-#include <3rdparty/rapidjson/filereadstream.h>
-#include <3rdparty/rapidjson/error/en.h>
 #include <3rdparty/rapidjson/prettywriter.h>
 #include <3rdparty/cpp-httplib/httplib.h>
 #include "base/io/log/Log.h"
@@ -282,12 +278,15 @@ int Service::getClientStatusList(httplib::Response& res)
 
 int Service::getClientStatistics(httplib::Response& res)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     rapidjson::Document respDocument;
     respDocument.SetObject();
 
     auto& allocator = respDocument.GetAllocator();
 
     rapidjson::Value clientStatistics(rapidjson::kArrayType);
+
     for (const auto& statistics : m_statistics)
     {
       rapidjson::Value algoStatistics(rapidjson::kObjectType);
@@ -827,6 +826,8 @@ void Service::sendViaTelegram(const std::string& title, const std::string& messa
 
 void Service::updateStatistics(uint64_t now)
 {
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   auto offlineThreshold = now - OFFLINE_TRESHOLD_IN_MS;
 
   for (const auto& clientStatus : m_clientStatus)
@@ -835,28 +836,38 @@ void Service::updateStatistics(uint64_t now)
     if (lastStatus > offlineThreshold)
     {
       auto& algoStatistics = m_statistics[clientStatus.second.getCurrentAlgoName()];
+      if (algoStatistics.find(now) == algoStatistics.end())
+      {
+        algoStatistics[now].first = 0;
+        algoStatistics[now].second = 0;
+      }
+
       algoStatistics[now].first += clientStatus.second.getHashrateMedium();
       algoStatistics[now].second++;
     }
   }
 
-  for (auto& algoStatistic : m_statistics)
+  for (auto statisticsIt = m_statistics.begin(); statisticsIt != m_statistics.end();)
   {
-    for (const auto& statistics : algoStatistic.second)
+    for (auto algoStatisticsIt = statisticsIt->second.begin(); algoStatisticsIt != statisticsIt->second.end();)
     {
-      if (statistics.first < (now - 86400000))
+      if (algoStatisticsIt->first < (now - 86400000))
       {
-        algoStatistic.second.erase(statistics.first);
+        algoStatisticsIt = statisticsIt->second.erase(algoStatisticsIt);
       }
       else
       {
-        break;
+        ++algoStatisticsIt;
       }
     }
 
-    if (algoStatistic.second.empty())
+    if (statisticsIt->second.empty())
     {
-      m_statistics.erase(algoStatistic.first);
+      statisticsIt = m_statistics.erase(statisticsIt);
+    }
+    else
+    {
+      ++statisticsIt;
     }
   }
 }

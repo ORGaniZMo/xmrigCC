@@ -98,6 +98,7 @@ public:
         MemoryPoolKey        = 1027,
         YieldKey             = 1030,
         ForceAutoconfigKey   = 1037,
+        CPUMaxUsageKey       = 1038,
         AstroBWTMaxSizeKey   = 1034,
         AstroBWTAVX2Key      = 1036,
 

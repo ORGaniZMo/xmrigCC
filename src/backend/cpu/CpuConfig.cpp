@@ -42,6 +42,7 @@ static const char *kMemoryPool          = "memory-pool";
 static const char *kPriority            = "priority";
 static const char *kYield               = "yield";
 static const char *kForceAutoconfig     = "force-autoconfig";
+static const char *kMaxCpuUsage         = "max-cpu-usage";
 
 #ifdef XMRIG_FEATURE_ASM
 static const char *kAsm = "asm";
@@ -79,6 +80,7 @@ rapidjson::Value xmrig::CpuConfig::toJSON(rapidjson::Document &doc) const
     obj.AddMember(StringRef(kHugePages),    m_hugePages, allocator);
     obj.AddMember(StringRef(kHwAes),        m_aes == AES_AUTO ? Value(kNullType) : Value(m_aes == AES_HW), allocator);
     obj.AddMember(StringRef(kPriority),     priority() != -1 ? Value(priority()) : Value(kNullType), allocator);
+    obj.AddMember(StringRef(kMaxCpuUsage),  maxCpuUsage() != -1  ? Value(maxCpuUsage()) : Value(kNullType), allocator);
     obj.AddMember(StringRef(kMemoryPool),   m_memoryPool < 1 ? Value(m_memoryPool < 0) : Value(m_memoryPool), allocator);
     obj.AddMember(StringRef(kYield),        m_yield, allocator);
     obj.AddMember(StringRef(kForceAutoconfig), m_forceAutoconfig, allocator);
@@ -142,6 +144,7 @@ void xmrig::CpuConfig::read(const rapidjson::Value &value)
 
         setAesMode(Json::getValue(value, kHwAes));
         setPriority(Json::getInt(value,  kPriority, -1));
+        setMaxCpuUsage(Json::getInt(value,  kMaxCpuUsage, -1));
         setMemoryPool(Json::getValue(value, kMemoryPool));
 
 #       ifdef XMRIG_FEATURE_ASM

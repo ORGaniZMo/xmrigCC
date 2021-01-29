@@ -80,6 +80,7 @@ private:
     const bool m_yield;
     const CnHash::AlgoVariant m_av;
     const int m_astrobwtMaxSize;
+    const int m_maxCpuUsage;
     const Miner *m_miner;
     cryptonight_ctx *m_ctx[N];
     uint8_t m_hash[N * 32]{ 0 };

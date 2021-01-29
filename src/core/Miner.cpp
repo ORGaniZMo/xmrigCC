@@ -377,7 +377,7 @@ void xmrig::Miner::pause()
 
 void xmrig::Miner::printHashrate(bool details)
 {
-    char num[8 * 4] = { 0 };
+    char num[9 * 4] = { 0 };
     double speed[3] = { 0.0 };
 
     for (IBackend *backend : d_ptr->backends) {
@@ -393,9 +393,9 @@ void xmrig::Miner::printHashrate(bool details)
 
     LOG_INFO(WHITE_BOLD("speed") " 10s/60s/15m " CYAN_BOLD("%s") CYAN(" %s %s ") CYAN_BOLD("H/s") " max " CYAN_BOLD("%s H/s"),
              Hashrate::format(speed[0],                                 num,         sizeof(num) / 4),
-             Hashrate::format(speed[1],                                 num + 8,     sizeof(num) / 4),
-             Hashrate::format(speed[2],                                 num + 8 * 2, sizeof(num) / 4 ),
-             Hashrate::format(d_ptr->maxHashrate[d_ptr->algorithm],     num + 8 * 3, sizeof(num) / 4)
+             Hashrate::format(speed[1],                                 num + 9,     sizeof(num) / 4),
+             Hashrate::format(speed[2],                                 num + 9 * 2, sizeof(num) / 4 ),
+             Hashrate::format(d_ptr->maxHashrate[d_ptr->algorithm],     num + 9 * 3, sizeof(num) / 4)
              );
 }
 
@@ -573,10 +573,10 @@ void xmrig::Miner::onUpdateRequest(ClientStatus& clientStatus)
 
     if (!d_ptr->job.isDonate()) {
         double t[3] = { 0.0 };
-        int ways = 0;
-        int threads = 0;
-        int totalPages = 0;
-        int totalHugepages = 0;
+        int ways = {0};
+        int threads = {0};
+        int totalPages = {0};
+        int totalHugepages = {0};
 
         for (IBackend *backend : d_ptr->backends) {
             const Hashrate *hr = backend->hashrate();
@@ -614,6 +614,7 @@ void xmrig::Miner::onUpdateRequest(ClientStatus& clientStatus)
         clientStatus.setHugepages(VirtualMemory::isHugepagesAvailable());
         clientStatus.setCurrentThreads(threads);
         clientStatus.setCurrentWays(ways);
+        clientStatus.setMaxCpuUsage(d_ptr->controller->config()->cpu().maxCpuUsage());
         clientStatus.setHashFactor(threads > 0 ? ways/threads : 0);
         clientStatus.setHashrateShort(t[0]);
         clientStatus.setHashrateMedium(t[1]);

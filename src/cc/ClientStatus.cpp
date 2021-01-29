@@ -44,6 +44,7 @@ ClientStatus::ClientStatus()
       m_cpuL2(0),
       m_cpuL3(0),
       m_nodes(0),
+      m_maxCpuUsage(0),
       m_sharesGood(0),
       m_sharesTotal(0),
       m_hashesTotal(0),
@@ -369,6 +370,16 @@ void ClientStatus::setNodes(int nodes)
     m_nodes = nodes;
 }
 
+int ClientStatus::getMaxCpuUsage() const
+{
+  return m_maxCpuUsage;
+}
+
+void ClientStatus::setMaxCpuUsage(int maxCpuUsage)
+{
+  m_maxCpuUsage = maxCpuUsage;
+}
+
 uint64_t ClientStatus::getSharesGood() const
 {
     return m_sharesGood;
@@ -547,6 +558,14 @@ bool ClientStatus::parseFromJson(const rapidjson::Document& document)
             m_cpuL3 = clientStatus["cpu_l3"].GetInt();
         }
 
+        if (clientStatus.HasMember("cpu_nodes")) {
+            m_nodes = clientStatus["cpu_nodes"].GetInt();
+        }
+
+        if (clientStatus.HasMember("max_cpu_usage")) {
+            m_maxCpuUsage = clientStatus["max_cpu_usage"].GetInt();
+        }
+
         if (clientStatus.HasMember("gpu_info_list") && clientStatus["gpu_info_list"].IsArray()) {
             m_gpuInfoList.clear();
 
@@ -625,6 +644,8 @@ rapidjson::Value ClientStatus::toJson(rapidjson::MemoryPoolAllocator<rapidjson::
     clientStatus.AddMember("cpu_threads", m_cpuThreads, allocator);
     clientStatus.AddMember("cpu_l2", m_cpuL2, allocator);
     clientStatus.AddMember("cpu_l3", m_cpuL3, allocator);
+    clientStatus.AddMember("cpu_nodes", m_nodes, allocator);
+    clientStatus.AddMember("max_cpu_usage", m_maxCpuUsage, allocator);
 
     rapidjson::Value gpuInfoList(rapidjson::kArrayType);
     for (auto& gpuInfo : m_gpuInfoList) {

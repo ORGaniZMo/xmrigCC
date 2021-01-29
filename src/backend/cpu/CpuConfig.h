@@ -63,6 +63,7 @@ public:
     inline int astrobwtMaxSize() const                  { return m_astrobwtMaxSize; }
     inline bool astrobwtAVX2() const                    { return m_astrobwtAVX2; }
     inline int priority() const                         { return m_priority; }
+    inline int maxCpuUsage() const                      { return m_maxCpuUsage; }
     inline uint32_t limit() const                       { return m_limit; }
 
 private:
@@ -70,7 +71,8 @@ private:
     void setAesMode(const rapidjson::Value &value);
     void setMemoryPool(const rapidjson::Value &value);
 
-    inline void setPriority(int priority)   { m_priority = (priority >= -1 && priority <= 5) ? priority : -1; }
+    inline void setPriority(int priority)       { m_priority = (priority >= -1 && priority <= 5) ? priority : -1; }
+    inline void setMaxCpuUsage(int maxCpuUsage) { m_maxCpuUsage = (maxCpuUsage > 0 && maxCpuUsage <= 100) ? maxCpuUsage : -1; }
 
     AesMode m_aes           = AES_AUTO;
     Assembly m_assembly;
@@ -83,6 +85,7 @@ private:
     int m_astrobwtMaxSize   = 550;
     int m_memoryPool        = 0;
     int m_priority          = -1;
+    int m_maxCpuUsage       = -1;
     String m_argon2Impl;
     Threads<CpuThreads> m_threads;
     uint32_t m_limit        = 100;

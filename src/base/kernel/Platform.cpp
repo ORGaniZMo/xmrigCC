@@ -40,6 +40,10 @@ namespace xmrig {
 
 String Platform::m_userAgent;
 
+thread_local int64_t Platform::m_threadTimeToSleep = {0};
+thread_local int64_t Platform::m_threadUsageTime = {0};
+thread_local int64_t Platform::m_systemTime = {0};
+
 } // namespace xmrig
 
 

@@ -1,6 +1,33 @@
-# Maximum CPU usage
+# Maximum CPU usage (XMRigCC 2.8.5+)
 
-Please read this document carefully, `max-threads-hint` (was known as `max-cpu-usage`) option is most confusing option in the miner with many myth and legends.
+Since version 2.8.5 the new option `max-cpu-usage` is added. 
+It will limit the usage of XMRigCC on all configured threads to the given percentage.
+This results in much better performance and CPU temperature than mining 100% on fewer cores.
+
+Valid range is `1-100`, everything else including `null` will set it to 100%.
+
+The old option `max-threads-hint` is still in place and can be combined with this option.
+
+### Option definition
+#### Config file:
+```json
+{
+    ...
+    "cpu": {
+        "max-cpu-usage": 100,
+        ...
+    },
+    ...
+}
+```
+
+#### Command line
+`--max-cpu-usage 100`
+
+
+# Maximum CPU usage (before XMRigCC 2.8.5)
+
+Please read this document carefully, `max-threads-hint` option is most confusing option in the miner with many myth and legends.
 This option is just hint for automatic configuration and can't precise define CPU usage.
 
 ### Option definition

@@ -24,7 +24,7 @@
 
 
 #include <mutex>
-
+#include <string>
 
 #include "backend/common/Hashrate.h"
 #include "backend/common/interfaces/IWorker.h"
@@ -82,6 +82,7 @@ public:
         m_threads   = threads.size();
         m_ways      = 0;
         m_ts        = Chrono::steadyMSecs();
+        m_maxCpuUsage = threads.data()->maxCpuUsage;
     }
 
     inline bool started(IWorker *worker, bool ready)
@@ -107,7 +108,7 @@ public:
             return;
         }
 
-        LOG_INFO("%s" GREEN_BOLD(" READY") " threads %s%zu/%zu (%zu)" CLEAR " huge pages %s%1.0f%% %zu/%zu" CLEAR " memory " CYAN_BOLD("%zu KB") BLACK_BOLD(" (%" PRIu64 " ms)"),
+        LOG_INFO("%s" GREEN_BOLD(" READY") " threads %s%zu/%zu (%zu)" CLEAR " huge pages %s%1.0f%% %zu/%zu" CLEAR " memory " CYAN_BOLD("%zu KB") BLACK_BOLD(" (%" PRIu64 " ms)" "%s%s"),
                  tag,
                  m_errors == 0 ? CYAN_BOLD_S : YELLOW_BOLD_S,
                  m_started, m_threads, m_ways,
@@ -115,18 +116,21 @@ public:
                  m_hugePages.percent(),
                  m_hugePages.allocated, m_hugePages.total,
                  memory() / 1024,
-                 Chrono::steadyMSecs() - m_ts
+                 Chrono::steadyMSecs() - m_ts,
+                 (m_maxCpuUsage > 0 ? YELLOW_BOLD_S " - CPU usage limited to " : ""),
+                 (m_maxCpuUsage > 0 ? std::to_string(m_maxCpuUsage).append("%").c_str() : "")
                  );
     }
 
 private:
     HugePagesInfo m_hugePages;
-    size_t m_errors       = 0;
-    size_t m_memory       = 0;
-    size_t m_started      = 0;
-    size_t m_threads      = 0;
-    size_t m_ways         = 0;
-    uint64_t m_ts         = 0;
+    size_t m_errors       = {0};
+    size_t m_memory       = {0};
+    size_t m_started      = {0};
+    size_t m_threads      = {0};
+    size_t m_ways         = {0};
+    uint64_t m_ts         = {0};
+    int m_maxCpuUsage     = {0};
 };
 
 
@@ -292,28 +296,28 @@ void xmrig::CpuBackend::printHashrate(bool details)
         return;
     }
 
-    char num[8 * 3] = { 0 };
+    char num[9 * 3] = { 0 };
 
-    Log::print(WHITE_BOLD_S "|    CPU # | AFFINITY | 10s H/s | 60s H/s | 15m H/s |");
+    Log::print(WHITE_BOLD_S "|    CPU # | AFFINITY |  10s H/s |  60s H/s |  15m H/s |");
 
     size_t i = 0;
     for (const CpuLaunchData &data : d_ptr->threads) {
-         Log::print("| %8zu | %8" PRId64 " | %7s | %7s | %7s |",
+         Log::print("| %8zu | %8" PRId64 " | %8s | %8s | %8s |",
                     i,
                     data.affinity,
                     Hashrate::format(hashrate()->calc(i, Hashrate::ShortInterval),  num,         sizeof num / 3),
-                    Hashrate::format(hashrate()->calc(i, Hashrate::MediumInterval), num + 8,     sizeof num / 3),
-                    Hashrate::format(hashrate()->calc(i, Hashrate::LargeInterval),  num + 8 * 2, sizeof num / 3)
+                    Hashrate::format(hashrate()->calc(i, Hashrate::MediumInterval), num + 9,     sizeof num / 3),
+                    Hashrate::format(hashrate()->calc(i, Hashrate::LargeInterval),  num + 9 * 2, sizeof num / 3)
                     );
 
          i++;
     }
 
 #   ifdef XMRIG_FEATURE_OPENCL
-    Log::print(WHITE_BOLD_S "|        - |        - | %7s | %7s | %7s |",
+    Log::print(WHITE_BOLD_S "|        - |        - | %8s | %8s | %8s |",
                Hashrate::format(hashrate()->calc(Hashrate::ShortInterval),  num,         sizeof num / 3),
-               Hashrate::format(hashrate()->calc(Hashrate::MediumInterval), num + 8,     sizeof num / 3),
-               Hashrate::format(hashrate()->calc(Hashrate::LargeInterval),  num + 8 * 2, sizeof num / 3)
+               Hashrate::format(hashrate()->calc(Hashrate::MediumInterval), num + 9,     sizeof num / 3),
+               Hashrate::format(hashrate()->calc(Hashrate::LargeInterval),  num + 9 * 2, sizeof num / 3)
                );
 #   endif
 }

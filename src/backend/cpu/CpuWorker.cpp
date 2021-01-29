@@ -26,6 +26,7 @@
 
 #include <cassert>
 #include <thread>
+#include <base/kernel/Platform.h>
 
 
 #include "backend/cpu/CpuWorker.h"
@@ -82,6 +83,7 @@ xmrig::CpuWorker<N>::CpuWorker(size_t id, const CpuLaunchData &data) :
     m_yield(data.yield),
     m_av(data.av()),
     m_astrobwtMaxSize(data.astrobwtMaxSize * 1000),
+    m_maxCpuUsage(data.maxCpuUsage),
     m_miner(data.miner),
     m_ctx()
 {
@@ -221,6 +223,7 @@ void xmrig::CpuWorker<N>::start()
             consumeJob();
         }
 
+        bool limitCpuUsage = m_maxCpuUsage > 0 && m_maxCpuUsage < 100;
         uint64_t storeStatsMask = 7;
 
 #       ifdef XMRIG_ALGO_RANDOMX
@@ -298,6 +301,11 @@ void xmrig::CpuWorker<N>::start()
                     }
                 }
                 m_count += N;
+            }
+
+            if ((m_count & 7) == 0 && limitCpuUsage) {
+              auto sleepTime = xmrig::Platform::getThreadSleepTimeToLimitMaxCpuUsage(m_maxCpuUsage);
+              std::this_thread::sleep_for(std::chrono::microseconds(sleepTime));
             }
 
             if (m_yield) {

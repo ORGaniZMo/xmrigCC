@@ -47,7 +47,7 @@ constexpr static int DAY_IN_MS = 86400000;
 class Service
 {
 public:
-  using Statistic = std::pair<double, size_t>;
+  using Statistic = std::pair<double, uint32_t>;
   using AlgoStatistic = std::map<uint64_t, Statistic>;
   using Statistics = std::map<std::string, AlgoStatistic>;
 

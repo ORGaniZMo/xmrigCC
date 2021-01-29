@@ -97,7 +97,7 @@ static const option options[] = {
     { "astrobwt-max-size",     1, nullptr, IConfig::AstroBWTMaxSizeKey    },
     { "astrobwt-avx2",         0, nullptr, IConfig::AstroBWTAVX2Key       },
 #endif
-    { "max-cpu-usage",         1, nullptr, IConfig::CPUMaxThreadsKey      },
+    { "max-cpu-usage",         1, nullptr, IConfig::CPUMaxUsageKey        },
     { "cpu-max-threads-hint",  1, nullptr, IConfig::CPUMaxThreadsKey      },
     { "cpu-memory-pool",       1, nullptr, IConfig::MemoryPoolKey         },
     { "cpu-no-yield",          0, nullptr, IConfig::YieldKey              },

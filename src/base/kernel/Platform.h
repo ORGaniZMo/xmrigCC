@@ -25,15 +25,12 @@
 #ifndef XMRIG_PLATFORM_H
 #define XMRIG_PLATFORM_H
 
+constexpr int MIN_RECALC_THRESHOLD_USEC = 100000;
 
 #include <cstdint>
-
-
 #include "base/tools/String.h"
 
-
 namespace xmrig {
-
 
 class Platform
 {
@@ -53,17 +50,18 @@ public:
     static void restoreTimerResolution();
     static void setProcessPriority(int priority);
     static void setThreadPriority(int priority);
-
-    static inline const char *userAgent() { return m_userAgent; }
+    static int64_t getThreadSleepTimeToLimitMaxCpuUsage(uint8_t maxCpuUsage);
+    static inline const char* userAgent() { return m_userAgent; }
 
 private:
     static char *createUserAgent();
-
     static String m_userAgent;
+
+    static thread_local int64_t m_threadTimeToSleep;
+    static thread_local int64_t m_threadUsageTime;
+    static thread_local int64_t m_systemTime;
 };
 
-
 } // namespace xmrig
-
 
 #endif /* XMRIG_PLATFORM_H */

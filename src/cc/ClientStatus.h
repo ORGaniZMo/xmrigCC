@@ -137,6 +137,9 @@ public:
     int getCpuThreads() const;
     void setCpuThreads(int cpuThreads);
 
+    int getMaxCpuUsage() const;
+    void setMaxCpuUsage(int maxCpuUsage);
+
     int getCpuL2() const;
     void setCpuL2(int cpuL2);
 
@@ -213,6 +216,7 @@ private:
     int m_cpuL2;
     int m_cpuL3;
     int m_nodes;
+    int m_maxCpuUsage;
 
     std::list<GPUInfo> m_gpuInfoList;
 

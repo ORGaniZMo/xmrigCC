@@ -26,6 +26,7 @@ Full Windows/Linux compatible, and you can mix Linux and Windows miner on one XM
 
 ## Last integrated algos in XMRigCC:
 
+* **CXCHE** variant (algo: "cn/cache_hash")
 * **Turtlecoin** argon2 chukwa variant 2 (algo: "argon2/chukwav2")
 * **Panthera (XLA)** variant (algo: "panthera")
 * **ninjacoin** variant (algo: "ninja")
@@ -78,7 +79,7 @@ Full Windows/Linux compatible, and you can mix Linux and Windows miner on one XM
 ## Usage
 ### Basic example XMRigCCServer
 ```
-xmrigServer --port=3344 --user=admin --pass=pass --access-token=SECRET_TOKEN_TO_ACCESS_CC_SERVER
+xmrigServer --port=3344 --user=admin --pass=pass --token=SECRET_TOKEN_TO_ACCESS_CC_SERVER
 ```
 
 ### Options XMRigCCServer

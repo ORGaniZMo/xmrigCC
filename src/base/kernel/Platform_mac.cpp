@@ -21,23 +21,23 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <mach/thread_act.h>
 #include <mach/thread_policy.h>
+#include <mach/mach.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/resource.h>
 #include <uv.h>
 #include <thread>
 
-
+#include "base/tools/Chrono.h"
 #include "base/kernel/Platform.h"
 #include "version.h"
 
 #ifdef XMRIG_NVIDIA_PROJECT
 #   include "nvidia/cryptonight.h"
 #endif
-
 
 char *xmrig::Platform::createUserAgent()
 {
@@ -127,3 +127,43 @@ void xmrig::Platform::setThreadPriority(int priority)
     setpriority(PRIO_PROCESS, 0, prio);
 }
 
+int64_t xmrig::Platform::getThreadSleepTimeToLimitMaxCpuUsage(uint8_t maxCpuUsage)
+{
+  uint64_t currentSystemTime = Chrono::highResolutionMicroSecs();
+  if (currentSystemTime - m_systemTime > MIN_RECALC_THRESHOLD_USEC)
+  {
+    thread_basic_info_data_t info = {0};
+    mach_msg_type_number_t infoCount = THREAD_BASIC_INFO_COUNT;
+
+    mach_port_t port = mach_thread_self();
+    kern_return_t kernErr = thread_info(port, THREAD_BASIC_INFO, (thread_info_t) & info, &infoCount);
+    mach_port_deallocate(mach_task_self(), port);
+
+    if (kernErr == KERN_SUCCESS)
+    {
+      int64_t currentThreadUsageTime = info.user_time.microseconds + (info.user_time.seconds * 1000000)
+                                     + info.system_time.microseconds + (info.system_time.seconds * 1000000);
+
+      if (m_threadUsageTime > 0 || m_systemTime > 0)
+      {
+        m_threadTimeToSleep = ((currentThreadUsageTime - m_threadUsageTime) * 100 / maxCpuUsage)
+                            - (currentSystemTime - m_systemTime - m_threadTimeToSleep);
+      }
+
+      m_threadUsageTime = currentThreadUsageTime;
+      m_systemTime = currentSystemTime;
+    }
+
+    // Something went terrible wrong, reset everything
+    if (m_threadTimeToSleep > 10000000 || m_threadTimeToSleep < 0)
+    {
+      m_threadTimeToSleep = 0;
+      m_threadUsageTime = 0;
+      m_systemTime = 0;
+    }
+
+    return m_threadTimeToSleep;
+  }
+
+  return 0;
+}

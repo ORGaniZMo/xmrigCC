@@ -1,3 +1,9 @@
+# 2.8.5
+* Added parameter --max-cpu-usage (config: `"max-cpu-usage": 100`) to **throttle cpu usage without reducing the cores/threads**
+  * See documentation for details [MAX-CPU-USAGE](https://github.com/Bendr0id/xmrigCC/blob/master/doc/CPU_MAX_USAGE.md)
+* Added columns `cpu-max-usage` and `cpu-nodes` to the dashboard and the info tooltip when hovering the `Host` column
+* Fixed potential crash in XMRigCCServer on cleanup statistics
+* Fixed Hashrate printout when hashrate is > 99999.9h/s
 # 2.8.4
 * Added cn variant CXCHE algo (`cn/cache_hash`)
 * Added parameter --force-autoconfig (config: `"force-autoconfig": true`) to force permanent cpu autoconfig, but it keeps manually disabled algos
