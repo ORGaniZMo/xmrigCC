@@ -36,7 +36,7 @@
 #include "base/io/log/Log.h"
 #include "base/kernel/Platform.h"
 #include "base/net/stratum/Client.h"
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 
 
 #ifdef XMRIG_FEATURE_HTTP

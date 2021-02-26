@@ -27,7 +27,7 @@
 #include "base/api/requests/HttpApiRequest.h"
 #include "base/io/json/Json.h"
 #include "base/net/http/HttpData.h"
-#include "rapidjson/error/en.h"
+#include "3rdparty/rapidjson/error/en.h"
 
 
 namespace xmrig {

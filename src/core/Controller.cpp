@@ -52,7 +52,7 @@ int xmrig::Controller::init()
 {
     Base::init();
 
-    VirtualMemory::init(config()->cpu().memPoolSize(), config()->cpu().isHugePages());
+    VirtualMemory::init(config()->cpu().memPoolSize(), config()->cpu().hugePageSize());
 
     m_network = new Network(this);
 
@@ -97,4 +97,10 @@ xmrig::Network *xmrig::Controller::network() const
     assert(m_network != nullptr);
 
     return m_network;
+}
+
+void xmrig::Controller::execCommand(char command)
+{
+    miner()->execCommand(command);
+    network()->execCommand(command);
 }

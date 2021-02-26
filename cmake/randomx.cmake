@@ -1,5 +1,6 @@
 if (WITH_RANDOMX)
     add_definitions(/DXMRIG_ALGO_RANDOMX)
+    set(WITH_ARGON2 ON)
 
     list(APPEND HEADERS_CRYPTO
         src/crypto/rx/Rx.h
@@ -16,8 +17,6 @@ if (WITH_RANDOMX)
     list(APPEND SOURCES_CRYPTO
         src/crypto/randomx/aes_hash.cpp
         src/crypto/randomx/allocator.cpp
-        src/crypto/randomx/argon2_core.c
-        src/crypto/randomx/argon2_ref.c
         src/crypto/randomx/blake2_generator.cpp
         src/crypto/randomx/blake2/blake2b.c
         src/crypto/randomx/bytecode_machine.cpp
@@ -67,7 +66,23 @@ if (WITH_RANDOMX)
              src/crypto/randomx/jit_compiler_a64.cpp
             )
         # cheat because cmake and ccache hate each other
-        set_property(SOURCE src/crypto/randomx/jit_compiler_a64_static.S PROPERTY LANGUAGE C)
+        if (CMAKE_GENERATOR STREQUAL Xcode)
+            set_property(SOURCE src/crypto/randomx/jit_compiler_a64_static.S PROPERTY LANGUAGE ASM)
+        else()
+            set_property(SOURCE src/crypto/randomx/jit_compiler_a64_static.S PROPERTY LANGUAGE C)
+        endif()
+    else()
+        list(APPEND SOURCES_CRYPTO
+             src/crypto/randomx/jit_compiler_fallback.cpp
+            )
+    endif()
+
+    if (WITH_SSE4_1)
+        list(APPEND SOURCES_CRYPTO src/crypto/randomx/blake2/blake2b_sse41.c)
+
+        if (CMAKE_C_COMPILER_ID MATCHES GNU OR CMAKE_C_COMPILER_ID MATCHES Clang)
+            set_source_files_properties(src/crypto/randomx/blake2/blake2b_sse41.c PROPERTIES COMPILE_FLAGS -msse4.1)
+        endif()
     endif()
 
     if (CMAKE_CXX_COMPILER_ID MATCHES Clang)
@@ -90,17 +105,40 @@ if (WITH_RANDOMX)
         message("-- WITH_MSR=ON")
 
         if (XMRIG_OS_WIN)
-            list(APPEND SOURCES_CRYPTO src/crypto/rx/Rx_win.cpp)
+            list(APPEND SOURCES_CRYPTO
+                src/crypto/rx/RxFix_win.cpp
+                src/hw/msr/Msr_win.cpp
+                )
         elseif (XMRIG_OS_LINUX)
-            list(APPEND SOURCES_CRYPTO src/crypto/rx/Rx_linux.cpp)
+            list(APPEND SOURCES_CRYPTO
+                src/crypto/rx/RxFix_linux.cpp
+                src/hw/msr/Msr_linux.cpp
+                )
         endif()
 
-        list(APPEND HEADERS_CRYPTO src/crypto/rx/msr/MsrItem.h)
-        list(APPEND SOURCES_CRYPTO src/crypto/rx/msr/MsrItem.cpp)
+        list(APPEND HEADERS_CRYPTO
+            src/crypto/rx/RxFix.h
+            src/crypto/rx/RxMsr.h
+            src/hw/msr/Msr.h
+            src/hw/msr/MsrItem.h
+            )
+
+        list(APPEND SOURCES_CRYPTO
+            src/crypto/rx/RxMsr.cpp
+            src/hw/msr/Msr.cpp
+            src/hw/msr/MsrItem.cpp
+            )
     else()
         remove_definitions(/DXMRIG_FEATURE_MSR)
         remove_definitions(/DXMRIG_FIX_RYZEN)
         message("-- WITH_MSR=OFF")
+    endif()
+
+    if (WITH_PROFILING)
+        add_definitions(/DXMRIG_FEATURE_PROFILING)
+
+        list(APPEND HEADERS_CRYPTO src/crypto/rx/Profiler.h)
+        list(APPEND SOURCES_CRYPTO src/crypto/rx/Profiler.cpp)
     endif()
 else()
     remove_definitions(/DXMRIG_ALGO_RANDOMX)

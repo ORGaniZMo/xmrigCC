@@ -31,10 +31,10 @@
 #include "base/io/log/Log.h"
 #include "base/net/http/HttpClient.h"
 #include "base/net/stratum/Client.h"
-#include "rapidjson/document.h"
-#include "rapidjson/error/en.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/writer.h"
+#include "3rdparty/rapidjson/document.h"
+#include "3rdparty/rapidjson/error/en.h"
+#include "3rdparty/rapidjson/stringbuffer.h"
+#include "3rdparty/rapidjson/writer.h"
 
 
 #ifdef XMRIG_FEATURE_TLS
@@ -256,7 +256,7 @@ void xmrig::SelfSelectClient::submitBlockTemplate(rapidjson::Value &result)
 
     JsonRequest::create(doc, sequence(), "block_template", params);
 
-    send(doc, [this](const rapidjson::Value &result, bool success, uint64_t elapsed) {
+    send(doc, [this](const rapidjson::Value &result, bool success, uint64_t) {
         if (!success) {
             if (!isQuiet()) {
                 LOG_ERR("[%s] error: " RED_BOLD("\"%s\"") RED_S ", code: %d", pool().daemon().url().data(), Json::getString(result, "message"), Json::getInt(result, "code"));

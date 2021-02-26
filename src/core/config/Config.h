@@ -31,7 +31,7 @@
 
 #include "backend/cpu/CpuConfig.h"
 #include "base/kernel/config/BaseConfig.h"
-#include "rapidjson/fwd.h"
+#include "3rdparty/rapidjson/fwd.h"
 
 
 #ifdef XMRIG_ALGO_RANDOMX

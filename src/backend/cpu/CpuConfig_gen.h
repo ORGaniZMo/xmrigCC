@@ -60,10 +60,6 @@ size_t inline generate<Algorithm::CN>(Threads<CpuThreads> &threads, uint32_t lim
         ++count;
     }
 
-#   ifdef XMRIG_ALGO_CN_GPU
-    count += generate("cn/gpu", threads, Algorithm::CN_GPU, limit);
-#   endif
-
     return count;
 }
 
@@ -116,17 +112,28 @@ template<>
 size_t inline generate<Algorithm::RANDOM_X>(Threads<CpuThreads> &threads, uint32_t limit)
 {
     size_t count = 0;
-
-    auto wow = Cpu::info()->threads(Algorithm::RX_WOW, limit);
+    auto cpuInfo = Cpu::info();
+    auto wow     = cpuInfo->threads(Algorithm::RX_WOW, limit);
 
     if (!threads.isExist(Algorithm::RX_ARQ)) {
-        auto arq = Cpu::info()->threads(Algorithm::RX_ARQ, limit);
+        auto arq = cpuInfo->threads(Algorithm::RX_ARQ, limit);
         if (arq == wow) {
             threads.setAlias(Algorithm::RX_ARQ, "rx/wow");
             ++count;
         }
         else {
             count += threads.move("rx/arq", std::move(arq));
+        }
+    }
+
+    if (!threads.isExist(Algorithm::RX_KEVA)) {
+        auto keva = cpuInfo->threads(Algorithm::RX_KEVA, limit);
+        if (keva == wow) {
+            threads.setAlias(Algorithm::RX_KEVA, "rx/wow");
+            ++count;
+        }
+        else {
+            count += threads.move("rx/keva", std::move(keva));
         }
     }
 
@@ -139,7 +146,6 @@ size_t inline generate<Algorithm::RANDOM_X>(Threads<CpuThreads> &threads, uint32
     }
 
     count += generate("rx", threads, Algorithm::RX_0, limit);
-    count += generate("rx/keva", threads, Algorithm::RX_KEVA, limit);
 
     return count;
 }

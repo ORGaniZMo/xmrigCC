@@ -18,10 +18,11 @@
 #include <cstring>
 #include <sstream>
 #include <fstream>
-#include <3rdparty/rapidjson/stringbuffer.h>
-#include <3rdparty/rapidjson/prettywriter.h>
+#include "3rdparty/rapidjson/stringbuffer.h"
+#include "3rdparty/rapidjson/prettywriter.h"
 #include <crypto/common/VirtualMemory.h>
-#include <base/kernel/Env.h>
+#include "base/kernel/Env.h"
+#include "base/io/log/Tags.h"
 
 #include "backend/cpu/Cpu.h"
 #include "base/tools/Timer.h"
@@ -67,8 +68,6 @@ namespace
   }
 }
 
-static const char* tag = YELLOW_BG(WHITE_BOLD_S " cc  ") " ";
-
 #ifdef TYPE_AMD_GPU
 xmrig::CCClient::CCClient(xmrig::Config* config, uv_async_t* async)
 #else
@@ -96,12 +95,6 @@ void xmrig::CCClient::start()
 {
   LOG_DEBUG("CCClient::start");
 
-  Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") CSI "1;%dm%s",
-             "CC Server",
-             (m_base->config()->ccClient().useTLS() ? 32 : 36),
-              m_base->config()->ccClient().url()
-  );
-
   updateAuthorization();
   updateClientInfo();
 
@@ -126,7 +119,7 @@ void xmrig::CCClient::updateClientInfo()
   std::string clientId;
   if (m_base->config()->ccClient().workerId())
   {
-    clientId = m_base->config()->ccClient().workerId();
+    clientId = Env::expand(m_base->config()->ccClient().workerId());
   }
   else
   {
@@ -142,13 +135,14 @@ void xmrig::CCClient::updateClientInfo()
   m_clientStatus.setCpuSockets(static_cast<int>(cpuInfo->packages()));
   m_clientStatus.setCpuCores(static_cast<int>(cpuInfo->cores()));
   m_clientStatus.setCpuThreads(static_cast<int>(cpuInfo->threads()));
-  m_clientStatus.setCpuX64(cpuInfo->isX64());
+  m_clientStatus.setCpuX64(ICpuInfo::is64bit());
+  m_clientStatus.setVM(cpuInfo->isVM());
   m_clientStatus.setCpuL2(static_cast<int>(cpuInfo->L2() / 1024));
   m_clientStatus.setCpuL3(static_cast<int>(cpuInfo->L3() / 1024));
   m_clientStatus.setNodes(static_cast<int>(cpuInfo->nodes()));
 
 #   ifdef XMRIG_FEATURE_ASM
-  const Assembly assembly = Cpu::assembly(cpuInfo->assembly());
+  const xmrig::Assembly assembly = Cpu::assembly(cpuInfo->assembly());
   m_clientStatus.setAssembly(assembly.toString());
 #   else
   m_clientStatus.setAssembly("none");
@@ -239,12 +233,12 @@ void xmrig::CCClient::publishClientStatusReport()
   auto res = performRequest(requestUrl, requestBuffer, "POST");
   if (!res)
   {
-    LOG_ERR(CLEAR "%s " RED("error:unable to performRequest POST -> http://%s:%d%s"), tag,
+    LOG_ERR(CLEAR "%s " RED("error:unable to performRequest POST -> http://%s:%d%s"), Tags::cc(),
             m_base->config()->ccClient().host(), m_base->config()->ccClient().port(), requestUrl.c_str());
   }
   else if (res->status != 200)
   {
-    LOG_ERR(CLEAR "%s " RED("error:\"%d\" -> http://%s:%d%s"), tag, res->status, m_base->config()->ccClient().host(),
+    LOG_ERR(CLEAR "%s " RED("error:\"%d\" -> http://%s:%d%s"), Tags::cc(), res->status, m_base->config()->ccClient().host(),
             m_base->config()->ccClient().port(), requestUrl.c_str());
   }
   else
@@ -254,33 +248,33 @@ void xmrig::CCClient::publishClientStatusReport()
     {
       if (controlCommand.getCommand() == ControlCommand::START)
       {
-        LOG_DEBUG(CLEAR "%s Command: START received -> resume", tag);
+        LOG_DEBUG(CLEAR "%s Command: START received -> resume", Tags::cc());
       }
       else if (controlCommand.getCommand() == ControlCommand::STOP)
       {
-        LOG_DEBUG(CLEAR "%s Command: STOP received -> pause", tag);
+        LOG_DEBUG(CLEAR "%s Command: STOP received -> pause", Tags::cc());
       }
       else if (controlCommand.getCommand() == ControlCommand::UPDATE_CONFIG)
       {
-        LOG_WARN(CLEAR "%s " YELLOW("Command: UPDATE_CONFIG received -> update config"), tag);
+        LOG_WARN(CLEAR "%s " YELLOW("Command: UPDATE_CONFIG received -> update config"), Tags::cc());
         fetchConfig();
       }
       else if (controlCommand.getCommand() == ControlCommand::PUBLISH_CONFIG)
       {
-        LOG_WARN(CLEAR "%s " YELLOW("Command: PUBLISH_CONFIG received -> publish config"), tag);
+        LOG_WARN(CLEAR "%s " YELLOW("Command: PUBLISH_CONFIG received -> publish config"), Tags::cc());
         publishConfig();
       }
       else if (controlCommand.getCommand() == ControlCommand::RESTART)
       {
-        LOG_WARN(CLEAR "%s " YELLOW("Command: RESTART received -> trigger restart"), tag);
+        LOG_WARN(CLEAR "%s " YELLOW("Command: RESTART received -> trigger restart"), Tags::cc());
       }
       else if (controlCommand.getCommand() == ControlCommand::SHUTDOWN)
       {
-        LOG_WARN(CLEAR "%s " YELLOW("Command: SHUTDOWN received -> quit"), tag);
+        LOG_WARN(CLEAR "%s " YELLOW("Command: SHUTDOWN received -> quit"), Tags::cc());
       }
       else if (controlCommand.getCommand() == ControlCommand::REBOOT)
       {
-        LOG_WARN(CLEAR "%s " YELLOW("Command: REBOOT received -> trigger reboot"), tag);
+        LOG_WARN(CLEAR "%s " YELLOW("Command: REBOOT received -> trigger reboot"), Tags::cc());
       }
 
       for (ICommandListener *listener : m_Commandlisteners)
@@ -290,7 +284,7 @@ void xmrig::CCClient::publishClientStatusReport()
     }
     else
     {
-      LOG_ERR(CLEAR "%s " RED(" Unknown command received from CC Server."), tag);
+      LOG_ERR(CLEAR "%s " RED(" Unknown command received from CC Server."), Tags::cc());
     }
   }
 }
@@ -305,12 +299,12 @@ void xmrig::CCClient::fetchConfig()
   auto res = performRequest(requestUrl, requestBuffer, "GET");
   if (!res)
   {
-    LOG_ERR(CLEAR "%s " RED("error:unable to performRequest GET -> http://%s:%d%s"), tag,
+    LOG_ERR(CLEAR "%s " RED("error:unable to performRequest GET -> http://%s:%d%s"), Tags::cc(),
             m_base->config()->ccClient().host(), m_base->config()->ccClient().port(), requestUrl.c_str());
   }
   else if (res->status != 200)
   {
-    LOG_ERR(CLEAR "%s " RED("error:\"%d\" -> http://%s:%d%s"), tag, res->status, m_base->config()->ccClient().host(),
+    LOG_ERR(CLEAR "%s " RED("error:\"%d\" -> http://%s:%d%s"), Tags::cc(), res->status, m_base->config()->ccClient().host(),
             m_base->config()->ccClient().port(), requestUrl.c_str());
   }
   else
@@ -334,16 +328,16 @@ void xmrig::CCClient::fetchConfig()
           static_cast<IWatcherListener*>(m_base)->onFileChanged(m_base->config()->fileName());
         }
 
-        LOG_WARN(CLEAR "%s " YELLOW("Config updated. -> reload"), tag);
+        LOG_WARN(CLEAR "%s " YELLOW("Config updated. -> reload"), Tags::cc());
       }
       else
       {
-        LOG_ERR(CLEAR "%s " RED(" Not able to store client config to file %s."), tag, m_base->config()->fileName().data());
+        LOG_ERR(CLEAR "%s " RED(" Not able to store client config to file %s."), Tags::cc(), m_base->config()->fileName().data());
       }
     }
     else
     {
-      LOG_ERR(CLEAR "%s " RED(" Not able to store client config. received client config is broken!"), tag);
+      LOG_ERR(CLEAR "%s " RED(" Not able to store client config. received client config is broken!"), Tags::cc());
     }
   }
 }
@@ -378,23 +372,23 @@ void xmrig::CCClient::publishConfig()
       auto res = performRequest(requestUrl, buffer.GetString(), "POST");
       if (!res)
       {
-        LOG_ERR(CLEAR "%s " RED("error:unable to performRequest POST -> http://%s:%d%s"), tag,
+        LOG_ERR(CLEAR "%s " RED("error:unable to performRequest POST -> http://%s:%d%s"), Tags::cc(),
                 m_base->config()->ccClient().host(), m_base->config()->ccClient().port(), requestUrl.c_str());
       }
       else if (res->status != 200)
       {
-        LOG_ERR(CLEAR "%s " RED("error:\"%d\" -> http://%s:%d%s"), tag, res->status, m_base->config()->ccClient().host(),
+        LOG_ERR(CLEAR "%s " RED("error:\"%d\" -> http://%s:%d%s"), Tags::cc(), res->status, m_base->config()->ccClient().host(),
                 m_base->config()->ccClient().port(), requestUrl.c_str());
       }
     }
     else
     {
-      LOG_ERR(CLEAR "%s " RED(" Not able to send config. Client config %s is broken!"), tag, m_base->config()->fileName().data());
+      LOG_ERR(CLEAR "%s " RED(" Not able to send config. Client config %s is broken!"), Tags::cc(), m_base->config()->fileName().data());
     }
   }
   else
   {
-    LOG_ERR(CLEAR "%s " RED(" Not able to load client config %s. Please make sure it exists! Using embedded config."), tag,
+    LOG_ERR(CLEAR "%s " RED(" Not able to load client config %s. Please make sure it exists! Using embedded config."), Tags::cc(),
             m_base->config()->fileName().data());
   }
 }
@@ -463,6 +457,8 @@ void xmrig::CCClient::onConfigChanged(Config* config, Config* previousConfig)
   LOG_DEBUG("CCClient::onConfigChanged");
   if (config->ccClient() != previousConfig->ccClient())
   {
+    config->ccClient().print();
+
     stop();
 
     if (config->ccClient().enabled() && config->ccClient().host() && config->ccClient().port() > 0)

@@ -33,7 +33,7 @@
 
 #include "base/net/stratum/ProxyUrl.h"
 #include "base/crypto/Coin.h"
-#include "rapidjson/fwd.h"
+#include "3rdparty/rapidjson/fwd.h"
 
 
 namespace xmrig {

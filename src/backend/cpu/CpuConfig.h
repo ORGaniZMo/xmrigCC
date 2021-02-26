@@ -52,8 +52,10 @@ public:
     std::vector<CpuLaunchData> get(const Miner *miner, const Algorithm &algorithm) const;
     void read(const rapidjson::Value &value);
 
+    inline bool astrobwtAVX2() const                    { return m_astrobwtAVX2; }
     inline bool isEnabled() const                       { return m_enabled; }
-    inline bool isHugePages() const                     { return m_hugePages; }
+    inline bool isHugePages() const                     { return m_hugePageSize > 0; }
+    inline bool isHugePagesJit() const                  { return m_hugePagesJit; }
     inline bool isShouldSave() const                    { return m_shouldSave; }
     inline bool isYield() const                         { return m_yield; }
     inline bool isForceAutoconfig() const               { return m_forceAutoconfig; }
@@ -61,24 +63,28 @@ public:
     inline const String &argon2Impl() const             { return m_argon2Impl; }
     inline const Threads<CpuThreads> &threads() const   { return m_threads; }
     inline int astrobwtMaxSize() const                  { return m_astrobwtMaxSize; }
-    inline bool astrobwtAVX2() const                    { return m_astrobwtAVX2; }
     inline int priority() const                         { return m_priority; }
+    inline size_t hugePageSize() const                  { return m_hugePageSize * 1024U; }
     inline int maxCpuUsage() const                      { return m_maxCpuUsage; }
     inline uint32_t limit() const                       { return m_limit; }
 
 private:
+    constexpr static size_t kDefaultHugePageSizeKb  = 2048U;
+    constexpr static size_t kOneGbPageSizeKb        = 1048576U;
+
     void generate();
     void setAesMode(const rapidjson::Value &value);
+    void setHugePages(const rapidjson::Value &value);
     void setMemoryPool(const rapidjson::Value &value);
 
-    inline void setPriority(int priority)       { m_priority = (priority >= -1 && priority <= 5) ? priority : -1; }
-    inline void setMaxCpuUsage(int maxCpuUsage) { m_maxCpuUsage = (maxCpuUsage > 0 && maxCpuUsage <= 100) ? maxCpuUsage : -1; }
+    inline void setPriority(int priority)   { m_priority = (priority >= -1 && priority <= 5) ? priority : -1; }
+    inline void setMaxCpuUsage(int maxCpuUsage) { m_maxCpuUsage = (maxCpuUsage > 0 && maxCpuUsage < 100) ? maxCpuUsage : -1; }
 
     AesMode m_aes           = AES_AUTO;
     Assembly m_assembly;
     bool m_astrobwtAVX2     = false;
     bool m_enabled          = true;
-    bool m_hugePages        = true;
+    bool m_hugePagesJit     = false;
     bool m_shouldSave       = false;
     bool m_yield            = true;
     bool m_forceAutoconfig  = false;
@@ -86,6 +92,7 @@ private:
     int m_memoryPool        = 0;
     int m_priority          = -1;
     int m_maxCpuUsage       = -1;
+    size_t m_hugePageSize   = kDefaultHugePageSizeKb;
     String m_argon2Impl;
     Threads<CpuThreads> m_threads;
     uint32_t m_limit        = 100;

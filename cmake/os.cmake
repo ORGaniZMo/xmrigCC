@@ -43,3 +43,7 @@ elseif(XMRIG_OS_UNIX)
         add_definitions(/DXMRIG_OS_FREEBSD)
     endif()
 endif()
+
+if (WITH_SECURE_JIT)
+    add_definitions(/DXMRIG_SECURE_JIT)
+endif()

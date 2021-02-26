@@ -37,10 +37,10 @@
 
 
 #include "base/io/json/Json.h"
-#include "rapidjson/document.h"
-#include "rapidjson/istreamwrapper.h"
-#include "rapidjson/ostreamwrapper.h"
-#include "rapidjson/prettywriter.h"
+#include "3rdparty/rapidjson/document.h"
+#include "3rdparty/rapidjson/istreamwrapper.h"
+#include "3rdparty/rapidjson/ostreamwrapper.h"
+#include "3rdparty/rapidjson/prettywriter.h"
 
 
 #if defined(_MSC_VER) || defined (__GNUC__)

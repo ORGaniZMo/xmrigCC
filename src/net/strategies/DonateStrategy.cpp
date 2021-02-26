@@ -28,20 +28,21 @@
 #include <iterator>
 
 
+#include "net/strategies/DonateStrategy.h"
+#include "3rdparty/rapidjson/document.h"
+#include "base/crypto/keccak.h"
 #include "base/kernel/Platform.h"
 #include "base/net/stratum/Client.h"
 #include "base/net/stratum/Job.h"
 #include "base/net/stratum/strategies/FailoverStrategy.h"
 #include "base/net/stratum/strategies/SinglePoolStrategy.h"
 #include "base/tools/Buffer.h"
+#include "base/tools/Cvt.h"
 #include "base/tools/Timer.h"
 #include "core/config/Config.h"
 #include "core/Controller.h"
 #include "core/Miner.h"
-#include "base/crypto/keccak.h"
 #include "net/Network.h"
-#include "net/strategies/DonateStrategy.h"
-#include "rapidjson/document.h"
 
 
 namespace xmrig {
@@ -63,9 +64,10 @@ xmrig::DonateStrategy::DonateStrategy(Controller *controller, IStrategyListener 
 {
     uint8_t hash[200];
 
-    const String &user = controller->config()->pools().data().front().user();
+    const auto &user = controller->config()->pools().data().front().user();
     keccak(reinterpret_cast<const uint8_t *>(user.data()), user.size(), hash);
-    Buffer::toHex(hash, 32, m_userId);
+
+    Cvt::toHex(m_userId, sizeof(m_userId), hash, 32);
 
 #   ifdef XMRIG_FEATURE_TLS
     m_pools.emplace_back(kDonateHost, 443, m_userId, nullptr, 0, true, true);
@@ -293,10 +295,10 @@ void xmrig::DonateStrategy::setAlgorithms(rapidjson::Document &doc, rapidjson::V
 }
 
 
-void xmrig::DonateStrategy::setJob(IClient *client, const Job &job)
+void xmrig::DonateStrategy::setJob(IClient *client, const Job &job, const rapidjson::Value &params)
 {
     if (isActive()) {
-        m_listener->onJob(this, client, job);
+        m_listener->onJob(this, client, job, params);
     }
 }
 

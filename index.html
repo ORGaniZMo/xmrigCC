@@ -179,17 +179,20 @@
                     {data: "client_status.hugepages_enabled", visible: false},
                     {data: "client_status.cpu_is_x64", visible: false},
                     {data: "client_status.cpu_has_aes", visible: false},
-                    {data: "client_status.hash_factor", visible: false},
-                    {data: "client_status.total_pages", visible: false},
-                    {data: "client_status.total_hugepages", visible: false},
-                    {data: "client_status.current_threads", visible: false},
-                    {data: "client_status.cpu_sockets", visible: false},
-                    {data: "client_status.cpu_cores", visible: false},
-                    {data: "client_status.cpu_threads", visible: false},
-                    {data: "client_status.cpu_l2", visible: false},
-                    {data: "client_status.cpu_l3", visible: false},
-                    {data: "client_status.cpu_nodes", visible: false},
-                    {data: "client_status.max_cpu_usage", visible: false},
+                    {data: "client_status.cpu_is_vm", visible: false},
+                    {data: "client_status.hash_factor", className: "right", visible: false},
+                    {data: "client_status.total_pages", className: "right", visible: false},
+                    {data: "client_status.total_hugepages", className: "right", visible: false},
+                    {data: "client_status.free_memory", render: memory, className: "right", visible: false},
+                    {data: "client_status.total_memory", render: memory, className: "right", visible: false},
+                    {data: "client_status.current_threads", className: "right", visible: false},
+                    {data: "client_status.cpu_sockets", className: "right", visible: false},
+                    {data: "client_status.cpu_cores", className: "right", visible: false},
+                    {data: "client_status.cpu_threads", className: "right", visible: false},
+                    {data: "client_status.cpu_l2", render: cache, className: "right", visible: false},
+                    {data: "client_status.cpu_l3", render: cache, className: "right", visible: false},
+                    {data: "client_status.cpu_nodes", className: "right", visible: false},
+                    {data: "client_status.max_cpu_usage", className: "right", visible: false},
 
                     {data: "client_status.hashrate_short", render: round, className: "right"},
                     {data: "client_status.hashrate_medium", render: round, className: "right"},
@@ -402,7 +405,7 @@
                     var sumSharesGood = 0;
                     var sumSharedTotal = 0;
 
-                    var colOffset = 23;
+                    var colOffset = 28;
 
                     sumHashrateShort = api
                         .column(colOffset, {page: 'current'})
@@ -1116,9 +1119,10 @@
                 var tooltip = "CPU: " + row.client_status.cpu_brand + " (" + row.client_status.cpu_sockets + ") [" + row.client_status.cpu_cores + " cores / " + row.client_status.cpu_threads + " threads]";
                 tooltip += '\n';
                 tooltip += "CPU Flags: " + (row.client_status.cpu_has_aes ? "AES-NI " : "");
-                tooltip += (row.client_status.cpu_is_x64 ? "x64" : "");
+                tooltip += (row.client_status.cpu_is_x64 ? "x64 " : "");
+                tooltip += (row.client_status.cpu_is_vm ? "VM" : "");
                 tooltip += '\n';
-                tooltip += "CPU Cache L2/L3: " + (row.client_status.cpu_l2 / 1024) + " MB/" + (row.client_status.cpu_l3 / 1024) + " MB";
+                tooltip += "CPU Cache L2/L3: " + cache(row.client_status.cpu_l2) + " MB/" + cache(row.client_status.cpu_l3) + " MB";
                 tooltip += '\n';
                 tooltip += "CPU Nodes: " + row.client_status.cpu_nodes;
                 tooltip += '\n';
@@ -1129,6 +1133,8 @@
                 tooltip += '\n';
                 tooltip += "Used Threads: " + row.client_status.current_threads;
                 tooltip += (row.client_status.hash_factor > 1 ? " [" + row.client_status.hash_factor + "x multi hash mode]" : "");
+                tooltip += '\n';
+                tooltip += "Memory Free/Total: " + memory(row.client_status.free_memory) + " GB/" + memory(row.client_status.total_memory) + " GB";
                 tooltip += '\n';
 
                 if (row.client_status.gpu_info_list) {
@@ -1160,6 +1166,14 @@
 
         function round(data, type, row) {
             return Math.round(data * 100) / 100;
+        }
+
+        function memory(data, type, row) {
+            return Math.round(data / 1024 / 1024 /1024 * 10) / 10;
+        }
+
+        function cache(data, type, row) {
+            return Math.round(data / 1024 * 100) / 100;
         }
 
         function isOnline(lastStatus) {
@@ -1323,15 +1337,18 @@
             <th>Hugepages Enabled</th>
             <th>CPU is x64</th>
             <th>CPU has aes</th>
+            <th>CPU is VM</th>
             <th>Hashfactor</th>
             <th>Total Pages</th>
             <th>Total Hugepages</th>
+            <th>Free Memory (GB)</th>
+            <th>Total Memory (GB)</th>
             <th>Used Threads</th>
             <th>CPU Sockets</th>
             <th>CPU Cores</th>
             <th>CPU Threads</th>
-            <th>CPU L2</th>
-            <th>CPU L3</th>
+            <th>CPU L2 (MB)</th>
+            <th>CPU L3 (MB)</th>
             <th>CPU nodes</th>
             <th>Max CPU usage</th>
 
@@ -1355,6 +1372,9 @@
         <tr>
             <th class="center" width="2%"><i class="fa fa-square-o" id="selectAllBottom"></i></th>
             <th class="left">Total:</th>
+            <th></th>
+            <th></th>
+            <th></th>
             <th></th>
             <th></th>
             <th></th>

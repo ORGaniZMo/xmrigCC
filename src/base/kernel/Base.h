@@ -30,7 +30,7 @@
 #include "base/kernel/interfaces/IConfigListener.h"
 #include "base/kernel/interfaces/IWatcherListener.h"
 #include "base/tools/Object.h"
-#include "rapidjson/fwd.h"
+#include "3rdparty/rapidjson/fwd.h"
 
 
 namespace xmrig {

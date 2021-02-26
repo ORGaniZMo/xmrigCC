@@ -22,7 +22,7 @@ The old option `max-threads-hint` is still in place and can be combined with thi
 ```
 
 #### Command line
-`--max-cpu-usage 100`
+`--cpu-max-cpu-usage 100`
 
 
 # Maximum CPU usage (before XMRigCC 2.8.5)

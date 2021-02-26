@@ -1,13 +1,6 @@
 /* XMRig
- * Copyright 2010      Jeff Garzik <jgarzik@pobox.com>
- * Copyright 2012-2014 pooler      <pooler@litecoinpool.org>
- * Copyright 2014      Lucas Jones <https://github.com/lucasjones>
- * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
- * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
- * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
- * Copyright 2018      Lee Clagett <https://github.com/vtnerd>
- * Copyright 2018-2020 SChernykh   <https://github.com/SChernykh>
- * Copyright 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright (c) 2018-2020 SChernykh   <https://github.com/SChernykh>
+ * Copyright (c) 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -26,10 +19,13 @@
 
 #include <cassert>
 #include <thread>
-#include <base/kernel/Platform.h>
+#include <mutex>
 
-
+#include "base/kernel/Platform.h"
+#include "backend/cpu/interfaces/ICpuInfo.h"
 #include "backend/cpu/CpuWorker.h"
+#include "base/tools/Chrono.h"
+#include "core/config/Config.h"
 #include "core/Miner.h"
 #include "crypto/cn/CnCtx.h"
 #include "crypto/cn/CryptoNight_test.h"
@@ -37,6 +33,7 @@
 #include "crypto/common/Nonce.h"
 #include "crypto/common/VirtualMemory.h"
 #include "crypto/rx/Rx.h"
+#include "crypto/rx/RxDataset.h"
 #include "crypto/rx/RxVm.h"
 #include "net/JobResults.h"
 
@@ -48,6 +45,8 @@
 
 #ifdef XMRIG_ALGO_ASTROBWT
 #   include "crypto/astrobwt/AstroBWT.h"
+#include "Cpu.h"
+
 #endif
 
 
@@ -56,18 +55,10 @@ namespace xmrig {
 static constexpr uint32_t kReserveCount = 32768;
 
 
-template<size_t N>
-inline bool nextRound(WorkerJob<N> &job)
-{
-    if (!job.nextRound(kReserveCount, 1)) {
-        JobResults::done(job.currentJob());
-
-        return false;
-    }
-
-    return true;
-}
-
+#ifdef XMRIG_ALGO_CN_HEAVY
+static std::mutex cn_heavyZen3MemoryMutex;
+VirtualMemory* cn_heavyZen3Memory = nullptr;
+#endif
 
 } // namespace xmrig
 
@@ -85,9 +76,23 @@ xmrig::CpuWorker<N>::CpuWorker(size_t id, const CpuLaunchData &data) :
     m_astrobwtMaxSize(data.astrobwtMaxSize * 1000),
     m_maxCpuUsage(data.maxCpuUsage),
     m_miner(data.miner),
+    m_threads(data.threads),
     m_ctx()
 {
-    m_memory = new VirtualMemory(m_algorithm.l3() * N, data.hugePages, false, true, m_node);
+#   ifdef XMRIG_ALGO_CN_HEAVY
+    // cn-heavy optimization for Zen3 CPUs
+    if ((N == 1) && (m_av == CnHash::AV_SINGLE) && (m_algorithm.family() == Algorithm::CN_HEAVY) && (Cpu::info()->arch() == ICpuInfo::ARCH_ZEN3)) {
+        std::lock_guard<std::mutex> lock(cn_heavyZen3MemoryMutex);
+        if (!cn_heavyZen3Memory) {
+            cn_heavyZen3Memory = new VirtualMemory(m_algorithm.l3() * m_threads, data.hugePages, false, false, node());
+        }
+        m_memory = cn_heavyZen3Memory;
+    }
+    else
+#   endif
+    {
+        m_memory = new VirtualMemory(m_algorithm.l3() * N, data.hugePages, false, true, node());
+    }
 }
 
 
@@ -99,7 +104,13 @@ xmrig::CpuWorker<N>::~CpuWorker()
 #   endif
 
     CnCtx::release(m_ctx, N);
-    delete m_memory;
+
+#   ifdef XMRIG_ALGO_CN_HEAVY
+    if (m_memory != cn_heavyZen3Memory)
+#   endif
+    {
+        delete m_memory;
+    }
 }
 
 
@@ -107,7 +118,7 @@ xmrig::CpuWorker<N>::~CpuWorker()
 template<size_t N>
 void xmrig::CpuWorker<N>::allocateRandomX_VM()
 {
-    RxDataset *dataset = Rx::dataset(m_job.currentJob(), m_node);
+    RxDataset *dataset = Rx::dataset(m_job.currentJob(), node());
 
     while (dataset == nullptr) {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -116,11 +127,13 @@ void xmrig::CpuWorker<N>::allocateRandomX_VM()
             return;
         }
 
-        dataset = Rx::dataset(m_job.currentJob(), m_node);
+        dataset = Rx::dataset(m_job.currentJob(), node());
     }
 
     if (!m_vm) {
-        m_vm = RxVm::create(dataset, m_memory->scratchpad(), !m_hwAES, m_assembly, m_node);
+        // Try to allocate scratchpad from dataset's 1 GB huge pages, if normal huge pages are not available
+        uint8_t* scratchpad = m_memory->isHugePages() ? m_memory->scratchpad() : dataset->tryAllocateScrathpad();
+        m_vm = RxVm::create(dataset, scratchpad ? scratchpad : m_memory->scratchpad(), !m_hwAES, m_assembly, node());
     }
 }
 #endif
@@ -148,17 +161,11 @@ bool xmrig::CpuWorker<N>::selfTest()
                         verify2(Algorithm::CN_R,     test_output_r)    &&
                         verify(Algorithm::CN_RWZ,    test_output_rwz)  &&
                         verify(Algorithm::CN_ZLS,    test_output_zls)  &&
+                        //verify(Algorithm::CN_CONCEAL, test_output_conceal)       &&
+                        //verify(Algorithm::CN_CACHE_HASH, test_output_cache_hash) &&
                         verify(Algorithm::CN_DOUBLE, test_output_double);
 
-#       ifdef XMRIG_ALGO_CN_GPU
-        if (!rc || N > 1) {
-            return rc;
-        }
-
-        return verify(Algorithm::CN_GPU, test_output_gpu);
-#       else
         return rc;
-#       endif
     }
 
 #   ifdef XMRIG_ALGO_CN_LITE
@@ -178,7 +185,8 @@ bool xmrig::CpuWorker<N>::selfTest()
 
 #   ifdef XMRIG_ALGO_CN_PICO
     if (m_algorithm.family() == Algorithm::CN_PICO) {
-        return verify(Algorithm::CN_PICO_0, test_output_pico_trtl);
+        return verify(Algorithm::CN_PICO_0, test_output_pico_trtl) &&
+               verify(Algorithm::CN_PICO_TLO, test_output_pico_tlo);
     }
 #   endif
 
@@ -207,6 +215,14 @@ bool xmrig::CpuWorker<N>::selfTest()
 
 
 template<size_t N>
+void xmrig::CpuWorker<N>::hashrateData(uint64_t &hashCount, uint64_t &, uint64_t &rawHashes) const
+{
+    hashCount = m_count;
+    rawHashes = m_count;
+}
+
+
+template<size_t N>
 void xmrig::CpuWorker<N>::start()
 {
     while (Nonce::sequence(Nonce::CPU) > 0) {
@@ -224,23 +240,13 @@ void xmrig::CpuWorker<N>::start()
         }
 
         bool limitCpuUsage = m_maxCpuUsage > 0 && m_maxCpuUsage < 100;
-        uint64_t storeStatsMask = 7;
 
 #       ifdef XMRIG_ALGO_RANDOMX
         bool first = true;
-        uint64_t tempHash[8] = {};
-
-        // RandomX is faster, we don't need to store stats so often
-        if (m_job.currentJob().algorithm().family() == Algorithm::RANDOM_X) {
-            storeStatsMask = 63;
-        }
+        alignas(16) uint64_t tempHash[8] = {};
 #       endif
 
         while (!Nonce::isOutdated(Nonce::CPU, m_job.sequence())) {
-            if ((m_count & storeStatsMask) == 0) {
-                storeStats();
-            }
-
             const Job &job = m_job.currentJob();
 
             if (job.algorithm().l3() != m_algorithm.l3()) {
@@ -265,7 +271,7 @@ void xmrig::CpuWorker<N>::start()
                     }
                 }
 
-                if (!nextRound(m_job)) {
+                if (!nextRound()) {
                     break;
                 }
 
@@ -289,14 +295,15 @@ void xmrig::CpuWorker<N>::start()
                     fn(job.algorithm())(m_job.blob(), job.size(), m_hash, m_ctx, job.height());
                 }
 
-                if (!nextRound(m_job)) {
+                if (!nextRound()) {
                     break;
                 };
             }
 
             if (valid) {
                 for (size_t i = 0; i < N; ++i) {
-                    if (*reinterpret_cast<uint64_t*>(m_hash + (i * 32) + 24) < job.target()) {
+                    const uint64_t value = *reinterpret_cast<uint64_t*>(m_hash + (i * 32) + 24);
+                    if (value < job.target()) {
                         JobResults::submit(job, current_job_nonces[i], m_hash + (i * 32));
                     }
                 }
@@ -319,6 +326,21 @@ void xmrig::CpuWorker<N>::start()
 
 
 template<size_t N>
+bool xmrig::CpuWorker<N>::nextRound()
+{
+    constexpr uint32_t count = kReserveCount;
+
+    if (!m_job.nextRound(count, 1)) {
+        JobResults::done(m_job.currentJob());
+
+        return false;
+    }
+
+    return true;
+}
+
+
+template<size_t N>
 bool xmrig::CpuWorker<N>::verify(const Algorithm &algorithm, const uint8_t *referenceValue)
 {
     cn_hash_fun func = fn(algorithm);
@@ -327,7 +349,6 @@ bool xmrig::CpuWorker<N>::verify(const Algorithm &algorithm, const uint8_t *refe
     }
 
     func(test_input, 76, m_hash, m_ctx, 0);
-
     return memcmp(m_hash, referenceValue, sizeof m_hash) == 0;
 }
 
@@ -387,7 +408,16 @@ template<size_t N>
 void xmrig::CpuWorker<N>::allocateCnCtx()
 {
     if (m_ctx[0] == nullptr) {
-        CnCtx::create(m_ctx, m_memory->scratchpad(), m_algorithm.l3(), N);
+        int shift = 0;
+
+#       ifdef XMRIG_ALGO_CN_HEAVY
+        // cn-heavy optimization for Zen3 CPUs
+        if (m_memory == cn_heavyZen3Memory) {
+            shift = (id() / 8) * m_algorithm.l3() * 8 + (id() % 8) * 64;
+        }
+#       endif
+
+        CnCtx::create(m_ctx, m_memory->scratchpad() + shift, m_algorithm.l3(), N);
     }
 }
 
@@ -399,7 +429,9 @@ void xmrig::CpuWorker<N>::consumeJob()
         return;
     }
 
-    m_job.add(m_miner->job(), kReserveCount, Nonce::CPU);
+    auto job = m_miner->job();
+    constexpr uint32_t count = kReserveCount;
+    m_job.add(job, count, Nonce::CPU);
 
 #   ifdef XMRIG_ALGO_RANDOMX
     if (m_job.currentJob().algorithm().family() == Algorithm::RANDOM_X) {

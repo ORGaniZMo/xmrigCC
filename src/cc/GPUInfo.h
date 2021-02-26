@@ -18,7 +18,7 @@
 #define XMRIG_GPUINFO_H
 
 #include <string>
-#include <3rdparty/rapidjson/document.h>
+#include "3rdparty/rapidjson/document.h"
 
 class GPUInfo
 {

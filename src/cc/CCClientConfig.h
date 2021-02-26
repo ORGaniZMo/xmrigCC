@@ -19,7 +19,7 @@
 #define XMRIG_CC_CLIENT_CONFIG_H
 
 #include "base/tools/String.h"
-#include "rapidjson/fwd.h"
+#include "3rdparty/rapidjson/fwd.h"
 
 namespace xmrig {
 
@@ -38,6 +38,7 @@ public:
 
     bool read(const rapidjson::Value &value);
     rapidjson::Value toJSON(rapidjson::Document &doc) const;
+    void print() const;
 
     inline bool enabled() const                  { return m_enabled; }
     inline bool useTLS() const                   { return m_useTls; }

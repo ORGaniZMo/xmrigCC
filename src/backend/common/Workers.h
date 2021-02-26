@@ -1,13 +1,6 @@
 /* XMRig
- * Copyright 2010      Jeff Garzik <jgarzik@pobox.com>
- * Copyright 2012-2014 pooler      <pooler@litecoinpool.org>
- * Copyright 2014      Lucas Jones <https://github.com/lucasjones>
- * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
- * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
- * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
- * Copyright 2018      Lee Clagett <https://github.com/vtnerd>
- * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
- * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright (c) 2018-2020 SChernykh   <https://github.com/SChernykh>
+ * Copyright (c) 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -29,7 +22,6 @@
 
 #include "backend/common/Thread.h"
 #include "backend/cpu/CpuLaunchData.h"
-#include "base/tools/Object.h"
 
 
 #ifdef XMRIG_FEATURE_OPENCL
@@ -45,6 +37,7 @@
 namespace xmrig {
 
 
+class Benchmark;
 class Hashrate;
 class WorkersPrivate;
 
@@ -58,19 +51,34 @@ public:
     Workers();
     ~Workers();
 
+    inline void start(const std::vector<T> &data)   { start(data, true); }
+
+    bool tick(uint64_t ticks);
     const Hashrate *hashrate() const;
+    void jobEarlyNotification(const Job &job);
     void setBackend(IBackend *backend);
-    void start(const std::vector<T> &data);
     void stop();
-    void tick(uint64_t ticks);
 
 private:
     static IWorker *create(Thread<T> *handle);
-    static void onReady(void *arg);
+    static void *onReady(void *arg);
+
+    void start(const std::vector<T> &data, bool sleep);
 
     std::vector<Thread<T> *> m_workers;
     WorkersPrivate *d_ptr;
 };
+
+
+template<class T>
+void xmrig::Workers<T>::jobEarlyNotification(const Job &job)
+{
+    for (Thread<T>* t : m_workers) {
+        if (t->worker()) {
+            t->worker()->jobEarlyNotification(job);
+        }
+    }
+}
 
 
 template<>

@@ -218,6 +218,7 @@ static void F8(hashState *state)
 
       /*xor the 512-bit message with the fist half of the 1024-bit hash state*/
       for (int i = 0; i < 8; ++i) x[i] ^= buf[i];
+
       /*the bijective function E8 */
       E8(state);
 
@@ -240,9 +241,8 @@ static HashReturn Init(hashState *state, int hashbitlen)
             case 224: memcpy(state->x,JH224_H0,128); break;
             case 256: memcpy(state->x,JH256_H0,128); break;
             case 384: memcpy(state->x,JH384_H0,128); break;
-            case 512:
             default:
-              memcpy(state->x,JH512_H0,128); break;
+            case 512: memcpy(state->x,JH512_H0,128); break;
       }
 
       return(SUCCESS);

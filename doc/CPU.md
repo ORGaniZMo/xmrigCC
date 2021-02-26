@@ -63,7 +63,7 @@ Each line represent one thread, first element is intensity, this option was know
 ```json
 [-1, -1, -1, -1]
 ```
-Each number represent one thread and means CPU affinity, this is default format for algorithm with maximum intensity 1, currently it all RandomX variants and cryptonight-gpu.
+Each number represent one thread and means CPU affinity, this is default format for algorithm with maximum intensity 1, currently it all RandomX variants.
 
 #### Short object format
 ```json

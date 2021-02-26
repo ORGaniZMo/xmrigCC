@@ -29,7 +29,7 @@
 
 
 #include "base/net/http/HttpResponse.h"
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 
 
 namespace xmrig {

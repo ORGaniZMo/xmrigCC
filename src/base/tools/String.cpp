@@ -23,23 +23,11 @@
  */
 
 
-#include <ctype.h>
-
-
 #include "base/tools/String.h"
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 
 
-xmrig::String::String(const char *str) :
-    m_size(str == nullptr ? 0 : strlen(str))
-{
-    if (m_size == 0) {
-        return;
-    }
-
-    m_data = new char[m_size + 1];
-    memcpy(m_data, str, m_size + 1);
-}
+#include <cctype>
 
 
 xmrig::String::String(const char *str, size_t size) :
@@ -53,6 +41,34 @@ xmrig::String::String(const char *str, size_t size) :
 
     m_data = new char[m_size + 1];
     memcpy(m_data, str, m_size);
+    m_data[m_size] = '\0';
+}
+
+
+xmrig::String::String(const char *str) :
+    m_size(str == nullptr ? 0 : strlen(str))
+{
+    if (str == nullptr) {
+        return;
+    }
+
+    m_data = new char[m_size + 1];
+    memcpy(m_data, str, m_size + 1);
+}
+
+
+xmrig::String::String(const rapidjson::Value &value)
+{
+    if (!value.IsString()) {
+        return;
+    }
+
+    if ((m_size = value.GetStringLength()) == 0) {
+        return;
+    }
+
+    m_data = new char[m_size + 1];
+    memcpy(m_data, value.GetString(), m_size);
     m_data[m_size] = '\0';
 }
 
@@ -103,8 +119,10 @@ rapidjson::Value xmrig::String::toJSON(rapidjson::Document &doc) const
 
 std::vector<xmrig::String> xmrig::String::split(char sep) const
 {
-    std::vector<xmrig::String> out;
+    std::vector<String> out;
     if (m_size == 0) {
+        out.emplace_back(*this);
+
         return out;
     }
 
@@ -113,7 +131,7 @@ std::vector<xmrig::String> xmrig::String::split(char sep) const
 
     for (pos = 0; pos < m_size; ++pos) {
         if (m_data[pos] == sep) {
-            if ((pos - start) > 0) {
+            if (pos > start) {
                 out.emplace_back(m_data + start, pos - start);
             }
 
@@ -121,7 +139,7 @@ std::vector<xmrig::String> xmrig::String::split(char sep) const
         }
     }
 
-    if ((pos - start) > 0) {
+    if (pos > start) {
         out.emplace_back(m_data + start, pos - start);
     }
 

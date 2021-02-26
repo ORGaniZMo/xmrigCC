@@ -19,7 +19,7 @@
 #define __CONTROL_COMMAND_H__
 
 #include <string>
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 
 static const char* command_str[7] = {
         "START",

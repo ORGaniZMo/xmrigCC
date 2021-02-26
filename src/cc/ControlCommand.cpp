@@ -16,8 +16,8 @@
  */
 
 #include <cstring>
-#include <3rdparty/rapidjson/stringbuffer.h>
-#include <3rdparty/rapidjson/prettywriter.h>
+#include "3rdparty/rapidjson/stringbuffer.h"
+#include "3rdparty/rapidjson/prettywriter.h"
 
 #include "ControlCommand.h"
 

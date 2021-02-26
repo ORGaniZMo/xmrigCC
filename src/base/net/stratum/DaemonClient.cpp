@@ -33,12 +33,13 @@
 #include "base/net/http/HttpClient.h"
 #include "base/net/stratum/SubmitResult.h"
 #include "base/tools/Buffer.h"
+#include "base/tools/Cvt.h"
 #include "base/tools/Timer.h"
 #include "net/JobResult.h"
-#include "rapidjson/document.h"
-#include "rapidjson/error/en.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/writer.h"
+#include "3rdparty/rapidjson/document.h"
+#include "3rdparty/rapidjson/error/en.h"
+#include "3rdparty/rapidjson/stringbuffer.h"
+#include "3rdparty/rapidjson/writer.h"
 
 
 #ifdef XMRIG_FEATURE_TLS
@@ -59,7 +60,7 @@ static const char *kHash                    = "hash";
 static const char *kHeight                  = "height";
 static const char *kJsonRPC                 = "/json_rpc";
 
-static const size_t BlobReserveSize         = 8;
+static const size_t kBlobReserveSize        = 8;
 
 }
 
@@ -110,7 +111,7 @@ int64_t xmrig::DaemonClient::submit(const JobResult &result)
 #   ifdef XMRIG_PROXY_PROJECT
     memcpy(data + 78, result.nonce, 8);
 #   else
-    Buffer::toHex(reinterpret_cast<const uint8_t *>(&result.nonce), 4, data + 78);
+    Cvt::toHex(data + 78, 8, reinterpret_cast<const uint8_t *>(&result.nonce), 4);
 #   endif
 
     using namespace rapidjson;
@@ -248,7 +249,7 @@ bool xmrig::DaemonClient::parseJob(const rapidjson::Value &params, int *code)
     m_blockhashingblob = Json::getString(params, "blockhashing_blob");
     if (m_apiVersion == API_DERO) {
         const uint64_t offset = Json::getUint64(params, "reserved_offset");
-        Buffer::toHex(Buffer::randomBytes(BlobReserveSize).data(), BlobReserveSize, m_blockhashingblob.data() + offset * 2);
+        Cvt::toHex(m_blockhashingblob.data() + offset * 2, kBlobReserveSize * 2, Cvt::randomBytes(kBlobReserveSize).data(), kBlobReserveSize);
     }
 
     if (blocktemplate.isNull() || !job.setBlob(m_blockhashingblob)) {
@@ -336,10 +337,10 @@ int64_t xmrig::DaemonClient::getBlockTemplate()
     Value params(kObjectType);
     params.AddMember("wallet_address", m_user.toJSON(), allocator);
     if (m_apiVersion == API_DERO) {
-        params.AddMember("reserve_size", static_cast<uint64_t>(BlobReserveSize), allocator);
+        params.AddMember("reserve_size", static_cast<uint64_t>(kBlobReserveSize), allocator);
     }
     else {
-        params.AddMember("extra_nonce", Buffer::randomBytes(BlobReserveSize).toHex().toJSON(doc), allocator);
+        params.AddMember("extra_nonce", Cvt::toHex(Cvt::randomBytes(kBlobReserveSize)).toJSON(doc), allocator);
     }
 
     JsonRequest::create(doc, m_sequence, "getblocktemplate", params);

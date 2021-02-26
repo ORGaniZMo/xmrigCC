@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.12)
 
 project(argon2 C)
 set(CMAKE_C_STANDARD 99)
@@ -17,12 +17,12 @@ set(ARGON2_SOURCES
 
 set(ARGON2_X86_64_ENABLED ON)
 set(ARGON2_X86_64_LIBS    argon2-sse2 argon2-ssse3 argon2-xop argon2-avx2 argon2-avx512f)
-set(ARGON2_X86_64_SOURCES arch/x86_64/lib/argon2-arch.c arch/x86_64/lib/cpu-flags.c)
+set(ARGON2_X86_64_SOURCES arch/x86_64/lib/argon2-arch.c)
 
 if (CMAKE_C_COMPILER_ID MATCHES MSVC)
     function(add_feature_impl FEATURE MSVC_FLAG DEF)
         add_library(argon2-${FEATURE} STATIC arch/x86_64/lib/argon2-${FEATURE}.c)
-        target_include_directories(argon2-${FEATURE} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        target_include_directories(argon2-${FEATURE} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../)
         target_include_directories(argon2-${FEATURE} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib)
         set_target_properties(argon2-${FEATURE} PROPERTIES POSITION_INDEPENDENT_CODE True)
 
@@ -38,7 +38,7 @@ if (CMAKE_C_COMPILER_ID MATCHES MSVC)
 elseif (NOT XMRIG_ARM AND CMAKE_SIZEOF_VOID_P EQUAL 8)
     function(add_feature_impl FEATURE GCC_FLAG DEF)
         add_library(argon2-${FEATURE} STATIC arch/x86_64/lib/argon2-${FEATURE}.c)
-        target_include_directories(argon2-${FEATURE} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        target_include_directories(argon2-${FEATURE} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../)
         target_include_directories(argon2-${FEATURE} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib)
         set_target_properties(argon2-${FEATURE} PROPERTIES POSITION_INDEPENDENT_CODE True)
 
@@ -84,5 +84,5 @@ endif()
 add_library(argon2 STATIC ${ARGON2_SOURCES})
 target_link_libraries(argon2 ${ARGON2_LIBS})
 
-target_include_directories(argon2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(argon2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../)
 target_include_directories(argon2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib)

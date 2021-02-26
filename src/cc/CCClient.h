@@ -21,7 +21,7 @@
 #include <uv.h>
 #include <chrono>
 #include <ctime>
-#include <3rdparty/cpp-httplib/httplib.h>
+#include "3rdparty/cpp-httplib/httplib.h"
 
 #include "ClientStatus.h"
 #include "version.h"

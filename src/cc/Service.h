@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 #include <map>
-#include <3rdparty/cpp-httplib/httplib.h>
+#include "3rdparty/cpp-httplib/httplib.h"
 
 #include "CCServerConfig.h"
 #include "ClientStatus.h"

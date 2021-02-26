@@ -32,6 +32,7 @@
 #include "backend/cpu/Cpu.h"
 #include "backend/cpu/CpuBackend.h"
 #include "base/io/log/Log.h"
+#include "base/io/log/Tags.h"
 #include "base/kernel/Platform.h"
 #include "base/net/stratum/Job.h"
 #include "base/tools/Object.h"
@@ -41,7 +42,7 @@
 #include "core/Miner.h"
 #include "crypto/common/Nonce.h"
 #include "crypto/rx/Rx.h"
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 #include "version.h"
 
 
@@ -66,7 +67,14 @@
 
 
 #ifdef XMRIG_ALGO_RANDOMX
+#   include "crypto/rx/Profiler.h"
+#   include "crypto/rx/Rx.h"
 #   include "crypto/rx/RxConfig.h"
+#endif
+
+
+#ifdef XMRIG_ALGO_ASTROBWT
+#   include "crypto/astrobwt/AstroBWT.h"
 #endif
 
 
@@ -118,7 +126,7 @@ public:
         for (int i = 0; i < Algorithm::MAX; ++i) {
             const Algorithm algo(static_cast<Algorithm::Id>(i));
 
-            if (isEnabled(algo)) {
+            if (algo.isValid() && isEnabled(algo)) {
                 algorithms.push_back(algo);
             }
         }
@@ -127,7 +135,9 @@ public:
 
     inline void handleJobChange()
     {
-        active = true;
+        if (!enabled) {
+            Nonce::pause(true);
+        }
 
         if (reset) {
             Nonce::reset(job.index());
@@ -139,8 +149,8 @@ public:
 
         Nonce::touch();
 
-        if (enabled) {
-            Nonce::pause(false);;
+        if (active && enabled) {
+            Nonce::pause(false);
         }
 
         if (ticks == 0) {
@@ -237,6 +247,107 @@ public:
 #   endif
 
 
+    static inline void printProfile()
+    {
+#       ifdef XMRIG_FEATURE_PROFILING
+        ProfileScopeData* data[ProfileScopeData::MAX_DATA_COUNT];
+
+        const uint32_t n = std::min<uint32_t>(ProfileScopeData::s_dataCount, ProfileScopeData::MAX_DATA_COUNT);
+        memcpy(data, ProfileScopeData::s_data, n * sizeof(ProfileScopeData*));
+
+        std::sort(data, data + n, [](ProfileScopeData* a, ProfileScopeData* b) {
+            return strcmp(a->m_threadId, b->m_threadId) < 0;
+        });
+
+        std::map<std::string, std::pair<uint32_t, double>> averageTime;
+
+        for (uint32_t i = 0; i < n;)
+        {
+            uint32_t n1 = i;
+            while ((n1 < n) && (strcmp(data[i]->m_threadId, data[n1]->m_threadId) == 0)) {
+                ++n1;
+            }
+
+            std::sort(data + i, data + n1, [](ProfileScopeData* a, ProfileScopeData* b) {
+                return a->m_totalCycles > b->m_totalCycles;
+            });
+
+            for (uint32_t j = i; j < n1; ++j) {
+                ProfileScopeData* p = data[j];
+                const double t = p->m_totalCycles / p->m_totalSamples * 1e9 / ProfileScopeData::s_tscSpeed;
+                LOG_INFO("%s Thread %6s | %-30s | %7.3f%% | %9.0f ns",
+                    Tags::profiler(),
+                    p->m_threadId,
+                    p->m_name,
+                    p->m_totalCycles * 100.0 / data[i]->m_totalCycles,
+                    t
+                );
+                auto& value = averageTime[p->m_name];
+                ++value.first;
+                value.second += t;
+            }
+
+            LOG_INFO("%s --------------|--------------------------------|----------|-------------", Tags::profiler());
+
+            i = n1;
+        }
+
+        for (auto& data : averageTime) {
+            LOG_INFO("%s %-30s %9.1f ns", Tags::profiler(), data.first.c_str(), data.second.second / data.second.first);
+        }
+#       endif
+    }
+
+
+    void printHashrate(bool details)
+    {
+        char num[16 * 4] = { 0 };
+        double speed[3]  = { 0.0 };
+        uint32_t count   = 0;
+
+        for (auto backend : backends) {
+            const auto hashrate = backend->hashrate();
+            if (hashrate) {
+                ++count;
+
+                speed[0] += hashrate->calc(Hashrate::ShortInterval);
+                speed[1] += hashrate->calc(Hashrate::MediumInterval);
+                speed[2] += hashrate->calc(Hashrate::LargeInterval);
+            }
+
+            backend->printHashrate(details);
+        }
+
+        if (!count) {
+            return;
+        }
+
+        printProfile();
+
+        double scale  = 1.0;
+        const char* h = "H/s";
+
+        if ((speed[0] >= 1e6) || (speed[1] >= 1e6) || (speed[2] >= 1e6) || (maxHashrate[algorithm] >= 1e6)) {
+            scale = 1e-6;
+            h = "MH/s";
+        }
+
+        LOG_INFO("%s " WHITE_BOLD("speed") " 10s/60s/15m " CYAN_BOLD("%s") CYAN(" %s %s ") CYAN_BOLD("%s") " max " CYAN_BOLD("%s %s"),
+                 Tags::miner(),
+                 Hashrate::format(speed[0] * scale,                 num,          sizeof(num) / 4),
+                 Hashrate::format(speed[1] * scale,                 num + 16,     sizeof(num) / 4),
+                 Hashrate::format(speed[2] * scale,                 num + 16 * 2, sizeof(num) / 4), h,
+                 Hashrate::format(maxHashrate[algorithm] * scale,   num + 16 * 3, sizeof(num) / 4), h
+                 );
+
+#       ifdef XMRIG_FEATURE_BENCHMARK
+        for (auto backend : backends) {
+            backend->printBenchProgress();
+        }
+#       endif
+    }
+
+
 #   ifdef XMRIG_ALGO_RANDOMX
     inline bool initRX() { return Rx::init(job, controller->config()->rx(), controller->config()->cpu()); }
 #   endif
@@ -266,11 +377,20 @@ xmrig::Miner::Miner(Controller *controller)
 {
     const int priority = controller->config()->cpu().priority();
     if (priority >= 0) {
+        Platform::setProcessPriority(priority);
         Platform::setThreadPriority(std::min(priority + 1, 5));
     }
 
+#   ifdef XMRIG_FEATURE_PROFILING
+    ProfileScopeData::Init();
+#   endif
+
 #   ifdef XMRIG_ALGO_RANDOMX
     Rx::init(this);
+#   endif
+
+#   ifdef XMRIG_ALGO_ASTROBWT
+    astrobwt::init();
 #   endif
 
     controller->addListener(this);
@@ -343,7 +463,7 @@ void xmrig::Miner::execCommand(char command)
     switch (command) {
     case 'h':
     case 'H':
-        printHashrate(true);
+        d_ptr->printHashrate(true);
         break;
 
     case 'p':
@@ -373,32 +493,6 @@ void xmrig::Miner::pause()
     Nonce::pause(true);
     Nonce::touch();
 }
-
-
-void xmrig::Miner::printHashrate(bool details)
-{
-    char num[9 * 4] = { 0 };
-    double speed[3] = { 0.0 };
-
-    for (IBackend *backend : d_ptr->backends) {
-        const Hashrate *hashrate = backend->hashrate();
-        if (hashrate) {
-            speed[0] += hashrate->calc(Hashrate::ShortInterval);
-            speed[1] += hashrate->calc(Hashrate::MediumInterval);
-            speed[2] += hashrate->calc(Hashrate::LargeInterval);
-        }
-
-        backend->printHashrate(details);
-    }
-
-    LOG_INFO(WHITE_BOLD("speed") " 10s/60s/15m " CYAN_BOLD("%s") CYAN(" %s %s ") CYAN_BOLD("H/s") " max " CYAN_BOLD("%s H/s"),
-             Hashrate::format(speed[0],                                 num,         sizeof(num) / 4),
-             Hashrate::format(speed[1],                                 num + 9,     sizeof(num) / 4),
-             Hashrate::format(speed[2],                                 num + 9 * 2, sizeof(num) / 4 ),
-             Hashrate::format(d_ptr->maxHashrate[d_ptr->algorithm],     num + 9 * 3, sizeof(num) / 4)
-             );
-}
-
 
 void xmrig::Miner::setEnabled(bool enabled)
 {
@@ -459,6 +553,8 @@ void xmrig::Miner::setJob(const Job &job, bool donate)
 
     mutex.unlock();
 
+    d_ptr->active = true;
+
     if (ready) {
         d_ptr->handleJobChange();
     }
@@ -507,7 +603,7 @@ void xmrig::Miner::onTimer(const Timer *)
 
     auto seconds = d_ptr->controller->config()->printTime();
     if (seconds && (d_ptr->ticks % (seconds * 2)) == 0) {
-        printHashrate(false);
+        d_ptr->printHashrate(false);
     }
 
     d_ptr->ticks++;
@@ -614,6 +710,8 @@ void xmrig::Miner::onUpdateRequest(ClientStatus& clientStatus)
         clientStatus.setHugepages(VirtualMemory::isHugepagesAvailable());
         clientStatus.setCurrentThreads(threads);
         clientStatus.setCurrentWays(ways);
+        clientStatus.setTotalMemory(uv_get_total_memory());
+        clientStatus.setFreeMemory(uv_get_free_memory());
         clientStatus.setMaxCpuUsage(d_ptr->controller->config()->cpu().maxCpuUsage());
         clientStatus.setHashFactor(threads > 0 ? ways/threads : 0);
         clientStatus.setHashrateShort(t[0]);

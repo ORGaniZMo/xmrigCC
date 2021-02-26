@@ -6,8 +6,8 @@
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
  * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
  * Copyright 2018      Lee Clagett <https://github.com/vtnerd>
- * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
- * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2018-2020 SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include <vector>
 
 
-#include "rapidjson/fwd.h"
+#include "3rdparty/rapidjson/fwd.h"
 
 
 namespace xmrig {
@@ -58,7 +58,6 @@ public:
         CN_DOUBLE,     // "cn/double"        CryptoNight variant 2 with double iterations (X-CASH).
         CN_CONCEAL,    // "cn/conceal"       CryptoNight variant 0 (modified, Conceal only).
         CN_CACHE_HASH, // "cn/cache_hash"    CryptoNight variant Cache (CXCHE)
-        CN_GPU,        // "cn/gpu"           CryptoNight-GPU (Ryo).
         CN_LITE_0,     // "cn-lite/0"        CryptoNight-Lite variant 0.
         CN_LITE_1,     // "cn-lite/1"        CryptoNight-Lite variant 1.
         CN_HEAVY_0,    // "cn-heavy/0"       CryptoNight-Heavy (4 MB).
@@ -72,7 +71,7 @@ public:
         RX_ARQ,        // "rx/arq"           RandomARQ (Arqma).
         RX_SFX,        // "rx/sfx"           RandomSFX (Safex Cash).
         RX_KEVA,       // "rx/keva"          RandomKV (Keva).
-        RX_XLA,        // "rx/xla"           RandomX-Panthera (Scala)
+        RX_XLA,        // "rx/xla"           RandomX-Panthera (Scala).
         AR2_CHUKWA,    // "argon2/chukwa"    Argon2id (Chukwa).
         AR2_CHUKWA_V2, // "argon2/chukwav2"  Argon2id (Chukwa v2).
         AR2_CHUKWA_LITE,// "argon2/chukwa-lite" Argon2id (Chukwa-Lite).
@@ -95,10 +94,11 @@ public:
     inline Algorithm() = default;
     inline Algorithm(const char *algo) : m_id(parse(algo)) {}
     inline Algorithm(Id id) : m_id(id)                     {}
+    Algorithm(const rapidjson::Value &value);
 
     inline bool isCN() const                          { auto f = family(); return f == CN || f == CN_LITE || f == CN_HEAVY || f == CN_PICO || f == CN_EXTREMELITE; }
     inline bool isEqual(const Algorithm &other) const { return m_id == other.m_id; }
-    inline bool isValid() const                       { return m_id != INVALID; }
+    inline bool isValid() const                       { return m_id != INVALID && family() != UNKNOWN; }
     inline const char *name() const                   { return name(false); }
     inline const char *shortName() const              { return name(true); }
     inline Family family() const                      { return family(m_id); }
@@ -111,6 +111,7 @@ public:
     inline operator Algorithm::Id() const                 { return m_id; }
 
     rapidjson::Value toJSON() const;
+    rapidjson::Value toJSON(rapidjson::Document &doc) const;
     size_t l2() const;
     size_t l3() const;
     uint32_t maxIntensity() const;

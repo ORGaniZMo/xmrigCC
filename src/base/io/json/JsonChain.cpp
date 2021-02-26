@@ -26,7 +26,7 @@
 #include "base/io/json/Json.h"
 #include "base/io/json/JsonChain.h"
 #include "base/io/log/Log.h"
-#include "rapidjson/error/en.h"
+#include "3rdparty/rapidjson/error/en.h"
 
 
 namespace xmrig {

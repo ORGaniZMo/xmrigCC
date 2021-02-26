@@ -23,8 +23,8 @@
  */
 
 
-#include <inttypes.h>
-#include <stdio.h>
+#include <cinttypes>
+#include <cstdio>
 #include <uv.h>
 
 
@@ -38,8 +38,19 @@
 #include "Summary.h"
 #include "version.h"
 
+#ifdef XMRIG_ALGO_RANDOMX
+#   include "crypto/rx/RxConfig.h"
+#endif
+
 
 namespace xmrig {
+
+
+#ifdef XMRIG_OS_WIN
+static constexpr const char *kHugepagesSupported = GREEN_BOLD("permission granted");
+#else
+static constexpr const char *kHugepagesSupported = GREEN_BOLD("supported");
+#endif
 
 
 #ifdef XMRIG_FEATURE_ASM
@@ -59,50 +70,69 @@ inline static const char *asmName(Assembly::Id assembly)
 #endif
 
 
-static void print_memory(Config *) {
-#   ifdef _WIN32
+static void print_pages(const Config *config)
+{
     Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") "%s",
-               "HUGE PAGES", VirtualMemory::isHugepagesAvailable() ? GREEN_BOLD("permission granted") : RED_BOLD("unavailable"));
+               "HUGE PAGES", config->cpu().isHugePages() ? (VirtualMemory::isHugepagesAvailable() ? kHugepagesSupported : RED_BOLD("unavailable")) : RED_BOLD("disabled"));
+
+#   ifdef XMRIG_ALGO_RANDOMX
+#   ifdef XMRIG_OS_LINUX
+    Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") "%s",
+               "1GB PAGES", (VirtualMemory::isOneGbPagesAvailable() ? (config->rx().isOneGbPages() ? kHugepagesSupported : YELLOW_BOLD("disabled")) : YELLOW_BOLD("unavailable")));
+#   else
+    Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") "%s", "1GB PAGES", YELLOW_BOLD("unavailable"));
+#   endif
 #   endif
 }
 
 
-static void print_cpu(Config *)
+static void print_cpu(const Config *)
 {
-    const ICpuInfo *info = Cpu::info();
+    const auto info = Cpu::info();
 
-    Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s%s (%zu)") " %sx64 %sAES",
+    Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s%s (%zu)") " %s %sAES%s",
                "CPU",
                info->brand(),
                info->packages(),
-               info->isX64()   ? GREEN_BOLD_S : RED_BOLD_S "-",
-               info->hasAES()  ? GREEN_BOLD_S : RED_BOLD_S "-"
+               ICpuInfo::is64bit()    ? GREEN_BOLD("64-bit") : RED_BOLD("32-bit"),
+               info->hasAES()         ? GREEN_BOLD_S : RED_BOLD_S "-",
+               info->isVM()           ? RED_BOLD_S " VM" : ""
                );
-#   if defined(XMRIG_FEATURE_LIBCPUID) || defined (XMRIG_FEATURE_HWLOC)
+#   if defined(XMRIG_FEATURE_HWLOC)
     Log::print(WHITE_BOLD("   %-13s") BLACK_BOLD("L2:") WHITE_BOLD("%.1f MB") BLACK_BOLD(" L3:") WHITE_BOLD("%.1f MB")
                CYAN_BOLD(" %zu") "C" BLACK_BOLD("/") CYAN_BOLD("%zu") "T"
-#              ifdef XMRIG_FEATURE_HWLOC
-               BLACK_BOLD(" NUMA:") CYAN_BOLD("%zu")
-#              endif
-               , "",
+               BLACK_BOLD(" NUMA:") CYAN_BOLD("%zu"),
+               "",
                info->L2() / 1048576.0,
                info->L3() / 1048576.0,
                info->cores(),
-               info->threads()
-#              ifdef XMRIG_FEATURE_HWLOC
-               , info->nodes()
-#              endif
+               info->threads(),
+               info->nodes()
                );
 #   else
-    Log::print(WHITE_BOLD("   %-13s") BLACK_BOLD("threads:") CYAN_BOLD("%zu"),
-               "",
-               info->threads()
-               );
+    Log::print(WHITE_BOLD("   %-13s") BLACK_BOLD("threads:") CYAN_BOLD("%zu"), "", info->threads());
 #   endif
 }
 
 
-static void print_threads(Config *config)
+static void print_memory(const Config *config)
+{
+    constexpr size_t oneGiB = 1024U * 1024U * 1024U;
+    const auto freeMem      = static_cast<double>(uv_get_free_memory());
+    const auto totalMem     = static_cast<double>(uv_get_total_memory());
+
+    const double percent = freeMem > 0 ? ((totalMem - freeMem) / totalMem * 100.0) : 100.0;
+
+    Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") CYAN_BOLD("%.1f/%.1f") CYAN(" GB") BLACK_BOLD(" (%.0f%%)"),
+               "MEMORY",
+               (totalMem - freeMem) / oneGiB,
+               totalMem / oneGiB,
+               percent
+               );
+}
+
+
+static void print_threads(const Config *config)
 {
     Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") WHITE_BOLD("%s%d%%"),
                "DONATE",
@@ -126,13 +156,16 @@ static void print_threads(Config *config)
 static void print_commands(Config *)
 {
     if (Log::isColors()) {
-        Log::print(GREEN_BOLD(" * ") WHITE_BOLD("COMMANDS     ") MAGENTA_BOLD("h") WHITE_BOLD("ashrate, ")
-                                                                     MAGENTA_BOLD("p") WHITE_BOLD("ause, ")
-                                                                     MAGENTA_BOLD("r") WHITE_BOLD("esume, ")
-                                                                     MAGENTA_BOLD("q") WHITE_BOLD("uit"));
+        Log::print(GREEN_BOLD(" * ") WHITE_BOLD("COMMANDS     ") MAGENTA_BG_BOLD("h") WHITE_BOLD("ashrate, ")
+                                                                 MAGENTA_BG_BOLD("p") WHITE_BOLD("ause, ")
+                                                                 MAGENTA_BG_BOLD("r") WHITE_BOLD("esume, ")
+                                                                 WHITE_BOLD("re") MAGENTA_BG(WHITE_BOLD_S "s") WHITE_BOLD("ults, ")
+                                                                 MAGENTA_BG_BOLD("c") WHITE_BOLD("onnection, ")
+								                                                 MAGENTA_BG_BOLD("q") WHITE_BOLD("uit")
+                   );
     }
     else {
-        Log::print(" * COMMANDS     'h' hashrate, 'p' pause, 'r' resume, 'q' quit");
+        Log::print(" * COMMANDS     'h' hashrate, 'p' pause, 'r' resume, 's' results, 'c' connection, 'q' quit");
     }
 }
 
@@ -142,13 +175,20 @@ static void print_commands(Config *)
 
 void xmrig::Summary::print(Controller *controller)
 {
-    controller->config()->printVersions();
-    print_memory(controller->config());
-    print_cpu(controller->config());
-    print_threads(controller->config());
-    controller->config()->pools().print();
+    const auto config = controller->config();
 
-    print_commands(controller->config());
+    config->printVersions();
+    print_pages(config);
+    print_cpu(config);
+    print_memory(config);
+    print_threads(config);
+    config->pools().print();
+
+#   ifdef XMRIG_FEATURE_CC_CLIENT
+    config->ccClient().print();
+#   endif
+
+    print_commands(config);
 }
 
 

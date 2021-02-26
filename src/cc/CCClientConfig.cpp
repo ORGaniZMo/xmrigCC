@@ -15,9 +15,12 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string>
+
+#include "base/io/log/Log.h"
 #include "base/io/json/Json.h"
 #include "cc/CCClientConfig.h"
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 
 
 namespace xmrig {
@@ -81,6 +84,20 @@ bool xmrig::CCClientConfig::read(const rapidjson::Value &value)
     }
 
     return false;
+}
+
+void xmrig::CCClientConfig::print() const
+{
+  std::string ccServer;
+  if (enabled() && m_url != nullptr) {
+    ccServer = CSI "1;" + std::to_string(enabled() ? (useTLS() ? 32 : 36) : 31) + "m" + url() + CLEAR;
+  } else {
+    ccServer = RED_BOLD("disabled");
+  }
+
+  Log::print(GREEN_BOLD(" * ") WHITE_BOLD("%-13s") "%s",
+    "CC Server",
+    ccServer.c_str());
 }
 
 bool xmrig::CCClientConfig::parseCCUrl(const char* url)

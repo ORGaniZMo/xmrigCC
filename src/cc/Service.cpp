@@ -27,12 +27,12 @@
 #include <dirent.h>
 #endif
 
-#include <3rdparty/rapidjson/document.h>
-#include <3rdparty/rapidjson/stringbuffer.h>
-#include <3rdparty/rapidjson/writer.h>
-#include <3rdparty/rapidjson/filewritestream.h>
-#include <3rdparty/rapidjson/prettywriter.h>
-#include <3rdparty/cpp-httplib/httplib.h>
+#include "3rdparty/rapidjson/document.h"
+#include "3rdparty/rapidjson/stringbuffer.h"
+#include "3rdparty/rapidjson/writer.h"
+#include "3rdparty/rapidjson/filewritestream.h"
+#include "3rdparty/rapidjson/prettywriter.h"
+#include "3rdparty/cpp-httplib/httplib.h"
 #include "base/io/log/Log.h"
 #include "version.h"
 #include "Service.h"

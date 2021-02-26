@@ -29,7 +29,7 @@
 #include "base/net/stratum/strategies/FailoverStrategy.h"
 #include "base/net/stratum/strategies/SinglePoolStrategy.h"
 #include "donate.h"
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 
 
 namespace xmrig {

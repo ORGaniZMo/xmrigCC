@@ -79,12 +79,17 @@ namespace xmrig {
         u += "  -v, --av=N                    algorithm variation, 0 auto select\n";
         u += "      --cpu-affinity            set process affinity to CPU core(s), mask 0x3 for cores 0 and 1\n";
         u += "      --cpu-priority            set process priority (0 idle, 2 normal to 5 highest)\n";
-        u += "      --cpu-max-threads-hint=N  maximum CPU threads count (in percentage) hint for autoconfig\n";
+        u += "      --cpu-max-cpu-usage=N     set maximum CPU usage (in percentage) on all used threads\n";
+        u += "      --cpu-max-threads-hint=N  set maximum CPU threads count (in percentage) hint for autoconfig\n";
         u += "      --cpu-memory-pool=N       number of 2 MB pages for persistent memory pool, -1 (auto), 0 (disable)\n";
         u += "      --cpu-no-yield            prefer maximum hashrate rather than system response/stability\n";
         u += "      --cpu-force-autoconfig    force cpu autoconfig, but keeps disabled algos\n";
         u += "      --no-huge-pages           disable huge pages support\n";
         u += "      --asm=ASM                 ASM optimizations, possible values: auto, none, intel, ryzen, bulldozer\n";
+
+#   if defined(__x86_64__) || defined(_M_AMD64)
+        u += "      --argon2-impl=IMPL        argon2 implementation: x86_64, SSE2, SSSE3, XOP, AVX2, AVX-512F\n";
+#   endif
 
 #   ifdef XMRIG_ALGO_RANDOMX
         u += "      --randomx-init=N          threads count to initialize RandomX dataset\n";

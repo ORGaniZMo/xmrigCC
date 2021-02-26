@@ -27,7 +27,7 @@
 
 
 #include "base/crypto/Algorithm.h"
-#include "rapidjson/fwd.h"
+#include "3rdparty/rapidjson/fwd.h"
 
 
 namespace xmrig {

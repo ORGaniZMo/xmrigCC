@@ -28,7 +28,7 @@
 
 
 #include "crypto/cn/CnAlgo.h"
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 
 
 #include <cassert>
@@ -77,10 +77,6 @@ static AlgoName const algorithm_names[] = {
     { "cryptonight/ccx",           "cn/ccx",           Algorithm::CN_CONCEAL      },
     { "cryptonight/cache_hash",    "cn/cache_hash",    Algorithm::CN_CACHE_HASH   },
     { "cryptonight/cache",         "cn/cache",         Algorithm::CN_CACHE_HASH   },
-#   ifdef XMRIG_ALGO_CN_GPU
-    { "cryptonight/gpu",           "cn/gpu",           Algorithm::CN_GPU          },
-    { "cryptonight_gpu",           nullptr,            Algorithm::CN_GPU          },
-#   endif
 #   ifdef XMRIG_ALGO_CN_LITE
     { "cryptonight-lite/0",        "cn-lite/0",        Algorithm::CN_LITE_0       },
     { "cryptonight-lite/1",        "cn-lite/1",        Algorithm::CN_LITE_1       },
@@ -155,11 +151,23 @@ static AlgoName const algorithm_names[] = {
 } /* namespace xmrig */
 
 
+xmrig::Algorithm::Algorithm(const rapidjson::Value &value) :
+    m_id(parse(value.GetString()))
+{
+}
+
+
 rapidjson::Value xmrig::Algorithm::toJSON() const
 {
     using namespace rapidjson;
 
     return isValid() ? Value(StringRef(shortName())) : Value(kNullType);
+}
+
+
+rapidjson::Value xmrig::Algorithm::toJSON(rapidjson::Document &) const
+{
+    return toJSON();
 }
 
 
@@ -190,15 +198,29 @@ size_t xmrig::Algorithm::l2() const
 
 size_t xmrig::Algorithm::l3() const
 {
-#   if defined(XMRIG_ALGO_RANDOMX) || defined(XMRIG_ALGO_ARGON2) || defined(XMRIG_ALGO_ASTROBWT)
     constexpr size_t oneMiB = 0x100000;
-#   endif
 
-    const Family f = family();
+    const auto f = family();
     assert(f != UNKNOWN);
 
-    if (f < RANDOM_X) {
-        return CnAlgo<>::memory(m_id);
+    switch (f) {
+    case CN:
+        return oneMiB * 2;
+
+    case CN_LITE:
+        return oneMiB;
+
+    case CN_HEAVY:
+        return oneMiB * 4;
+
+    case CN_PICO:
+        return oneMiB / 4;
+
+    case CN_EXTREMELITE:
+        return oneMiB / 8;
+
+    default:
+        break;
     }
 
 #   ifdef XMRIG_ALGO_RANDOMX
@@ -222,7 +244,6 @@ size_t xmrig::Algorithm::l3() const
     }
 #   endif
 
-
 #   ifdef XMRIG_ALGO_ARGON2
     if (f == ARGON2) {
         switch (m_id) {
@@ -241,16 +262,15 @@ size_t xmrig::Algorithm::l3() const
     }
 #   endif
 
-
 #   ifdef XMRIG_ALGO_ASTROBWT
     if (f == ASTROBWT) {
-        switch (m_id) {
-            case ASTROBWT_DERO:
-                return oneMiB * 20;
+      switch (m_id) {
+        case ASTROBWT_DERO:
+            return oneMiB * 20;
 
-            default:
-                break;
-        }
+        default:
+            break;
+      }
     }
 #   endif
 
@@ -279,12 +299,6 @@ uint32_t xmrig::Algorithm::maxIntensity() const
     }
 #   endif
 
-#   ifdef XMRIG_ALGO_CN_GPU
-    if (m_id == CN_GPU) {
-        return 1;
-    }
-#   endif
-
     return 5;
 }
 
@@ -292,72 +306,69 @@ uint32_t xmrig::Algorithm::maxIntensity() const
 xmrig::Algorithm::Family xmrig::Algorithm::family(Id id)
 {
     switch (id) {
-    case CN_0:
-    case CN_1:
-    case CN_2:
-    case CN_R:
-    case CN_FAST:
-    case CN_HALF:
-    case CN_XAO:
-    case CN_RTO:
-    case CN_RWZ:
-    case CN_ZLS:
-    case CN_DOUBLE:
-    case CN_CONCEAL:
-    case CN_CACHE_HASH:
-#   ifdef XMRIG_ALGO_CN_GPU
-    case CN_GPU:
-#   endif
-        return CN;
-        
-#   ifdef XMRIG_ALGO_CN_LITE
-    case CN_LITE_0:
-    case CN_LITE_1:
-        return CN_LITE;
-#   endif
+      case CN_0:
+      case CN_1:
+      case CN_2:
+      case CN_R:
+      case CN_FAST:
+      case CN_HALF:
+      case CN_XAO:
+      case CN_RTO:
+      case CN_RWZ:
+      case CN_ZLS:
+      case CN_DOUBLE:
+      case CN_CONCEAL:
+      case CN_CACHE_HASH:
+          return CN;
 
-#   ifdef XMRIG_ALGO_CN_HEAVY
-    case CN_HEAVY_0:
-    case CN_HEAVY_TUBE:
-    case CN_HEAVY_XHV:
-        return CN_HEAVY;
-#   endif
+  #   ifdef XMRIG_ALGO_CN_LITE
+      case CN_LITE_0:
+      case CN_LITE_1:
+          return CN_LITE;
+  #   endif
 
-#   ifdef XMRIG_ALGO_CN_PICO
-    case CN_PICO_0:
-    case CN_PICO_TLO:
-        return CN_PICO;
-#   endif
+  #   ifdef XMRIG_ALGO_CN_HEAVY
+      case CN_HEAVY_0:
+      case CN_HEAVY_TUBE:
+      case CN_HEAVY_XHV:
+          return CN_HEAVY;
+  #   endif
 
-#   ifdef XMRIG_ALGO_CN_EXTREMELITE
-    case CN_EXTREMELITE_0:
-        return CN_EXTREMELITE;
-#   endif
+  #   ifdef XMRIG_ALGO_CN_PICO
+      case CN_PICO_0:
+      case CN_PICO_TLO:
+          return CN_PICO;
+  #   endif
 
-#   ifdef XMRIG_ALGO_RANDOMX
-    case RX_0:
-    case RX_WOW:
-    case RX_ARQ:
-    case RX_SFX:
-    case RX_KEVA:
-    case RX_XLA:
-        return RANDOM_X;
-#   endif
+  #   ifdef XMRIG_ALGO_CN_EXTREMELITE
+      case CN_EXTREMELITE_0:
+          return CN_EXTREMELITE;
+  #   endif
 
-#   ifdef XMRIG_ALGO_ARGON2
-    case AR2_CHUKWA:
-    case AR2_CHUKWA_V2:
-    case AR2_CHUKWA_LITE:
-        return ARGON2;
-#   endif
+  #   ifdef XMRIG_ALGO_RANDOMX
+      case RX_0:
+      case RX_WOW:
+      case RX_ARQ:
+      case RX_SFX:
+      case RX_KEVA:
+      case RX_XLA:
+          return RANDOM_X;
+  #   endif
 
-#   ifdef XMRIG_ALGO_ASTROBWT
-    case ASTROBWT_DERO:
-        return ASTROBWT;
-#   endif
+  #   ifdef XMRIG_ALGO_ARGON2
+      case AR2_CHUKWA:
+      case AR2_CHUKWA_V2:
+      case AR2_CHUKWA_LITE:
+          return ARGON2;
+  #   endif
 
-    default:
-        break;
+  #   ifdef XMRIG_ALGO_ASTROBWT
+      case ASTROBWT_DERO:
+          return ASTROBWT;
+  #   endif
+
+      default:
+          break;
     }
 
     return UNKNOWN;

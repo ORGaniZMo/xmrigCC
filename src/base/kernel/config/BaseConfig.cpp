@@ -26,8 +26,9 @@
 #include "base/kernel/config/BaseConfig.h"
 #include "base/io/json/Json.h"
 #include "base/io/log/Log.h"
+#include "base/io/log/Tags.h"
 #include "base/kernel/interfaces/IJsonReader.h"
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 #include "version.h"
 
 
@@ -115,7 +116,7 @@ bool xmrig::BaseConfig::save()
     getJSON(doc);
 
     if (Json::save(m_fileName, doc)) {
-        LOG_NOTICE("configuration saved to: \"%s\"", m_fileName.data());
+        LOG_NOTICE("%s " WHITE_BOLD("configuration saved to: \"%s\""), Tags::config(), m_fileName.data());
         return true;
     }
 
@@ -139,11 +140,16 @@ void xmrig::BaseConfig::printVersions()
 
     std::string libs;
 
-#   if defined(XMRIG_FEATURE_TLS) && defined(OPENSSL_VERSION_TEXT)
+#   if defined(XMRIG_FEATURE_TLS)
     {
-        constexpr const char *v = OPENSSL_VERSION_TEXT + 8;
+#       if defined(LIBRESSL_VERSION_TEXT)
+        snprintf(buf, sizeof buf, "LibreSSL/%s ", LIBRESSL_VERSION_TEXT + 9);
+        libs += buf;
+#       elif defined(OPENSSL_VERSION_TEXT)
+        constexpr const char *v = &OPENSSL_VERSION_TEXT[8];
         snprintf(buf, sizeof buf, "OpenSSL/%.*s ", static_cast<int>(strchr(v, ' ') - v), v);
         libs += buf;
+#       endif
     }
 #   endif
 

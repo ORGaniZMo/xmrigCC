@@ -26,8 +26,8 @@
 
 #include "3rdparty/http-parser/http_parser.h"
 #include "base/net/http/HttpApiResponse.h"
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
+#include "3rdparty/rapidjson/prettywriter.h"
+#include "3rdparty/rapidjson/stringbuffer.h"
 
 
 namespace xmrig {

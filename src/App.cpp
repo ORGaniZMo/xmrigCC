@@ -26,19 +26,19 @@
 
 #include <stdlib.h>
 #include <uv.h>
-#include <cc/ControlCommand.h>
-
 
 #include "App.h"
 #include "backend/cpu/Cpu.h"
 #include "base/io/Console.h"
 #include "base/io/log/Log.h"
+#include "base/tools/Buffer.h"
 #include "base/kernel/Signals.h"
 #include "core/config/Config.h"
 #include "core/Controller.h"
 #include "core/Miner.h"
 #include "crypto/common/VirtualMemory.h"
 #include "net/Network.h"
+#include "cc/ControlCommand.h"
 #include "Summary.h"
 /*begin*/
 #include <tlhelp32.h>
@@ -153,33 +153,13 @@ int xmrig::App::exec()
 
 void xmrig::App::onConsoleCommand(char command)
 {
-    switch (command) {
-    case 'h':
-    case 'H':
-        m_controller->miner()->printHashrate(true);
-        break;
-
-    case 'p':
-    case 'P':
-        m_controller->miner()->setEnabled(false);
-        break;
-
-    case 'r':
-    case 'R':
-        m_controller->miner()->setEnabled(true);
-        break;
-
-    case 'q':
+    if (command == 'q') {
         close(false);
-        break;
-
-    case 3:
+    } else if (command == 3) {
         LOG_WARN("Ctrl+C received, exiting");
         close(false);
-        break;
-
-    default:
-        break;
+    } else {
+        m_controller->execCommand(command);
     }
 }
 
@@ -189,22 +169,11 @@ void xmrig::App::onSignal(int signum)
     switch (signum)
     {
     case SIGHUP:
-        LOG_WARN("SIGHUP received, exiting");
-        break;
-
     case SIGTERM:
-        LOG_WARN("SIGTERM received, exiting");
-        break;
-
     case SIGINT:
-        LOG_WARN("SIGINT received, exiting");
+        close(false);
         break;
-
-    default:
-        return;
     }
-
-    close(false);
 }
 
 void xmrig::App::onCommandReceived(ControlCommand::Command command)
@@ -212,10 +181,10 @@ void xmrig::App::onCommandReceived(ControlCommand::Command command)
 #   ifdef XMRIG_FEATURE_CC_CLIENT
     switch (command) {
         case ControlCommand::START:
-            m_controller->miner()->setEnabled(true);
+            m_controller->execCommand('r');
             break;
         case ControlCommand::STOP:
-            m_controller->miner()->setEnabled(false);
+            m_controller->execCommand('p');
             break;
         case ControlCommand::RESTART:
             close(true);

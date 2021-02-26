@@ -97,11 +97,9 @@ static const option options[] = {
     { "astrobwt-max-size",     1, nullptr, IConfig::AstroBWTMaxSizeKey    },
     { "astrobwt-avx2",         0, nullptr, IConfig::AstroBWTAVX2Key       },
 #endif
-    { "max-cpu-usage",         1, nullptr, IConfig::CPUMaxUsageKey        },
     { "cpu-max-threads-hint",  1, nullptr, IConfig::CPUMaxThreadsKey      },
     { "cpu-memory-pool",       1, nullptr, IConfig::MemoryPoolKey         },
     { "cpu-no-yield",          0, nullptr, IConfig::YieldKey              },
-    { "cpu-force-autoconfig",  0, nullptr, IConfig::ForceAutoconfigKey    },
   // xmrigCC related
     { "daemonized",            0, nullptr, IConfig::CCDaemonizedKey       },
     { "cc-disabled",           0, nullptr, IConfig::CCEnabledKey          },
@@ -113,6 +111,8 @@ static const option options[] = {
     { "cc-worker-id",          1, nullptr, IConfig::CCWorkerId            },
     { "cc-update-interval-s",  1, nullptr, IConfig::CCUpdateInterval      },
     { "cc-upload-config-on-start",    0, nullptr, IConfig::CCUploadConfigOnStartup },
+    { "cpu-force-autoconfig",  0, nullptr, IConfig::ForceAutoconfigKey    },
+    { "cpu-max-cpu-usage",     1, nullptr, IConfig::CPUMaxUsageKey        },
     { nullptr,                 0, nullptr, 0 }
 };
 

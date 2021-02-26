@@ -18,39 +18,12 @@
 
 #include <chrono>
 #include <cstring>
-#include <3rdparty/rapidjson/stringbuffer.h>
-#include <3rdparty/rapidjson/prettywriter.h>
+#include "3rdparty/rapidjson/stringbuffer.h"
+#include "3rdparty/rapidjson/prettywriter.h"
 
 #include "ClientStatus.h"
 
 ClientStatus::ClientStatus()
-    : m_currentStatus(Status::PAUSED),
-      m_hasHugepages(false),
-      m_isHugepagesEnabled(false),
-      m_isCpuX64(false),
-      m_hasCpuAES(false),
-      m_hashrateShort(0),
-      m_hashrateMedium(0),
-      m_hashrateLong(0),
-      m_hashrateHighest(0),
-      m_hashFactor(1),
-      m_totalPages(0),
-      m_totalHugepages(0),
-      m_currentThreads(0),
-      m_currentWays(0),
-      m_cpuSockets(0),
-      m_cpuCores(0),
-      m_cpuThreads(0),
-      m_cpuL2(0),
-      m_cpuL3(0),
-      m_nodes(0),
-      m_maxCpuUsage(0),
-      m_sharesGood(0),
-      m_sharesTotal(0),
-      m_hashesTotal(0),
-      m_uptime(0),
-      m_avgTime(0),
-      m_lastStatusUpdate(0)
 {
 
 }
@@ -210,6 +183,16 @@ void ClientStatus::setCpuX64(bool isCpuX64)
     m_isCpuX64 = isCpuX64;
 }
 
+bool ClientStatus::isVM() const
+{
+  return m_isVM;
+}
+
+void ClientStatus::setVM(bool isVM)
+{
+  m_isVM = isVM;
+}
+
 bool ClientStatus::hasCpuAES() const
 {
     return m_hasCpuAES;
@@ -360,6 +343,26 @@ void ClientStatus::setCpuL3(int cpuL3)
     m_cpuL3 = cpuL3;
 }
 
+uint64_t ClientStatus::getTotalMemory() const
+{
+    return m_totalMemory;
+}
+
+void ClientStatus::setTotalMemory(uint64_t totalMemory)
+{
+    m_totalMemory = totalMemory;
+}
+
+uint64_t ClientStatus::getFreeMemory() const
+{
+    return m_freeMemory;
+}
+
+void ClientStatus::setFreeMemory(uint64_t freeMemory)
+{
+    m_freeMemory = freeMemory;
+}
+
 int ClientStatus::getNodes()
 {
     return m_nodes;
@@ -498,6 +501,10 @@ bool ClientStatus::parseFromJson(const rapidjson::Document& document)
             m_isCpuX64 = clientStatus["cpu_is_x64"].GetBool();
         }
 
+        if (clientStatus.HasMember("cpu_is_vm")) {
+            m_isVM = clientStatus["cpu_is_vm"].GetBool();
+        }
+
         if (clientStatus.HasMember("cpu_has_aes")) {
             m_hasCpuAES = clientStatus["cpu_has_aes"].GetBool();
         }
@@ -535,7 +542,7 @@ bool ClientStatus::parseFromJson(const rapidjson::Document& document)
         }
 
         if (clientStatus.HasMember("current_ways")) {
-            m_currentThreads = clientStatus["current_ways"].GetInt();
+            m_currentWays = clientStatus["current_ways"].GetInt();
         }
 
         if (clientStatus.HasMember("cpu_sockets")) {
@@ -590,6 +597,14 @@ bool ClientStatus::parseFromJson(const rapidjson::Document& document)
             m_hashesTotal = clientStatus["hashes_total"].GetUint64();
         }
 
+        if (clientStatus.HasMember("total_memory")) {
+            m_totalMemory = clientStatus["total_memory"].GetUint64();
+        }
+
+        if (clientStatus.HasMember("free_memory")) {
+            m_freeMemory = clientStatus["free_memory"].GetUint64();
+        }
+
         if (clientStatus.HasMember("avg_time")) {
             m_avgTime = clientStatus["avg_time"].GetUint();
         }
@@ -628,6 +643,7 @@ rapidjson::Value ClientStatus::toJson(rapidjson::MemoryPoolAllocator<rapidjson::
     clientStatus.AddMember("hugepages_enabled", m_isHugepagesEnabled, allocator);
     clientStatus.AddMember("cpu_is_x64", m_isCpuX64, allocator);
     clientStatus.AddMember("cpu_has_aes", m_hasCpuAES, allocator);
+    clientStatus.AddMember("cpu_is_vm", m_isVM, allocator);
 
     clientStatus.AddMember("hashrate_short", m_hashrateShort, allocator);
     clientStatus.AddMember("hashrate_medium", m_hashrateMedium, allocator);
@@ -646,6 +662,8 @@ rapidjson::Value ClientStatus::toJson(rapidjson::MemoryPoolAllocator<rapidjson::
     clientStatus.AddMember("cpu_l3", m_cpuL3, allocator);
     clientStatus.AddMember("cpu_nodes", m_nodes, allocator);
     clientStatus.AddMember("max_cpu_usage", m_maxCpuUsage, allocator);
+    clientStatus.AddMember("total_memory", m_totalMemory, allocator);
+    clientStatus.AddMember("free_memory", m_freeMemory, allocator);
 
     rapidjson::Value gpuInfoList(rapidjson::kArrayType);
     for (auto& gpuInfo : m_gpuInfoList) {

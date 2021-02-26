@@ -1,5 +1,10 @@
+# 2.9.0
+* Fixed Dashboard sum column
+* Fixed 1GB HugePages
+* Rebased latest RX and CN improvements from XMRig 6.8.2
+* Added columns `total memory`, `free memory` and `isVM` to the dashboard and the info tooltip when hovering the `Host` column #323
 # 2.8.5
-* Added parameter --max-cpu-usage (config: `"max-cpu-usage": 100`) to **throttle cpu usage without reducing the cores/threads**
+* Added parameter --cpu-max-cpu-usage (config: `"max-cpu-usage": 100`) to **throttle cpu usage without reducing the cores/threads**
   * See documentation for details [MAX-CPU-USAGE](https://github.com/Bendr0id/xmrigCC/blob/master/doc/CPU_MAX_USAGE.md)
 * Added columns `cpu-max-usage` and `cpu-nodes` to the dashboard and the info tooltip when hovering the `Host` column
 * Fixed potential crash in XMRigCCServer on cleanup statistics

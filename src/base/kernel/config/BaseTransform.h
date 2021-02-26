@@ -28,7 +28,7 @@
 
 #include "base/kernel/interfaces/IConfigTransform.h"
 #include "base/crypto/Coin.h"
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 
 
 struct option;

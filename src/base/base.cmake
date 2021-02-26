@@ -1,7 +1,9 @@
 set(HEADERS_BASE
+    src/3rdparty/fmt/format.cc
     src/base/api/interfaces/IApiListener.h
     src/base/cc/interfaces/IClientStatusListener.h
     src/base/cc/interfaces/ICommandListener.h
+    src/base/io/Async.h
     src/base/io/Console.h
     src/base/io/json/Json.h
     src/base/io/json/JsonChain.h
@@ -11,6 +13,7 @@ set(HEADERS_BASE
     src/base/io/log/backends/RemoteLog.h
     src/base/io/log/FileLogWriter.h
     src/base/io/log/Log.h
+    src/base/io/log/Tags.h
     src/base/io/Watcher.h
     src/base/kernel/Base.h
     src/base/kernel/config/BaseConfig.h
@@ -52,18 +55,22 @@ set(HEADERS_BASE
     src/base/net/stratum/strategies/StrategyProxy.h
     src/base/net/stratum/SubmitResult.h
     src/base/net/stratum/Url.h
-    src/base/net/tools/RecvBuf.h
+    src/base/net/tools/LineReader.h
+    src/base/net/tools/MemPool.h
+    src/base/net/tools/NetBuffer.h
     src/base/net/tools/Storage.h
     src/base/tools/Arguments.h
     src/base/tools/Baton.h
     src/base/tools/Buffer.h
     src/base/tools/Chrono.h
+    src/base/tools/Cvt.h
     src/base/tools/Handle.h
     src/base/tools/String.h
     src/base/tools/Timer.h
    )
 
 set(SOURCES_BASE
+    src/base/io/Async.cpp
     src/base/io/Console.cpp
     src/base/io/json/Json.cpp
     src/base/io/json/JsonChain.cpp
@@ -73,6 +80,7 @@ set(SOURCES_BASE
     src/base/io/log/backends/RemoteLog.cpp
     src/base/io/log/FileLogWriter.cpp
     src/base/io/log/Log.cpp
+    src/base/io/log/Tags.cpp
     src/base/io/Watcher.cpp
     src/base/kernel/Base.cpp
     src/base/kernel/config/BaseConfig.cpp
@@ -96,8 +104,10 @@ set(SOURCES_BASE
     src/base/net/stratum/strategies/FailoverStrategy.cpp
     src/base/net/stratum/strategies/SinglePoolStrategy.cpp
     src/base/net/stratum/Url.cpp
+    src/base/net/tools/LineReader.cpp
+    src/base/net/tools/NetBuffer.cpp
     src/base/tools/Arguments.cpp
-    src/base/tools/Buffer.cpp
+    src/base/tools/Cvt.cpp
     src/base/tools/String.cpp
     src/base/tools/Timer.cpp
    )
@@ -118,9 +128,6 @@ else()
         src/base/io/json/Json_unix.cpp
         src/base/kernel/Platform_unix.cpp
         )
-    list(APPEND SOURCES_BASE
-         src/base/io/Async.cpp
-         )
 endif()
 
 

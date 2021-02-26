@@ -9,23 +9,25 @@ if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
-option(WITH_LIBCPUID        "Enable libcpuid support" ON)
 option(WITH_HWLOC           "Enable hwloc support" ON)
 option(WITH_CN_LITE         "Enable CryptoNight-Lite algorithms family" ON)
 option(WITH_CN_HEAVY        "Enable CryptoNight-Heavy algorithms family" ON)
 option(WITH_CN_PICO         "Enable CryptoNight-Pico algorithm" ON)
-option(WITH_CN_GPU          "Enable CryptoNight-GPU algorithm" OFF)
 option(WITH_RANDOMX         "Enable RandomX algorithms family" ON)
 option(WITH_ARGON2          "Enable Argon2 algorithms family" ON)
 option(WITH_ASTROBWT        "Enable AstroBWT algorithms family" ON)
-option(WITH_HTTP            "Enable HTTP protocol support (client/server)" ON)
 option(WITH_CN_EXTREMELITE  "CryptoNight-Extremelite support" ON)
+option(WITH_HTTP            "Enable HTTP protocol support (client/server)" ON)
 option(WITH_DEBUG_LOG       "Enable debug log output" OFF)
+option(WITH_PROFILING       "Enable developer profiling" OFF)
 option(WITH_TLS             "Enable OpenSSL support" ON)
 option(WITH_ZLIB            "Enabled gzip compression on CC (client/server)" OFF)
 option(WITH_ASM             "Enable ASM PoW implementations" ON)
+option(WITH_ENV_VARS        "Enable environment variables support in config file" ON)
 option(WITH_EMBEDDED_CONFIG "Enable internal embedded JSON config" OFF)
 option(WITH_MSR             "Enable MSR support" ON)
+option(WITH_SSE4_1          "Enable SSE 4.1 for Blake2" ON)
+option(WITH_SECURE_JIT      "Enable secure access to JIT memory" OFF)
 option(WITH_CC_CLIENT       "CC Client" ON)
 option(WITH_CC_SERVER       "CC Server" ON)
 option(WITH_HTTPLIB_POLL    "Use poll.h (recommended) instead of old plain sockets for HTTP" ON)
@@ -33,7 +35,6 @@ option(WITH_HTTPLIB_POLL    "Use poll.h (recommended) instead of old plain socke
 option(BUILD_STATIC         "Build static binary" OFF)
 option(ARM_TARGET           "Force use specific ARM target 8 or 7" 0)
 option(HWLOC_DEBUG          "Enable hwloc debug helpers and log" OFF)
-
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -91,6 +92,7 @@ set(HEADERS_CRYPTO
     src/base/crypto/Algorithm.h
     src/base/crypto/Coin.h
     src/base/crypto/keccak.h
+    src/base/crypto/sha3.h
     src/crypto/common/HugePagesInfo.h
     src/crypto/common/MemoryPool.h
     src/crypto/common/Nonce.h
@@ -130,6 +132,7 @@ set(SOURCES_CRYPTO
     src/base/crypto/Algorithm.cpp
     src/base/crypto/Coin.cpp
     src/base/crypto/keccak.cpp
+    src/base/crypto/sha3.cpp
     src/crypto/common/HugePagesInfo.cpp
     src/crypto/common/MemoryPool.cpp
     src/crypto/common/Nonce.cpp
@@ -189,9 +192,10 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     endif()
 endif()
 
-add_definitions(/D__STDC_FORMAT_MACROS)
-add_definitions(/DUNICODE)
-add_definitions(/DMINER_EXECUTABLE_NAME=${MINER_EXECUTABLE_NAME})
+add_definitions(-DMINER_EXECUTABLE_NAME=${MINER_EXECUTABLE_NAME})
+add_definitions(-DXMRIG_MINER_PROJECT -DXMRIG_JSON_SINGLE_LINE_ARRAY)
+add_definitions(-D__STDC_FORMAT_MACROS -DUNICODE -D_FILE_OFFSET_BITS=64)
+
 
 find_package(UV REQUIRED)
 
@@ -201,7 +205,6 @@ include(cmake/argon2.cmake)
 include(cmake/astrobwt.cmake)
 include(cmake/OpenSSL.cmake)
 include(cmake/asm.cmake)
-include(cmake/cn-gpu.cmake)
 
 if (WITH_CN_LITE)
     add_definitions(/DXMRIG_ALGO_CN_LITE)
@@ -237,6 +240,8 @@ if (WITH_CC_SERVER)
             src/base/io/json/JsonChain.cpp
             src/base/io/Console.cpp
             src/base/kernel/Env.cpp
+            src/base/kernel/Process.cpp
+            src/base/tools/Arguments.cpp
             src/base/kernel/Signals.cpp
             src/base/tools/String.cpp
             src/cc/CCCServerConfig.cpp
@@ -314,7 +319,7 @@ if (WITH_DEBUG_LOG)
     add_definitions(/DAPP_DEBUG)
 endif()
 
-add_executable(xmrigMiner ${HEADERS} ${SOURCES} ${SOURCES_OS} ${SOURCES_CPUID} ${HEADERS_CRYPTO} ${SOURCES_CRYPTO} ${SOURCES_SYSLOG} ${TLS_SOURCES} ${XMRIG_ASM_SOURCES} ${CN_GPU_SOURCES} ${SOURCES_CC_CLIENT} ${SOURCES_CC_COMMON})
+add_executable(xmrigMiner ${HEADERS} ${SOURCES} ${SOURCES_OS} ${SOURCES_CPUID} ${HEADERS_CRYPTO} ${SOURCES_CRYPTO} ${SOURCES_SYSLOG} ${TLS_SOURCES} ${XMRIG_ASM_SOURCES} ${SOURCES_CC_CLIENT} ${SOURCES_CC_COMMON})
 target_link_libraries(xmrigMiner ${XMRIG_ASM_LIBRARY} ${OPENSSL_LIBRARIES} ${UV_LIBRARIES} ${EXTRA_LIBS} ${CPUID_LIB} ${ARGON2_LIBRARY} ${ZLIB_LIBRARIES})
 set_target_properties(xmrigMiner PROPERTIES OUTPUT_NAME ${MINER_EXECUTABLE_NAME})
 

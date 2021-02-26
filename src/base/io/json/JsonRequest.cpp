@@ -24,7 +24,7 @@
 
 
 #include "base/io/json/JsonRequest.h"
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 
 
 void xmrig::JsonRequest::create(rapidjson::Document &doc, int64_t id, const char *method, rapidjson::Value &params)

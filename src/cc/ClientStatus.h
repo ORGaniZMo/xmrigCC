@@ -98,6 +98,9 @@ public:
     bool isCpuX64() const;
     void setCpuX64(bool isCpuX64);
 
+    bool isVM() const;
+    void setVM(bool isVM);
+
     bool hasCpuAES() const;
     void setCpuAES(bool hasCpuAES);
 
@@ -146,6 +149,12 @@ public:
     int getCpuL3() const;
     void setCpuL3(int cpuL3);
 
+    uint64_t getTotalMemory() const;
+    void setTotalMemory(uint64_t totalMemory);
+
+    uint64_t getFreeMemory() const;
+    void setFreeMemory(uint64_t freeMemory);
+
     void setNodes(int nodes);
     int getNodes();
 
@@ -181,7 +190,7 @@ private:
             "CONFIG_UPDATED"
     };
 
-    Status m_currentStatus;
+    Status m_currentStatus = Status::PAUSED;
 
     std::string m_clientId;
     std::string m_currentPool;
@@ -195,38 +204,41 @@ private:
     std::string m_log;
     std::string m_assembly;
 
-    bool m_hasHugepages;
-    bool m_isHugepagesEnabled;
-    bool m_isCpuX64;
-    bool m_hasCpuAES;
+    bool m_hasHugepages = false;
+    bool m_isHugepagesEnabled = false;
+    bool m_isCpuX64 = false;
+    bool m_hasCpuAES = false;
+    bool m_isVM = false;
 
-    double m_hashrateShort;
-    double m_hashrateMedium;
-    double m_hashrateLong;
-    double m_hashrateHighest;
+    double m_hashrateShort = 0;
+    double m_hashrateMedium = 0;
+    double m_hashrateLong = 0;
+    double m_hashrateHighest = 0;
 
-    int m_hashFactor;
-    int m_totalPages;
-    int m_totalHugepages;
-    int m_currentThreads;
-    int m_currentWays;
-    int m_cpuSockets;
-    int m_cpuCores;
-    int m_cpuThreads;
-    int m_cpuL2;
-    int m_cpuL3;
-    int m_nodes;
-    int m_maxCpuUsage;
+    int m_hashFactor = 0;
+    int m_totalPages = 0;
+    int m_totalHugepages = 0;
+    int m_currentThreads = 0;
+    int m_currentWays = 0;
+    int m_cpuSockets = 0;
+    int m_cpuCores = 0;
+    int m_cpuThreads = 0;
+    int m_cpuL2 = 0;
+    int m_cpuL3 = 0;
+    int m_nodes = 0;
+    int m_maxCpuUsage = 0;
 
     std::list<GPUInfo> m_gpuInfoList;
 
-    uint64_t m_sharesGood;
-    uint64_t m_sharesTotal;
-    uint64_t m_hashesTotal;
-    uint64_t m_uptime;
+    uint64_t m_sharesGood = 0;
+    uint64_t m_sharesTotal = 0;
+    uint64_t m_hashesTotal = 0;
+    uint64_t m_uptime = 0;
+    uint64_t m_totalMemory = 0;
+    uint64_t m_freeMemory = 0;
 
-    uint32_t m_avgTime;
-    uint64_t m_lastStatusUpdate;
+    uint32_t m_avgTime = 0;
+    uint64_t m_lastStatusUpdate = 0;
 };
 
 #endif /* __CLIENT_STATUS_H__ */

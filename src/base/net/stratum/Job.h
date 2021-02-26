@@ -6,9 +6,9 @@
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
  * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
  * Copyright 2018      Lee Clagett <https://github.com/vtnerd>
- * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
  * Copyright 2019      Howard Chu  <https://github.com/hyc>
- * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2018-2020 SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2020 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -32,9 +32,9 @@
 #include <cstdint>
 
 
+#include "base/crypto/Algorithm.h"
 #include "base/tools/Buffer.h"
 #include "base/tools/String.h"
-#include "base/crypto/Algorithm.h"
 
 
 namespace xmrig {
@@ -46,7 +46,8 @@ public:
     // Max blob size is 84 (75 fixed + 9 variable), aligned to 96. https://github.com/xmrig/xmrig/issues/1 Thanks fireice-uk.
     // SECOR increase requirements for blob size: https://github.com/xmrig/xmrig/issues/913
     // Haven (XHV) offshore increases requirements by adding pricing_record struct (192 bytes) to block_header.
-    static constexpr const size_t kMaxBlobSize = 384;
+    // Round it up to 408 (136*3) for a convenient keccak calculation in OpenCL
+    static constexpr const size_t kMaxBlobSize = 408;
     static constexpr const size_t kMaxSeedSize = 32;
 
     Job() = default;
@@ -73,14 +74,18 @@ public:
     inline const String &extraNonce() const             { return m_extraNonce; }
     inline const String &id() const                     { return m_id; }
     inline const String &poolWallet() const             { return m_poolWallet; }
-    inline const uint32_t *nonce() const                { return reinterpret_cast<const uint32_t*>(m_blob + 39); }
+    inline const uint32_t *nonce() const                { return reinterpret_cast<const uint32_t*>(m_blob + nonceOffset()); }
     inline const uint8_t *blob() const                  { return m_blob; }
+    inline int32_t nonceOffset() const                  { return 39; }
+    inline size_t nonceSize() const                     { return 4; }
     inline size_t size() const                          { return m_size; }
-    inline uint32_t *nonce()                            { return reinterpret_cast<uint32_t*>(m_blob + 39); }
+    inline uint32_t *nonce()                            { return reinterpret_cast<uint32_t*>(m_blob + nonceOffset()); }
     inline uint32_t backend() const                     { return m_backend; }
     inline uint64_t diff() const                        { return m_diff; }
     inline uint64_t height() const                      { return m_height; }
+    inline uint64_t nonceMask() const                   { return isNicehash() ? 0xFFFFFFULL : (nonceSize() == sizeof(uint64_t) ? (-1ULL  >> (extraNonce().size() * 4)): 0xFFFFFFFFULL); }
     inline uint64_t target() const                      { return m_target; }
+    inline uint8_t *blob()                              { return m_blob; }
     inline uint8_t fixedByte() const                    { return *(m_blob + 42); }
     inline uint8_t index() const                        { return m_index; }
     inline void reset()                                 { m_size = 0; m_diff = 0; }
@@ -95,19 +100,18 @@ public:
     inline void setPoolWallet(const String &poolWallet) { m_poolWallet = poolWallet; }
 
 #   ifdef XMRIG_PROXY_PROJECT
-    inline char *rawBlob()                            { return m_rawBlob; }
-    inline const char *rawBlob() const                { return m_rawBlob; }
-    inline const char *rawTarget() const              { return m_rawTarget; }
-    inline const String &rawSeedHash() const          { return m_rawSeedHash; }
+    inline char *rawBlob()                              { return m_rawBlob; }
+    inline const char *rawBlob() const                  { return m_rawBlob; }
+    inline const char *rawTarget() const                { return m_rawTarget; }
+    inline const String &rawSeedHash() const            { return m_rawSeedHash; }
 #   endif
 
-    static inline uint32_t *nonce(uint8_t *blob)   { return reinterpret_cast<uint32_t*>(blob + 39); }
-    static inline uint64_t toDiff(uint64_t target) { return target ? (0xFFFFFFFFFFFFFFFFULL / target) : 0; }
+    static inline uint64_t toDiff(uint64_t target)      { return target ? (0xFFFFFFFFFFFFFFFFULL / target) : 0; }
 
-    inline bool operator!=(const Job &other) const { return !isEqual(other); }
-    inline bool operator==(const Job &other) const { return isEqual(other); }
-    inline Job &operator=(const Job &other)        { copy(other); return *this; }
-    inline Job &operator=(Job &&other) noexcept    { move(std::move(other)); return *this; }
+    inline bool operator!=(const Job &other) const      { return !isEqual(other); }
+    inline bool operator==(const Job &other) const      { return isEqual(other); }
+    inline Job &operator=(const Job &other)             { copy(other); return *this; }
+    inline Job &operator=(Job &&other) noexcept         { move(std::move(other)); return *this; }
 
 private:
     void copy(const Job &other);

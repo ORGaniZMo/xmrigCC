@@ -31,7 +31,7 @@
 
 #include "base/kernel/interfaces/IJsonReader.h"
 #include "base/tools/String.h"
-#include "rapidjson/document.h"
+#include "3rdparty/rapidjson/document.h"
 
 
 namespace xmrig {
