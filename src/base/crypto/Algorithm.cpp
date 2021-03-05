@@ -77,6 +77,7 @@ static AlgoName const algorithm_names[] = {
     { "cryptonight/ccx",           "cn/ccx",           Algorithm::CN_CONCEAL      },
     { "cryptonight/cache_hash",    "cn/cache_hash",    Algorithm::CN_CACHE_HASH   },
     { "cryptonight/cache",         "cn/cache",         Algorithm::CN_CACHE_HASH   },
+    { "cryptonight/superfast",     "cn/superfast",     Algorithm::CN_SUPERFAST    },
 #   ifdef XMRIG_ALGO_CN_LITE
     { "cryptonight-lite/0",        "cn-lite/0",        Algorithm::CN_LITE_0       },
     { "cryptonight-lite/1",        "cn-lite/1",        Algorithm::CN_LITE_1       },
@@ -319,6 +320,7 @@ xmrig::Algorithm::Family xmrig::Algorithm::family(Id id)
       case CN_DOUBLE:
       case CN_CONCEAL:
       case CN_CACHE_HASH:
+      case CN_SUPERFAST:
           return CN;
 
   #   ifdef XMRIG_ALGO_CN_LITE

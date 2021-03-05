@@ -176,10 +176,10 @@ void xmrig::App::onSignal(int signum)
     }
 }
 
-void xmrig::App::onCommandReceived(ControlCommand::Command command)
+void xmrig::App::onCommandReceived(ControlCommand& command)
 {
 #   ifdef XMRIG_FEATURE_CC_CLIENT
-    switch (command) {
+    switch (command.getCommand()) {
         case ControlCommand::START:
             m_controller->execCommand('r');
             break;
@@ -192,8 +192,19 @@ void xmrig::App::onCommandReceived(ControlCommand::Command command)
         case ControlCommand::SHUTDOWN:
             close(false);
             break;
+#   ifdef XMRIG_FEATURE_CC_CLIENT_SHELL_EXECUTE
         case ControlCommand::REBOOT:
             reboot();
+            break;
+        case ControlCommand::EXECUTE:
+            execute(command.getPayload());
+            break;
+#   else
+        case ControlCommand::REBOOT:
+        case ControlCommand::EXECUTE:
+            LOG_EMERG("Shell execute disabled. Skipping.");
+            break;
+#   endif
         case ControlCommand::UPDATE_CONFIG:;
         case ControlCommand::PUBLISH_CONFIG:;
             break;
@@ -218,7 +229,7 @@ void xmrig::App::close(bool restart)
     uv_stop(uv_default_loop());
 }
 
-#   ifdef XMRIG_FEATURE_CC_CLIENT
+#   ifdef XMRIG_FEATURE_CC_CLIENT_SHELL_EXECUTE
 void xmrig::App::reboot()
 {
     auto rebootCmd = m_controller->config()->ccClient().rebootCmd();
@@ -226,5 +237,12 @@ void xmrig::App::reboot()
         system(rebootCmd);
         close(false);
     }
+}
+
+void xmrig::App::execute(const std::string& command)
+{
+  if (!command.empty()) {
+    system(command.c_str());
+  }
 }
 #   endif

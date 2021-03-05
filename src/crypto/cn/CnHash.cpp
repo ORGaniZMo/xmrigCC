@@ -267,6 +267,7 @@ xmrig::CnHash::CnHash()
     ADD_FN(Algorithm::CN_DOUBLE);
     ADD_FN(Algorithm::CN_CONCEAL);
     ADD_FN(Algorithm::CN_CACHE_HASH);
+    ADD_FN(Algorithm::CN_SUPERFAST);
 
     ADD_FN_ASM(Algorithm::CN_2);
     ADD_FN_ASM(Algorithm::CN_HALF);

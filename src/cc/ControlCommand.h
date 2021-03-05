@@ -21,14 +21,15 @@
 #include <string>
 #include "3rdparty/rapidjson/document.h"
 
-static const char* command_str[7] = {
+static const char* command_str[8] = {
         "START",
         "STOP",
         "UPDATE_CONFIG",
         "PUBLISH_CONFIG",
         "RESTART",
         "SHUTDOWN",
-        "REBOOT"
+        "REBOOT",
+        "EXECUTE"
 };
 
 class ControlCommand
@@ -41,7 +42,8 @@ public:
         PUBLISH_CONFIG,
         RESTART,
         SHUTDOWN,
-        REBOOT
+        REBOOT,
+        EXECUTE
     };
 
 public:
@@ -71,10 +73,14 @@ public:
     Command getCommand() const;
     void setCommand(const Command& command);
 
+    std::string getPayload() const;
+    void setPayload(const std::string& payload);
+
     bool isOneTimeCommand() const;
 
 private:
     Command m_command;
+    std::string m_payload;
 };
 
 #endif /* __CONTROL_COMMAND_H__ */

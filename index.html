@@ -305,6 +305,14 @@
                         }
                     },
                     {
+                        text: '<i class="fa fa-rocket"></i>',
+                        className: 'btn-success',
+                        enabled: false,
+                        action: function () {
+                            $('#commandExecuteDialog').modal('show');
+                        }
+                    },
+                    {
                         text: '<i class="fa fa-sign-out"></i>',
                         className: 'btn-danger',
                         enabled: false,
@@ -528,6 +536,7 @@
                 table.button(6).enable(selectedRows > 0);
                 table.button(7).enable(selectedRows > 0);
                 table.button(8).enable(selectedRows > 0);
+                table.button(9).enable(selectedRows > 0);
             });
 
             table.on('deselect', function () {
@@ -541,6 +550,7 @@
                 table.button(6).enable(selectedRows > 0);
                 table.button(7).enable(selectedRows > 0);
                 table.button(8).enable(selectedRows > 0);
+                table.button(9).enable(selectedRows > 0);
             });
 
             table.buttons().container().appendTo('#clientStatusList_wrapper .col-sm-6:eq(0)');
@@ -635,6 +645,17 @@
                     var data = row.data();
 
                     sendAction("SHUTDOWN", data.client_status.client_id);
+                });
+            });
+
+            $('#commandExecuteDialogExecute').click(function (event) {
+                var command = $('#executeCommand').val();
+
+                table.rows({selected: true}).eq(0).each(function (index) {
+                    var row = table.row(index);
+                    var data = row.data();
+
+                    sendAction("EXECUTE", data.client_status.client_id, command);
                 });
             });
 
@@ -926,17 +947,17 @@
             }, CHART_RELOAD_INTERVAL_IN_MS);
         });
 
-        function sendAction(action, clientId) {
+        function sendAction(action, clientId, payload) {
             $.ajax({
                 type: "POST",
                 url: "/admin/setClientCommand?clientId=" + clientId,
                 dataType: "text",
-                data: '{"control_command":{"command": "' + action + '"}}',
+                data: '{"control_command":{"command": "' + action + '", "payload": "' + payload + '"}}',
                 success: function (data) {
-                    setSuccess('<strong>Successfully send ' + action + ' to ' + clientId + '</strong> - It can take up to 30s until the command is processed.');
+                    setSuccess('<strong>Successfully send ' + action + ' to ' + clientId + ' [payload=\'' + payload +'\']</strong> - It can take up to 30s until the command is processed.');
                 },
                 error: function (data) {
-                    setError('<strong>Failed to send ' + action + ' to ' + clientId + '</strong> \nError: ' + JSON.stringify(data, undefined, 2));
+                    setError('<strong>Failed to send ' + action + ' to ' + clientId + ' [payload=\'' + payload +'\']</strong> \nError: ' + JSON.stringify(data, undefined, 2));
                 }
             });
         }
@@ -1616,6 +1637,27 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="commandExecuteDialog" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Remote Execute...</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="executeCommand">Command to execute:</label>
+                        <input type="text" class="form-control" id="executeCommand"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="commandExecuteDialogExecute" type="button" class="btn btn-success" data-dismiss="modal">Execute</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>	
 </div>
 </body>
 </html>

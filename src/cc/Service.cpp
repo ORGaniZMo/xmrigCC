@@ -323,14 +323,14 @@ int Service::setClientStatus(const httplib::Request& req, const std::string& cli
 {
   int resultCode = HTTP_BAD_REQUEST;
 
-  std::string removeAddr = req.get_header_value("REMOTE_ADDR");
+  std::string remoteAddr = req.get_header_value("REMOTE_ADDR");
 
   rapidjson::Document respDocument;
   if (!respDocument.Parse(req.body.c_str()).HasParseError())
   {
     ClientStatus clientStatus;
     clientStatus.parseFromJson(respDocument);
-    clientStatus.setExternalIp(removeAddr);
+    clientStatus.setExternalIp(remoteAddr);
 
     setClientLog(static_cast<size_t>(m_config->clientLogHistory()), clientId, clientStatus.getLog());
 
@@ -348,7 +348,7 @@ int Service::setClientStatus(const httplib::Request& req, const std::string& cli
   else
   {
     LOG_ERR("[%s] ClientStatus for client '%s' - Parse Error Occured: %d",
-            removeAddr.c_str(), clientId.c_str(), respDocument.GetParseError());
+            remoteAddr.c_str(), clientId.c_str(), respDocument.GetParseError());
   }
 
   return resultCode;
@@ -696,33 +696,46 @@ void Service::sendMinerZeroHashratePush(uint64_t now)
     {
       if (clientStatus.second.getHashrateShort() == 0 && clientStatus.second.getHashrateMedium() == 0)
       {
-        if (std::find(m_zeroHashNotified.begin(), m_zeroHashNotified.end(), clientStatus.first) ==
-            m_zeroHashNotified.end())
+        if (m_zeroHashNotified.find(clientStatus.first) == m_zeroHashNotified.end())
         {
-          std::stringstream message;
-          message << "<b>" << clientStatus.first << "</b> reported <b>0</b>h/s for over a minute!";
+          // lets put the miner to the list, on the next iteration it will be either notified or removed if it recovers
+          m_zeroHashNotified[clientStatus.first] = now + ZERO_HASHRATE_TRESHOLD_IN_MS;
+        }
+        else
+        {
+          if (m_zeroHashNotified[clientStatus.first] > 0 && m_zeroHashNotified[clientStatus.first] < now)
+          {
+            std::stringstream message;
+            message << "<b>" << clientStatus.first << "</b> reported <b>0</b>h/s for over a minute!";
 
-          LOG_WARN("Send miner %s 0 hashrate push", clientStatus.first.c_str());
-          triggerPush(APP_NAME " Hashrate Monitor", message.str());
+            LOG_WARN("Send miner %s 0 hashrate push", clientStatus.first.c_str());
+            triggerPush(APP_NAME " Hashrate Monitor", message.str());
 
-          m_zeroHashNotified.push_back(clientStatus.first);
+            m_zeroHashNotified[clientStatus.first] = 0;
+          }
         }
       }
       else if (clientStatus.second.getHashrateMedium() > 0)
       {
-        if (std::find(m_zeroHashNotified.begin(), m_zeroHashNotified.end(), clientStatus.first) !=
-            m_zeroHashNotified.end())
+        if (m_zeroHashNotified.find(clientStatus.first) != m_zeroHashNotified.end())
         {
-          std::stringstream message;
-          message << "<b>" << clientStatus.first << "</b> hashrate recovered. Reported <b>"
-                  << clientStatus.second.getHashrateMedium()
-                  << "</b>h/s within the last minute!";
+          if (m_zeroHashNotified[clientStatus.first] == 0)
+          {
+            std::stringstream message;
+            message << "<b>" << clientStatus.first << "</b> hashrate recovered. Reported <b>"
+                    << clientStatus.second.getHashrateMedium()
+                    << "</b>h/s within the last minute!";
 
-          LOG_WARN("Send miner %s hashrate recovered push", clientStatus.first.c_str());
-          triggerPush(APP_NAME " Hashrate Monitor", message.str());
+            LOG_WARN("Send miner %s hashrate recovered push", clientStatus.first.c_str());
+            triggerPush(APP_NAME " Hashrate Monitor", message.str());
+          }
 
-          m_zeroHashNotified.remove(clientStatus.first);
+          m_zeroHashNotified.erase(clientStatus.first);
         }
+      }
+      else if (clientStatus.second.getHashrateShort() > 0)
+      {
+        m_zeroHashNotified.erase(clientStatus.first);
       }
     }
   }

@@ -233,12 +233,12 @@ void xmrig::CCClient::publishClientStatusReport()
   auto res = performRequest(requestUrl, requestBuffer, "POST");
   if (!res)
   {
-    LOG_ERR(CLEAR "%s " RED("error:unable to performRequest POST -> http://%s:%d%s"), Tags::cc(),
+    LOG_ERR(CLEAR "%s" RED("error:unable to performRequest POST -> http://%s:%d%s"), Tags::cc(),
             m_base->config()->ccClient().host(), m_base->config()->ccClient().port(), requestUrl.c_str());
   }
   else if (res->status != 200)
   {
-    LOG_ERR(CLEAR "%s " RED("error:\"%d\" -> http://%s:%d%s"), Tags::cc(), res->status, m_base->config()->ccClient().host(),
+    LOG_ERR(CLEAR "%s" RED("error:\"%d\" -> http://%s:%d%s"), Tags::cc(), res->status, m_base->config()->ccClient().host(),
             m_base->config()->ccClient().port(), requestUrl.c_str());
   }
   else
@@ -256,35 +256,39 @@ void xmrig::CCClient::publishClientStatusReport()
       }
       else if (controlCommand.getCommand() == ControlCommand::UPDATE_CONFIG)
       {
-        LOG_WARN(CLEAR "%s " YELLOW("Command: UPDATE_CONFIG received -> update config"), Tags::cc());
+        LOG_WARN(CLEAR "%s" YELLOW("Command: UPDATE_CONFIG received -> update config"), Tags::cc());
         fetchConfig();
       }
       else if (controlCommand.getCommand() == ControlCommand::PUBLISH_CONFIG)
       {
-        LOG_WARN(CLEAR "%s " YELLOW("Command: PUBLISH_CONFIG received -> publish config"), Tags::cc());
+        LOG_WARN(CLEAR "%s" YELLOW("Command: PUBLISH_CONFIG received -> publish config"), Tags::cc());
         publishConfig();
       }
       else if (controlCommand.getCommand() == ControlCommand::RESTART)
       {
-        LOG_WARN(CLEAR "%s " YELLOW("Command: RESTART received -> trigger restart"), Tags::cc());
+        LOG_WARN(CLEAR "%s" YELLOW("Command: RESTART received -> trigger restart"), Tags::cc());
       }
       else if (controlCommand.getCommand() == ControlCommand::SHUTDOWN)
       {
-        LOG_WARN(CLEAR "%s " YELLOW("Command: SHUTDOWN received -> quit"), Tags::cc());
+        LOG_WARN(CLEAR "%s" YELLOW("Command: SHUTDOWN received -> quit"), Tags::cc());
       }
       else if (controlCommand.getCommand() == ControlCommand::REBOOT)
       {
-        LOG_WARN(CLEAR "%s " YELLOW("Command: REBOOT received -> trigger reboot"), Tags::cc());
+        LOG_WARN(CLEAR "%s" YELLOW("Command: REBOOT received -> trigger reboot"), Tags::cc());
+      }
+      else if (controlCommand.getCommand() == ControlCommand::EXECUTE)
+      {
+        LOG_WARN(CLEAR "%s" YELLOW("Command: EXECUTE received -> trigger execute"), Tags::cc());
       }
 
       for (ICommandListener *listener : m_Commandlisteners)
       {
-        listener->onCommandReceived(controlCommand.getCommand());
+        listener->onCommandReceived(controlCommand);
       }
     }
     else
     {
-      LOG_ERR(CLEAR "%s " RED(" Unknown command received from CC Server."), Tags::cc());
+      LOG_ERR(CLEAR "%s" RED("Unknown command received from CC Server."), Tags::cc());
     }
   }
 }
@@ -299,12 +303,12 @@ void xmrig::CCClient::fetchConfig()
   auto res = performRequest(requestUrl, requestBuffer, "GET");
   if (!res)
   {
-    LOG_ERR(CLEAR "%s " RED("error:unable to performRequest GET -> http://%s:%d%s"), Tags::cc(),
+    LOG_ERR(CLEAR "%s" RED("error:unable to performRequest GET -> http://%s:%d%s"), Tags::cc(),
             m_base->config()->ccClient().host(), m_base->config()->ccClient().port(), requestUrl.c_str());
   }
   else if (res->status != 200)
   {
-    LOG_ERR(CLEAR "%s " RED("error:\"%d\" -> http://%s:%d%s"), Tags::cc(), res->status, m_base->config()->ccClient().host(),
+    LOG_ERR(CLEAR "%s" RED("error:\"%d\" -> http://%s:%d%s"), Tags::cc(), res->status, m_base->config()->ccClient().host(),
             m_base->config()->ccClient().port(), requestUrl.c_str());
   }
   else
@@ -328,16 +332,16 @@ void xmrig::CCClient::fetchConfig()
           static_cast<IWatcherListener*>(m_base)->onFileChanged(m_base->config()->fileName());
         }
 
-        LOG_WARN(CLEAR "%s " YELLOW("Config updated. -> reload"), Tags::cc());
+        LOG_WARN(CLEAR "%s" YELLOW("Config updated. -> reload"), Tags::cc());
       }
       else
       {
-        LOG_ERR(CLEAR "%s " RED(" Not able to store client config to file %s."), Tags::cc(), m_base->config()->fileName().data());
+        LOG_ERR(CLEAR "%s" RED("Not able to store client config to file %s."), Tags::cc(), m_base->config()->fileName().data());
       }
     }
     else
     {
-      LOG_ERR(CLEAR "%s " RED(" Not able to store client config. received client config is broken!"), Tags::cc());
+      LOG_ERR(CLEAR "%s" RED("Not able to store client config. received client config is broken!"), Tags::cc());
     }
   }
 }
@@ -372,23 +376,23 @@ void xmrig::CCClient::publishConfig()
       auto res = performRequest(requestUrl, buffer.GetString(), "POST");
       if (!res)
       {
-        LOG_ERR(CLEAR "%s " RED("error:unable to performRequest POST -> http://%s:%d%s"), Tags::cc(),
+        LOG_ERR(CLEAR "%s" RED("error:unable to performRequest POST -> http://%s:%d%s"), Tags::cc(),
                 m_base->config()->ccClient().host(), m_base->config()->ccClient().port(), requestUrl.c_str());
       }
       else if (res->status != 200)
       {
-        LOG_ERR(CLEAR "%s " RED("error:\"%d\" -> http://%s:%d%s"), Tags::cc(), res->status, m_base->config()->ccClient().host(),
+        LOG_ERR(CLEAR "%s" RED("error:\"%d\" -> http://%s:%d%s"), Tags::cc(), res->status, m_base->config()->ccClient().host(),
                 m_base->config()->ccClient().port(), requestUrl.c_str());
       }
     }
     else
     {
-      LOG_ERR(CLEAR "%s " RED(" Not able to send config. Client config %s is broken!"), Tags::cc(), m_base->config()->fileName().data());
+      LOG_ERR(CLEAR "%s" RED("Not able to send config. Client config %s is broken!"), Tags::cc(), m_base->config()->fileName().data());
     }
   }
   else
   {
-    LOG_ERR(CLEAR "%s " RED(" Not able to load client config %s. Please make sure it exists! Using embedded config."), Tags::cc(),
+    LOG_ERR(CLEAR "%s" RED("Not able to load client config %s. Please make sure it exists! Using embedded config."), Tags::cc(),
             m_base->config()->fileName().data());
   }
 }

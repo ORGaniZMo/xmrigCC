@@ -1,8 +1,20 @@
+# 2.9.1
+* Added feature "Remote shell execute #307" to Dashboard can be disabled add the CMAKE parameter `-DWITH_CC_SHELL_EXEC=OFF` default is `ON` 
+* Added CRYPTO cn variant "superfast" algo (`cn/superfast`)
+* Fixed Environment variable parsing for `(pool) user, (pool) pass, (pool) rig-id, (cc) worker-id and log-file` #300
+* Fixed docker build
 # 2.9.0
+* Rebased latest RX and CN improvements from XMRig 6.8.2
+  * Memory stats
+  * Results/Connection info printout (
+  * Soft-AES hashrate improvement on CPUw without AES-NI
+  * VM detection
+  * ...
+* Added columns `total memory`, `free memory` and `isVM` to the dashboard and the info tooltip when hovering the `Host` column #323
 * Fixed Dashboard sum column
 * Fixed 1GB HugePages
-* Rebased latest RX and CN improvements from XMRig 6.8.2
-* Added columns `total memory`, `free memory` and `isVM` to the dashboard and the info tooltip when hovering the `Host` column #323
+* Fixed `--cpu-max-cpu-usage` commandline parameter
+* Fixed `max-threads-hint`
 # 2.8.5
 * Added parameter --cpu-max-cpu-usage (config: `"max-cpu-usage": 100`) to **throttle cpu usage without reducing the cores/threads**
   * See documentation for details [MAX-CPU-USAGE](https://github.com/Bendr0id/xmrigCC/blob/master/doc/CPU_MAX_USAGE.md)

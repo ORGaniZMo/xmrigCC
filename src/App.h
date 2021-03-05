@@ -59,14 +59,15 @@ public:
 protected:
     void onConsoleCommand(char command) override;
     void onSignal(int signum) override;
-    void onCommandReceived(ControlCommand::Command command) override;
+    void onCommandReceived(ControlCommand& command) override;
 
 private:
     bool background(int &rc);
     void close(bool restart);
 
-#   ifdef XMRIG_FEATURE_CC_CLIENT
+#   ifdef XMRIG_FEATURE_CC_CLIENT_SHELL_EXECUTE
     void reboot();
+    void execute(const std::string& command);
 #   endif
 
     bool m_restart = false;

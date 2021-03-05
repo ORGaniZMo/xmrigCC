@@ -29,6 +29,7 @@ option(WITH_MSR             "Enable MSR support" ON)
 option(WITH_SSE4_1          "Enable SSE 4.1 for Blake2" ON)
 option(WITH_SECURE_JIT      "Enable secure access to JIT memory" OFF)
 option(WITH_CC_CLIENT       "CC Client" ON)
+option(WITH_CC_SHELL_EXEC   "CC Client allow shell execute" ON)
 option(WITH_CC_SERVER       "CC Server" ON)
 option(WITH_HTTPLIB_POLL    "Use poll.h (recommended) instead of old plain sockets for HTTP" ON)
 
@@ -278,6 +279,10 @@ if (WITH_CC_CLIENT)
             src/cc/CCClient.cpp
             src/base/io/log/backends/RemoteLog.cpp)
     add_definitions("/DXMRIG_FEATURE_CC_CLIENT")
+
+    if (WITH_CC_SHELL_EXEC)
+        add_definitions("/DXMRIG_FEATURE_CC_CLIENT_SHELL_EXECUTE")
+    endif()
 
     if (WITH_TLS)
         add_definitions(/DCPPHTTPLIB_OPENSSL_SUPPORT)

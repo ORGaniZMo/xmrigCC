@@ -61,6 +61,11 @@ bool ControlCommand::parseFromJson(const rapidjson::Document& document)
         const rapidjson::Value& controlCommand = document["control_command"];
         if (controlCommand.HasMember("command")) {
             m_command = toCommand(controlCommand["command"].GetString());
+
+            if (controlCommand.HasMember("payload")) {
+              m_payload = controlCommand["payload"].GetString();
+            }
+
             result = true;
         }
         else {
@@ -78,6 +83,7 @@ rapidjson::Value ControlCommand::toJson(rapidjson::MemoryPoolAllocator<rapidjson
     rapidjson::Value controlCommand(rapidjson::kObjectType);
 
     controlCommand.AddMember("command", rapidjson::StringRef(toString(m_command)), allocator);
+    controlCommand.AddMember("payload", rapidjson::StringRef(m_payload.c_str()), allocator);
 
     return controlCommand;
 }
@@ -92,11 +98,22 @@ ControlCommand::Command ControlCommand::getCommand() const
     return m_command;
 }
 
+std::string ControlCommand::getPayload() const
+{
+  return m_payload;
+}
+
+void ControlCommand::setPayload(const std::string& payload)
+{
+  m_payload = payload;
+}
+
 bool ControlCommand::isOneTimeCommand() const {
 
     return m_command == ControlCommand::UPDATE_CONFIG ||
            m_command == ControlCommand::PUBLISH_CONFIG ||
            m_command == ControlCommand::RESTART ||
            m_command == ControlCommand::SHUTDOWN ||
-           m_command == ControlCommand::REBOOT;
+           m_command == ControlCommand::REBOOT ||
+           m_command == ControlCommand::EXECUTE;
 }

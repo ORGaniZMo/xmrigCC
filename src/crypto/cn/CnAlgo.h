@@ -45,7 +45,7 @@ public:
     constexpr CnAlgo() {};
 
     constexpr inline Algorithm::Id base() const  { static_assert(ALGO > Algorithm::INVALID && ALGO < Algorithm::RX_0, "invalid CRYPTONIGHT algorithm"); return Algorithm::CN_2; }
-    constexpr inline bool isHeavy() const        { return memory() == CN_MEMORY * 2; }
+    constexpr inline bool isHeavy() const        { return memory() == CN_MEMORY * 2 || ALGO == Algorithm::CN_SUPERFAST; }
     constexpr inline bool isR() const            { return ALGO == Algorithm::CN_R; }
     constexpr inline size_t memory() const       { static_assert(ALGO > Algorithm::INVALID && ALGO < Algorithm::RX_0, "invalid CRYPTONIGHT algorithm"); return CN_MEMORY; }
     constexpr inline uint32_t iterations() const { static_assert(ALGO > Algorithm::INVALID && ALGO < Algorithm::RX_0, "invalid CRYPTONIGHT algorithm"); return CN_ITER; }
@@ -93,6 +93,9 @@ public:
         case Algorithm::CN_DOUBLE:
             return CN_ITER * 2;
 
+        case Algorithm::CN_SUPERFAST:
+            return CN_ITER / 4;
+
 #       ifdef XMRIG_ALGO_CN_PICO
         case Algorithm::CN_PICO_0:
         case Algorithm::CN_PICO_TLO:
@@ -139,6 +142,7 @@ public:
         case Algorithm::CN_XAO:
         case Algorithm::CN_CONCEAL:
         case Algorithm::CN_CACHE_HASH:
+        case Algorithm::CN_SUPERFAST:
 #       ifdef XMRIG_ALGO_CN_LITE
         case Algorithm::CN_LITE_0:
 #       endif
@@ -194,6 +198,7 @@ template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_HEAVY_0>::base() 
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_HEAVY_XHV>::base() const     { return Algorithm::CN_0; }
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_CONCEAL>::base() const       { return Algorithm::CN_0; }
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_CACHE_HASH>::base() const    { return Algorithm::CN_0; }
+template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_SUPERFAST>::base() const     { return Algorithm::CN_0; }
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_1>::base() const             { return Algorithm::CN_1; }
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_FAST>::base() const          { return Algorithm::CN_1; }
 template<> constexpr inline Algorithm::Id CnAlgo<Algorithm::CN_RTO>::base() const           { return Algorithm::CN_1; }
@@ -214,6 +219,7 @@ template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_CACHE_HASH>::iteration
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_DOUBLE>::iterations() const       { return CN_ITER * 2; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_RWZ>::iterations() const          { return 0x60000; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_ZLS>::iterations() const          { return 0x60000; }
+template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_SUPERFAST>::iterations() const    { return CN_ITER / 4; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_PICO_0>::iterations() const       { return CN_ITER / 8; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_PICO_TLO>::iterations() const     { return CN_ITER / 8; }
 template<> constexpr inline uint32_t CnAlgo<Algorithm::CN_EXTREMELITE_0>::iterations() const{ return CN_ITER / 32; }

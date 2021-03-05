@@ -31,7 +31,7 @@ class ICommandListener
 public:
     virtual ~ICommandListener() = default;
 
-    virtual void onCommandReceived(ControlCommand::Command controlCommand) = 0;
+    virtual void onCommandReceived(ControlCommand& controlCommand) = 0;
 };
 
 

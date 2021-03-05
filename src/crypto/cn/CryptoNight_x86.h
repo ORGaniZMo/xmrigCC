@@ -744,7 +744,7 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
 
             ((int64_t*)&l0[interleaved_index<interleave>(idx0 & MASK)])[0] = n ^ q;
 
-            if (ALGO == Algorithm::CN_HEAVY_XHV) {
+            if (ALGO == Algorithm::CN_HEAVY_XHV || ALGO == Algorithm::CN_SUPERFAST) {
                 d = ~d;
             }
 
@@ -1165,7 +1165,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
 
             ((int64_t*)&l0[idx0 & MASK])[0] = n ^ q;
 
-            if (ALGO == Algorithm::CN_HEAVY_XHV) {
+            if (ALGO == Algorithm::CN_HEAVY_XHV || ALGO == Algorithm::CN_SUPERFAST) {
                 d = ~d;
             }
 
@@ -1223,7 +1223,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
 
             ((int64_t*)&l1[idx1 & MASK])[0] = n ^ q;
 
-            if (ALGO == Algorithm::CN_HEAVY_XHV) {
+            if (ALGO == Algorithm::CN_HEAVY_XHV || ALGO == Algorithm::CN_SUPERFAST) {
                 d = ~d;
             }
 
@@ -1373,7 +1373,7 @@ inline void cryptonight_triple_hash(const uint8_t *__restrict__ input, size_t si
 
 #   ifdef XMRIG_ALGO_CN_HEAVY
     constexpr bool IS_CN_HEAVY_TUBE = ALGO == Algorithm::CN_HEAVY_TUBE;
-    constexpr bool IS_CN_HEAVY_XHV  = ALGO == Algorithm::CN_HEAVY_XHV;
+    constexpr bool IS_CN_HEAVY_XHV  = ALGO == Algorithm::CN_HEAVY_XHV || ALGO == Algorithm::CN_SUPERFAST;
 #   else
     constexpr bool IS_CN_HEAVY_TUBE = false;
     constexpr bool IS_CN_HEAVY_XHV  = false;
@@ -1447,7 +1447,7 @@ inline void cryptonight_quad_hash(const uint8_t *__restrict__ input, size_t size
 
 #   ifdef XMRIG_ALGO_CN_HEAVY
     constexpr bool IS_CN_HEAVY_TUBE = ALGO == Algorithm::CN_HEAVY_TUBE;
-    constexpr bool IS_CN_HEAVY_XHV  = ALGO == Algorithm::CN_HEAVY_XHV;
+    constexpr bool IS_CN_HEAVY_XHV  = ALGO == Algorithm::CN_HEAVY_XHV || ALGO == Algorithm::CN_SUPERFAST;
 #   else
     constexpr bool IS_CN_HEAVY_TUBE = false;
     constexpr bool IS_CN_HEAVY_XHV  = false;
@@ -1529,7 +1529,7 @@ inline void cryptonight_penta_hash(const uint8_t *__restrict__ input, size_t siz
 
 #   ifdef XMRIG_ALGO_CN_HEAVY
     constexpr bool IS_CN_HEAVY_TUBE = ALGO == Algorithm::CN_HEAVY_TUBE;
-    constexpr bool IS_CN_HEAVY_XHV  = ALGO == Algorithm::CN_HEAVY_XHV;
+    constexpr bool IS_CN_HEAVY_XHV  = ALGO == Algorithm::CN_HEAVY_XHV || ALGO == Algorithm::CN_SUPERFAST;
 #   else
     constexpr bool IS_CN_HEAVY_TUBE = false;
     constexpr bool IS_CN_HEAVY_XHV  = false;

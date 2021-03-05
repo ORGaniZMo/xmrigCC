@@ -651,7 +651,7 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
 
             ((int64_t*)&l0[idx0 & MASK])[0] = n ^ q;
 
-            if (ALGO == Algorithm::CN_HEAVY_XHV) {
+            if (ALGO == Algorithm::CN_HEAVY_XHV || ALGO == Algorithm::CN_SUPERFAST) {
                 idx0 = (~d) ^ q;
             }
             else {
@@ -827,7 +827,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
 
             ((int64_t*)&l0[idx0 & MASK])[0] = n ^ q;
 
-            if (ALGO == Algorithm::CN_HEAVY_XHV) {
+            if (ALGO == Algorithm::CN_HEAVY_XHV || ALGO == Algorithm::CN_SUPERFAST) {
                 idx0 = (~d) ^ q;
             }
             else {
@@ -887,7 +887,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
 
             ((int64_t*)&l1[idx1 & MASK])[0] = n ^ q;
 
-            if (ALGO == Algorithm::CN_HEAVY_XHV) {
+            if (ALGO == Algorithm::CN_HEAVY_XHV || ALGO == Algorithm::CN_SUPERFAST) {
                 idx1 = (~d) ^ q;
             }
             else {

@@ -163,7 +163,8 @@ bool xmrig::CpuWorker<N>::selfTest()
                         verify(Algorithm::CN_ZLS,    test_output_zls)  &&
                         //verify(Algorithm::CN_CONCEAL, test_output_conceal)       &&
                         //verify(Algorithm::CN_CACHE_HASH, test_output_cache_hash) &&
-                        verify(Algorithm::CN_DOUBLE, test_output_double);
+                        verify(Algorithm::CN_DOUBLE, test_output_double) &&
+                        verify(Algorithm::CN_SUPERFAST, test_output_superfast);
 
         return rc;
     }
