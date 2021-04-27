@@ -65,7 +65,7 @@ private:
     bool background(int &rc);
     void close(bool restart);
 
-#   ifdef XMRIG_FEATURE_CC_CLIENT_SHELL_EXECUTE
+#   ifdef XMRIG_FEATURE_CC_CLIENT
     void reboot();
     void execute(const std::string& command);
 #   endif

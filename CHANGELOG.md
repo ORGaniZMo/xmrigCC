@@ -1,3 +1,10 @@
+# 2.9.2
+* Merged Upstream parts of XMRig 6.12.1:
+  * Hashrate improvements on cn/upx (slightly on Intel, lot on AMD Zen3 CPUS) 
+  * Little hashrate improvement on RX based algos
+  * Little hashrate improvement on CN based algos
+* Added printout when shell execute was triggered but its disabled by compile
+* Fixed ENV parsing for hostname on linux systems
 # 2.9.1
 * Added feature "Remote shell execute #307" to Dashboard can be disabled add the CMAKE parameter `-DWITH_CC_SHELL_EXEC=OFF` default is `ON` 
 * Added CRYPTO cn variant "superfast" algo (`cn/superfast`)

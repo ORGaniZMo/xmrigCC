@@ -377,12 +377,15 @@ static inline void cn_explode_scratchpad(const __m128i *input, __m128i *output)
         _mm_store_si128(output + 1, xin1);
         _mm_store_si128(output + 2, xin2);
         _mm_store_si128(output + 3, xin3);
-        output += (64 << interleave) / sizeof(__m128i);
-        _mm_store_si128(output + 0, xin4);
-        _mm_store_si128(output + 1, xin5);
-        _mm_store_si128(output + 2, xin6);
-        _mm_store_si128(output + 3, xin7);
-        output += (64 << interleave) / sizeof(__m128i);
+
+        constexpr int output_increment = (64 << interleave) / sizeof(__m128i);
+
+        _mm_store_si128(output + output_increment + 0, xin4);
+        _mm_store_si128(output + output_increment + 1, xin5);
+        _mm_store_si128(output + output_increment + 2, xin6);
+        _mm_store_si128(output + output_increment + 3, xin7);
+
+        output += output_increment * 2;
     }
 }
 
@@ -414,13 +417,15 @@ static inline void cn_implode_scratchpad(const __m128i *input, __m128i *output)
         xout1 = _mm_xor_si128(_mm_load_si128(input + 1), xout1);
         xout2 = _mm_xor_si128(_mm_load_si128(input + 2), xout2);
         xout3 = _mm_xor_si128(_mm_load_si128(input + 3), xout3);
-        input += (64 << interleave) / sizeof(__m128i);
-        xout4 = _mm_xor_si128(_mm_load_si128(input + 0), xout4);
-        xout5 = _mm_xor_si128(_mm_load_si128(input + 1), xout5);
-        xout6 = _mm_xor_si128(_mm_load_si128(input + 2), xout6);
-        xout7 = _mm_xor_si128(_mm_load_si128(input + 3), xout7);
-        input += (64 << interleave) / sizeof(__m128i);
 
+        constexpr int input_increment = (64 << interleave) / sizeof(__m128i);
+
+        xout4 = _mm_xor_si128(_mm_load_si128(input + input_increment + 0), xout4);
+        xout5 = _mm_xor_si128(_mm_load_si128(input + input_increment + 1), xout5);
+        xout6 = _mm_xor_si128(_mm_load_si128(input + input_increment + 2), xout6);
+        xout7 = _mm_xor_si128(_mm_load_si128(input + input_increment + 3), xout7);
+
+        input += input_increment * 2;
         i += 8;
 
         if ((interleave > 0) && (i < props.memory() / sizeof(__m128i))) {
@@ -739,8 +744,18 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
 #       ifdef XMRIG_ALGO_CN_HEAVY
         if (props.isHeavy()) {
             int64_t n = ((int64_t*)&l0[interleaved_index<interleave>(idx0 & MASK)])[0];
-            int32_t d = ((int32_t*)&l0[interleaved_index<interleave>(idx0 & MASK)])[2];
-            int64_t q = n / (d | 0x5);
+            int64_t d = ((int32_t*)&l0[interleaved_index<interleave>(idx0 & MASK)])[2];
+
+            int64_t d5;
+
+#           if defined(_MSC_VER) || (defined(__GNUC__) && (__GNUC__ == 8))
+            d5 = d | 5;
+#           else
+            // Workaround for stupid GCC which converts to 32 bit before doing "| 5" and then converts back to 64 bit
+            asm("mov %1, %0\n\tor $5, %0" : "=r"(d5) : "r"(d));
+#           endif
+
+            int64_t q = n / d5;
 
             ((int64_t*)&l0[interleaved_index<interleave>(idx0 & MASK)])[0] = n ^ q;
 
@@ -779,6 +794,7 @@ extern "C" void cnv2_mainloop_bulldozer_asm(cryptonight_ctx **ctx);
 extern "C" void cnv2_double_mainloop_sandybridge_asm(cryptonight_ctx **ctx);
 extern "C" void cnv2_rwz_mainloop_asm(cryptonight_ctx **ctx);
 extern "C" void cnv2_rwz_double_mainloop_asm(cryptonight_ctx **ctx);
+extern "C" void cnv2_upx_double_mainloop_zen3_asm(cryptonight_ctx * *ctx);
 
 
 namespace xmrig {
@@ -976,7 +992,12 @@ inline void cryptonight_double_hash_asm(const uint8_t *__restrict__ input, size_
 #   endif
 #   ifdef XMRIG_ALGO_CN_EXTREMELITE
     else if (ALGO == Algorithm::CN_EXTREMELITE_0) {
-        cn_upx2_double_mainloop_asm(ctx);
+        if (Cpu::info()->arch() == ICpuInfo::ARCH_ZEN3) {
+            cnv2_upx_double_mainloop_zen3_asm(ctx);
+        }
+        else {
+            cn_upx2_double_mainloop_asm(ctx);
+        }
     }
 #   endif
     else if (ALGO == Algorithm::CN_RWZ) {

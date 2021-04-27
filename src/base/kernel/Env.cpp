@@ -59,6 +59,11 @@ static void createVariables()
     variables.insert({ "XMRIG_VERSION", APP_VERSION });
     variables.insert({ "XMRIG_EXE_DIR", Process::location(Process::ExeLocation, "") });
     variables.insert({ "XMRIG_CWD",     Process::location(Process::CwdLocation, "") });
+
+    String hostname = "HOSTNAME";
+    if (!getenv(hostname)) {
+      variables.insert({ std::move(hostname), Env::hostname() });
+    }
 }
 #endif
 
