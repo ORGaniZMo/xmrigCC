@@ -1,3 +1,5 @@
+# 2.9.3
+* Integrated [Yadacoin](https://yadacoin.io/) RandomX variant (`rx/yada`) or coin (`yada`) #342 
 # 2.9.2
 * Merged Upstream parts of XMRig 6.12.1:
   * Hashrate improvements on cn/upx (slightly on Intel, lot on AMD Zen3 CPUS) 

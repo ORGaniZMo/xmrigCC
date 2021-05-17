@@ -43,7 +43,8 @@ public:
         ARQMA,
         DERO,
         KEVA,
-        TURTLE
+        TURTLE,
+        YADA
     };
 
 

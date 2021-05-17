@@ -1,6 +1,6 @@
 # XMRigCC 
 
-XMRigCC is a high performance RandomX, CryptoNight, Argon2 and AstroBWT CPU miner for support for Windows, Linux and MacOS.
+XMRigCC is a high performance RandomX, CryptoNight, Argon2 and AstroBWT CPU miner with support for Windows, Linux and MacOS.
 
 :bulb: **This is the CPU variant of XMRigCC, if you're looking for the AMD GPU (OpenCL, Cryptonight only) variant [click here](https://github.com/Bendr0id/xmrigCC-amd/).**
 

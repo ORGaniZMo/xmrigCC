@@ -68,6 +68,7 @@ public:
         CN_PICO_TLO,   // "cn-pico/tlo"      CryptoNight-Pico (TLO)
         CN_EXTREMELITE_0,// "cn-extremelite" CryptoNight-Extremelite (UPX)
         RX_0,          // "rx/0"             RandomX (reference configuration).
+        RX_YADA,       // "rx/yada"          RandomYada (YadaCoin)
         RX_WOW,        // "rx/wow"           RandomWOW (Wownero).
         RX_ARQ,        // "rx/arq"           RandomARQ (Arqma).
         RX_SFX,        // "rx/sfx"           RandomSFX (Safex Cash).
@@ -89,7 +90,8 @@ public:
         CN_EXTREMELITE,
         RANDOM_X,
         ARGON2,
-        ASTROBWT
+        ASTROBWT,
+        YADA
     };
 
     inline Algorithm() = default;

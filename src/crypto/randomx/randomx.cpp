@@ -125,8 +125,16 @@ RandomX_ConfigurationScala::RandomX_ConfigurationScala()
   // End of DefyX/Panthera DATASET
 }
 
+RandomX_ConfigurationYada::RandomX_ConfigurationYada()
+{
+    ArgonSalt = "RandomXYadaCoin\x03";
+    SuperscalarLatency = 150;
+    ArgonIterations = 4;
+}
+
 RandomX_ConfigurationBase::RandomX_ConfigurationBase()
-	: ArgonMemory(262144)
+	: SuperscalarLatency(170)
+	, ArgonMemory(262144)
 	, CacheAccesses(8)
 	, DatasetBaseSize(2147483648)
 	, DatasetExtraSize(33554368)
@@ -390,6 +398,7 @@ RandomX_ConfigurationArqma RandomX_ArqmaConfig;
 RandomX_ConfigurationSafex RandomX_SafexConfig;
 RandomX_ConfigurationKeva RandomX_KevaConfig;
 RandomX_ConfigurationScala RandomX_ScalaConfig;
+RandomX_ConfigurationYada RandomX_YadaConfig;
 
 alignas(64) RandomX_ConfigurationBase RandomX_CurrentConfig;
 
