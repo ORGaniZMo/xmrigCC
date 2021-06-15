@@ -1,3 +1,9 @@
+# 2.9.4
+* Improved hashrate on RX algos (upstream improvments)
+* Fixed invalid shared on panthera algo (#355)
+* Add a column for the percent of allocated hugepages (#348),  Graph hashrate data rounding
+* Fixed some compile issues / missing headers
+* Fixed issue when parsing rx/yada jobs
 # 2.9.3
 * Integrated [Yadacoin](https://yadacoin.io/) RandomX variant (`rx/yada`) or coin (`yada`) #342 
 # 2.9.2

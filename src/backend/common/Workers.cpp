@@ -48,7 +48,6 @@ public:
     ~WorkersPrivate()   = default;
 
     IBackend *backend   = nullptr;
-    std::shared_ptr<Benchmark> benchmark;
     std::shared_ptr<Hashrate> hashrate;
 };
 

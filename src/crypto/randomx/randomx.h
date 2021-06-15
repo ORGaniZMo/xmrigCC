@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
+#include "base/crypto/Algorithm.h"
 #include "crypto/randomx/intrin_portable.h"
 
 #define RANDOMX_HASH_SIZE 32
@@ -128,8 +129,8 @@ struct RandomX_ConfigurationBase
 	uint32_t codeReadDatasetTweakedSize;
 	uint8_t codeReadDatasetRyzenTweaked[72];
 	uint32_t codeReadDatasetRyzenTweakedSize;
-	uint8_t codeReadDatasetLightSshInitTweaked[68];
-	uint8_t codePrefetchScratchpadTweaked[32];
+	uint8_t codePrefetchScratchpadTweaked[28];
+	uint32_t codePrefetchScratchpadTweakedSize;
 
 	uint32_t CacheLineAlignMask_Calculated;
 	uint32_t DatasetExtraItems_Calculated;
@@ -319,12 +320,9 @@ RANDOMX_EXPORT void randomx_destroy_vm(randomx_vm *machine);
  * @param output is a pointer to memory where the hash will be stored. Must not
  *        be NULL and at least RANDOMX_HASH_SIZE bytes must be available for writing.
 */
-RANDOMX_EXPORT void randomx_calculate_hash(randomx_vm *machine, const void *input, size_t inputSize, void *output);
-
 RANDOMX_EXPORT void randomx_calculate_hash_first(randomx_vm* machine, uint64_t (&tempHash)[8], const void* input, size_t inputSize);
 RANDOMX_EXPORT void randomx_calculate_hash_next(randomx_vm* machine, uint64_t (&tempHash)[8], const void* nextInput, size_t nextInputSize, void* output);
 
-RANDOMX_EXPORT void panthera_calculate_hash(randomx_vm *machine, const void *input, size_t inputSize, void *output);
 RANDOMX_EXPORT void panthera_calculate_hash_first(randomx_vm* machine, uint64_t (&tempHash)[8], const void* input, size_t inputSize);
 RANDOMX_EXPORT void panthera_calculate_hash_next(randomx_vm* machine, uint64_t (&tempHash)[8], const void* nextInput, size_t nextInputSize, void* output);
 
