@@ -86,6 +86,7 @@ private:
     String m_fingerprint;
     String m_user;
     String m_pass;
+    String m_rigId;
     String m_ip;
     String m_tls;
     uint64_t m_accepted         = 0;

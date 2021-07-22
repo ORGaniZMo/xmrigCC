@@ -210,6 +210,12 @@ void xmrig::RxDataset::allocate(bool hugePages, bool oneGbPages)
         return;
     }
 
+    if (m_mode == RxConfig::AutoMode && !ICpuInfo::is64bit()) {
+      LOG_ERR(CLEAR "%s" RED_BOLD_S "fast RandomX mode disabled CPU doesn't support 64-Bit", Tags::randomx());
+
+      return;
+    }
+
     m_memory  = new VirtualMemory(maxSize(), hugePages, oneGbPages, false, m_node);
 
     if (m_memory->isOneGbPages()) {

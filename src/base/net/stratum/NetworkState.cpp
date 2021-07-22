@@ -268,6 +268,7 @@ void xmrig::NetworkState::onActive(IStrategy *strategy, IClient *client)
 
     m_user           = client->pool().user();
     m_pass           = client->pool().password();
+    m_rigId          = client->pool().rigId();
     m_ip             = client->ip();
     m_tls            = client->tlsVersion();
     m_fingerprint    = client->tlsFingerprint();
@@ -374,6 +375,7 @@ void xmrig::NetworkState::getConnection(ClientStatus& clientStatus) const
     clientStatus.setCurrentAlgoName(m_algorithm.name());
     clientStatus.setCurrentPoolUser(m_user ? m_user.data() : "");
     clientStatus.setCurrentPoolPass(m_pass ? m_pass.data() : "");
+    clientStatus.setCurrentPoolRigId(m_rigId ? m_rigId.data() : "");
 }
 
 void xmrig::NetworkState::getResults(ClientStatus& clientStatus) const

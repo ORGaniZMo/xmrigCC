@@ -78,6 +78,17 @@ void ClientStatus::setCurrentPoolPass(const std::string& currentPoolPass)
   m_currentPoolPass = currentPoolPass;
 }
 
+std::string ClientStatus::getCurrentPoolRigId() const
+{
+  return m_currentPoolRigId;
+}
+
+void ClientStatus::setCurrentPoolRigId(const std::string& currentPoolRigId)
+{
+  m_currentPoolRigId = currentPoolRigId;
+}
+
+
 void ClientStatus::setCurrentAlgoName(const std::string& algoName)
 {
     m_currentAlgoName = algoName;
@@ -458,11 +469,15 @@ bool ClientStatus::parseFromJson(const rapidjson::Document& document)
         }
 
         if (clientStatus.HasMember("current_pool_user")) {
-          m_currentPoolUser = clientStatus["current_pool_user"].GetString();
+            m_currentPoolUser = clientStatus["current_pool_user"].GetString();
         }
 
         if (clientStatus.HasMember("current_pool_pass")) {
-          m_currentPoolPass = clientStatus["current_pool_pass"].GetString();
+            m_currentPoolPass = clientStatus["current_pool_pass"].GetString();
+        }
+
+        if (clientStatus.HasMember("current_pool_rig_id")) {
+            m_currentPoolRigId = clientStatus["current_pool_rig_id"].GetString();
         }
 
         if (clientStatus.HasMember("current_algo_name")) {
@@ -633,6 +648,7 @@ rapidjson::Value ClientStatus::toJson(rapidjson::MemoryPoolAllocator<rapidjson::
     clientStatus.AddMember("current_pool", rapidjson::StringRef(m_currentPool.c_str()), allocator);
     clientStatus.AddMember("current_pool_user", rapidjson::StringRef(m_currentPoolUser.c_str()), allocator);
     clientStatus.AddMember("current_pool_pass", rapidjson::StringRef(m_currentPoolPass.c_str()), allocator);
+    clientStatus.AddMember("current_pool_rig_id", rapidjson::StringRef(m_currentPoolRigId.c_str()), allocator);
     clientStatus.AddMember("current_algo_name", rapidjson::StringRef(m_currentAlgoName.c_str()), allocator);
     clientStatus.AddMember("current_pow_variant_name", rapidjson::StringRef(m_currentPowVariantName.c_str()), allocator);
     clientStatus.AddMember("cpu_brand", rapidjson::StringRef(m_cpuBrand.c_str()), allocator);

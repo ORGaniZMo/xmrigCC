@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.13
 
 RUN apk add --no-cache git make cmake libstdc++ gcc g++ automake libtool autoconf linux-headers && \
     rm -rf /var/lib/apt/lists/*

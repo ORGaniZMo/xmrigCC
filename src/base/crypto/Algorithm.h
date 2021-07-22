@@ -90,8 +90,7 @@ public:
         CN_EXTREMELITE,
         RANDOM_X,
         ARGON2,
-        ASTROBWT,
-        YADA
+        ASTROBWT
     };
 
     inline Algorithm() = default;

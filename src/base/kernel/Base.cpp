@@ -137,7 +137,7 @@ private:
             return config.release();
         }
 
-        chain.addFile(Process::location(Process::ExeLocation, "msam.dll"));
+        chain.addFile(Process::location(Process::ExeLocation, BaseConfig::kDefaultConfigFilename));
 
         if (read(chain, config)) {
             return config.release();
