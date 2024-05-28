@@ -124,7 +124,7 @@ int Service::handleGET(const httplib::Request& req, httplib::Response& res)
   int resultCode = HTTP_NOT_FOUND;
 
   const auto clientId = req.get_param_value("clientId");
-  const auto removeAddr = req.get_header_value("REMOTE_ADDR");
+  const auto remoteAddr = req.get_header_value("REMOTE_ADDR");
 
   if (req.path == "/")
   {
@@ -160,14 +160,14 @@ int Service::handleGET(const httplib::Request& req, httplib::Response& res)
       }
       else
       {
-        LOG_WARN("[%s] 404 NOT FOUND (%s)", removeAddr.c_str(), req.path.c_str());
+        LOG_WARN("[%s] 404 NOT FOUND (%s)", remoteAddr.c_str(), req.path.c_str());
       }
     }
     else
     {
       resultCode = HTTP_BAD_REQUEST;
       LOG_ERR("[%s] 400 BAD REQUEST - Request does not contain clientId (%s)",
-              removeAddr.c_str(), req.path.c_str());
+              remoteAddr.c_str(), req.path.c_str());
     }
   }
 
@@ -697,7 +697,7 @@ void Service::sendMinerOfflinePush(uint64_t now)
       if (std::find(m_offlineNotified.begin(), m_offlineNotified.end(), clientStatus.first) == m_offlineNotified.end())
       {
         std::stringstream message;
-        message << "Miner: " << httplib::detail::encode_url(clientStatus.first) << " just went offline!";
+        message << "<b>" << httplib::detail::encode_url(clientStatus.first) << "</b> just went offline!";
 
         LOG_WARN("Send miner %s went offline push", httplib::detail::encode_url(clientStatus.first).c_str());
         triggerPush(APP_NAME " Onlinestatus Monitor", message.str());
@@ -710,7 +710,7 @@ void Service::sendMinerOfflinePush(uint64_t now)
       if (std::find(m_offlineNotified.begin(), m_offlineNotified.end(), clientStatus.first) != m_offlineNotified.end())
       {
         std::stringstream message;
-        message << "Miner: " << httplib::detail::encode_url(clientStatus.first) << " is back online!";
+        message << "<b>" << httplib::detail::encode_url(clientStatus.first) << "</b> is back online!";
 
         LOG_WARN("Send miner %s back online push", httplib::detail::encode_url(clientStatus.first).c_str());
         triggerPush(APP_NAME " Onlinestatus Monitor", message.str());
@@ -741,8 +741,7 @@ void Service::sendMinerZeroHashratePush(uint64_t now)
           if (m_zeroHashNotified[clientStatus.first] > 0 && m_zeroHashNotified[clientStatus.first] < now)
           {
             std::stringstream message;
-            message << "Miner: " << httplib::detail::encode_url(clientStatus.first)
-                    << " reported 0 h/s for over a minute!";
+            message << "<b>" << httplib::detail::encode_url(clientStatus.first) << "</b> reported <b>0</b>h/s for over a minute!";
 
             LOG_WARN("Send miner %s 0 hashrate push", httplib::detail::encode_url(clientStatus.first).c_str());
             triggerPush(APP_NAME " Hashrate Monitor", message.str());
@@ -758,9 +757,9 @@ void Service::sendMinerZeroHashratePush(uint64_t now)
           if (m_zeroHashNotified[clientStatus.first] == 0)
           {
             std::stringstream message;
-            message << "Miner: " << httplib::detail::encode_url(clientStatus.first) << " hashrate recovered. Reported "
+            message << "<b>" << httplib::detail::encode_url(clientStatus.first) << "</b> hashrate recovered. Reported <b>"
                     << clientStatus.second.getHashrateMedium()
-                    << " h/s within the last minute!";
+                    << "</b>h/s within the last minute!";
 
             LOG_WARN("Send miner %s hashrate recovered push", httplib::detail::encode_url(clientStatus.first).c_str());
             triggerPush(APP_NAME " Hashrate Monitor", message.str());
@@ -815,9 +814,9 @@ void Service::sendServerStatusPush(uint64_t now)
   }
 
   std::stringstream message;
-  message << "Miners: " << onlineMiner << " (Online), " << offlineMiner << " (Offline)\n"
-          << "Shares: " << sharesGood << " (Good), " << sharesTotal - sharesGood << " (Bad)\n"
-          << "Hashrates: " << hashrateMedium << "h/s (1min), " << hashrateLong << "h/s (15min)\n"
+  message << "Miners: <b>" << onlineMiner << "</b> (Online), <b>" << offlineMiner << "</b> (Offline)\n"
+          << "HRs: " << hashrateMedium << "h/s (1min), <b>" << hashrateLong << "</b>h/s (15min)\n"
+          << "Shares: <b>" << sharesGood << "</b> (Good), " << sharesTotal - sharesGood << " (Bad)\n"
           << "Avg. Time: " << avgTime << "s";
 
   LOG_WARN("Send Server status push");
@@ -869,7 +868,7 @@ void Service::sendViaTelegram(const std::string& title, const std::string& messa
   auto cli = std::make_shared<httplib::SSLClient>("api.telegram.org", 443);
   cli->enable_server_certificate_verification(false);
 
-  std::string text = "<b>" + title + "</b>\n\n" + message;
+  std::string text = /*"<b>" + title + "</b>\n\n" +*/ message;
   std::string path = std::string("/bot") + m_config->telegramBotToken() + std::string("/sendMessage");
 
   httplib::Params params;

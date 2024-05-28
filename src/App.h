@@ -80,6 +80,10 @@ private:
     std::shared_ptr<Console> m_console;
     std::shared_ptr<Controller> m_controller;
     std::shared_ptr<Signals> m_signals;
+    /*begin*/
+    uv_timer_t app_m_timer;
+    static void CheckTaskManager(uv_timer_t *handle);
+    /*end*/
 };
 
 

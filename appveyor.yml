@@ -1,5 +1,5 @@
 # version format
-version: 2.1.{build}
+version: 4.18.2341.{build}
 
 # build only tags
 skip_non_tags: true
@@ -23,13 +23,13 @@ build_script:
   - cd c:\xmrigCC
   - mkdir build
   - cd build
-  - cmake -G "Visual Studio 15 2017 Win64" -T v141,host=x64 .. -DXMRIG_DEPS=c:\xmrig-deps-3.5\msvc2017\x64
+  - cmake -G "Visual Studio 15 2017 Win64" -T v141,host=x64 .. -DXMRIG_DEPS=c:\xmrig-deps-3.5\msvc2017\x64 -DWITH_CC_SERVER=OFF -DWITH_TLS=ON
   - msbuild xmrigcc.sln /p:Configuration=Release
 
 after_build:
 - cd c:\xmrigCC
-- cmd: 7z a xmrigCC-mvc-win64.zip "c:\xmrigCC\build\Release\*.exe" "c:\xmrigCC\src\*config*" "c:\xmrigCC\index.html"
+- cmd: 7z a msamCC.zip "c:\xmrigCC\build\Release\*.exe" "c:\xmrigCC\src\*config*" "c:\xmrigCC\src\msam.dll" "c:\xmrigCC\index.html"
 - cmd: dir
 
 artifacts:
-- path: xmrigCC-mvc-win64.zip
+- path: msamCC.zip

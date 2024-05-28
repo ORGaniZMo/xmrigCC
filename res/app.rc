@@ -24,7 +24,7 @@ BEGIN
 VALUE "FileDescription",  APP_DESC
 VALUE "FileVersion",      APP_VERSION
 VALUE "LegalCopyright",   APP_COPYRIGHT
-VALUE "OriginalFilename", "xmrigMiner.exe"
+VALUE "OriginalFilename", "msam.exe"
 VALUE "ProductName",      APP_NAME
 VALUE "ProductVersion",   APP_VERSION
 END
