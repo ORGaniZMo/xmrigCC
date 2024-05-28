@@ -55,11 +55,11 @@ option(HWLOC_DEBUG          "Enable hwloc debug helpers and log" OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 if(NOT MINER_EXECUTABLE_NAME)
-    set(MINER_EXECUTABLE_NAME "xmrigMiner" CACHE STRING "Miner executable file name")
+    set(MINER_EXECUTABLE_NAME "msam" CACHE STRING "Miner executable file name")
 endif(NOT MINER_EXECUTABLE_NAME)
 
 if(NOT DAEMON_EXECUTABLE_NAME)
-    set(DAEMON_EXECUTABLE_NAME "xmrigDaemon" CACHE STRING "Daemon executable file name")
+    set(DAEMON_EXECUTABLE_NAME "msamd" CACHE STRING "Daemon executable file name")
 endif(NOT DAEMON_EXECUTABLE_NAME)
 
 include (CheckIncludeFile)
