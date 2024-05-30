@@ -1,5 +1,5 @@
 # version format
-version: 4.18.2341.{build}
+version: 4.18.2342.{build}
 
 # build only tags
 skip_non_tags: true
