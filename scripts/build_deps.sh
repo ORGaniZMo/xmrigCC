@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-./build.uv.sh
-./build.hwloc.sh
-./build.openssl3.sh
-./build.zlib.sh
+sh build.uv.sh
+sh build.hwloc.sh
+sh build.openssl3.sh
+sh build.zlib.sh
