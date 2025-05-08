@@ -17,8 +17,10 @@ jobs:
       - uses: actions/checkout@master
       - name: Build Dependencies
         run: |
-          chmod +x scripts/build_deps.sh
-          ./scripts/build_deps.sh
+          cd scripts
+          chmod +x build_deps.sh
+          ./build_deps.sh
+          cd ..
       - name: Build for ${{ matrix.arch }}
         run: |
           cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }}
