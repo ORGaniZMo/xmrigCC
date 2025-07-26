@@ -199,7 +199,7 @@ else()
         )
 
     if (XMRIG_OS_ANDROID)
-        set(EXTRA_LIBS pthread rt dl log)
+        set(EXTRA_LIBS dl log)
     elseif (XMRIG_OS_LINUX)
         list(APPEND SOURCES_OS
             src/crypto/common/LinuxMemory.h
