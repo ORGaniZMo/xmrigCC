@@ -6,7 +6,6 @@ const fs = require('fs');
 const path = require('path');
 const { text2h, text2h_bundle, addIncludes } = require('./js/opencl');
 const { opencl_minify } = require('./js/opencl_minify');
-const cwd = process.cwd();
 
 
 function cn()
@@ -77,7 +76,6 @@ function kawpow()
     fs.writeFileSync('kawpow_dag_cl.h', text2h(kawpow_dag, 'xmrig', 'kawpow_dag_cl'));
 }
 
-
 function cn_gpu()
 {
     const cn_gpu = opencl_minify(addIncludes('cryptonight_gpu.cl', [ 'wolf-aes.cl', 'keccak.cl' ]));
@@ -87,18 +85,25 @@ function cn_gpu()
 }
 
 
-process.chdir(path.resolve('src/backend/opencl/cl/cn'));
+for (let i = 0; i < 2; i++) {
+    if (fs.existsSync('src/backend/opencl/cl/OclSource.h')) {
+        break;
+    }
 
+    process.chdir('..');
+}
+
+process.chdir(path.resolve('src/backend/opencl/cl'));
+
+const cwd = process.cwd();
+
+process.chdir(path.resolve(cwd, 'cn'));
 cn();
 cn_r();
 cn_gpu();
 
-process.chdir(cwd);
-process.chdir(path.resolve('src/backend/opencl/cl/rx'));
-
+process.chdir(path.resolve(cwd, 'rx'));
 rx();
 
-process.chdir(cwd);
-process.chdir(path.resolve('src/backend/opencl/cl/kawpow'));
-
+process.chdir(path.resolve(cwd, 'kawpow'));
 kawpow();

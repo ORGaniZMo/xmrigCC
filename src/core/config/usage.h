@@ -4,8 +4,8 @@
  * Copyright (c) 2014      Lucas Jones <https://github.com/lucasjones>
  * Copyright (c) 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
  * Copyright (c) 2016      Jay D Dee   <jayddee246@gmail.com>
- * Copyright (c) 2018-2024 SChernykh   <https://github.com/SChernykh>
- * Copyright (c) 2016-2024 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright (c) 2018-2025 SChernykh   <https://github.com/SChernykh>
+ * Copyright (c) 2016-2025 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -21,12 +21,9 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XMRIG_USAGE_H
-#define XMRIG_USAGE_H
-
+#pragma once
 
 #include "version.h"
-
 
 #include <string>
 
@@ -59,7 +56,8 @@ static inline const std::string &usage()
     u += "      --tls-fingerprint=HEX     pool TLS certificate fingerprint for strict certificate pinning\n";
 #   endif
 
-    u += "      --dns-ipv6                prefer IPv6 records from DNS responses\n";
+    u += "  -4, --ipv4                    resolve names to IPv4 addresses\n";
+    u += "  -6, --ipv6                    resolve names to IPv6 addresses\n";
     u += "      --dns-ttl=N               N seconds (default: 30) TTL for internal DNS cache\n";
 
 #   ifdef XMRIG_FEATURE_HTTP
@@ -159,6 +157,8 @@ static inline const std::string &usage()
     u += "      --cc-disabled                 disable CC Client feature\n";
     u += "      --cc-url=URL                  url of the CC Server\n";
     u += "      --cc-access-token=T           access token for CC Server\n";
+    u += "      --cc-http-proxy=URL           http_proxy url to use for communication with the CC Server\n";
+    u += "      --cc-socks-proxy=URL          socks_proxy url to use for communication with the CC Server\n";
     u += "      --cc-worker-id=ID             custom worker-id for CC Server\n";
     u += "      --cc-update-interval-s=N      status update interval in seconds (default: 10 min: 1)\n";
     u += "      --cc-use-tls                  enable tls encryption for CC communication\n";
@@ -208,6 +208,4 @@ static inline const std::string &usage()
 }
 
 
-} /* namespace xmrig */
-
-#endif /* XMRIG_USAGE_H */
+} // namespace xmrig
