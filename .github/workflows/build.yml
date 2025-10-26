@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2019  # Windows Server 2019 includes Visual Studio 2017
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
