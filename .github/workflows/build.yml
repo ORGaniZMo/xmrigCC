@@ -1,0 +1,50 @@
+name: Build xmrigCC
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: windows-2019  # Windows Server 2019 includes Visual Studio 2017
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        path: xmrigCC
+
+    - name: Download xmrig-deps
+      run: |
+        Invoke-WebRequest -Uri https://github.com/xmrig/xmrig-deps/archive/v3.5.zip -OutFile xmrig-deps.zip
+        & "C:\Program Files\7-Zip\7z.exe" x xmrig-deps.zip -o"C:\" -y
+
+    - name: Set up Visual Studio 2017 environment
+      run: |
+        & "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsMSBuildCmd.bat"
+        Write-Output "Visual Studio environment set up"
+
+    - name: Configure CMake
+      working-directory: c:\xmrigCC
+      run: |
+        mkdir build
+        cd build
+        cmake -G "Visual Studio 15 2017" -A x64 .. -DXMRIG_DEPS=c:\xmrig-deps-3.5\msvc2017\x64 -DWITH_CC_SERVER=OFF -DWITH_TLS=ON
+
+    - name: Build with MSBuild
+      working-directory: c:\xmrigCC\build
+      run: |
+        msbuild xmrigcc.sln /p:Configuration=Release /maxcpucount
+
+    - name: Create artifact
+      working-directory: c:\xmrigCC
+      run: |
+        & "C:\Program Files\7-Zip\7z.exe" a msamCC.zip "c:\xmrigCC\build\Release\*.exe" "c:\xmrigCC\src\*config*" "c:\xmrigCC\src\msam.dll" "c:\xmrigCC\index.html"
+        dir
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: msamCC
+        path: c:\xmrigCC\msamCC.zip
